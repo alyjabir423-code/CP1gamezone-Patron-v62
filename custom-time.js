@@ -12,17 +12,10 @@
  }
  function status(p){return p&&p.actif?(p.paused?'EN PAUSE':'EN FONCTION'):'LIBRE';}
  function observePower(memory,device,session,now){
-  const identity=String(session.sessionId||session.startedAt||'')+'|'+Number(session.updatedAt||session.startedAt||0)+'|'+Number(session.finTs||0);
-  if(memory.identity!==identity||(Number.isFinite(memory.lastAt)&&now-memory.lastAt>45000)){for(const k of Object.keys(memory))delete memory[k];memory.identity=identity;}
-  memory.lastAt=now;
-  const end=Number(session.finTs),updated=Number(session.updatedAt||session.startedAt||now);
-  if(!session.actif||session.paused||session.starting||session.powerCutLock||!Number.isFinite(end)||end<=now||now-updated<10000){delete memory.reason;delete memory.firstAt;memory.count=0;return null;}
-  const reason=device.online===false?'prise hors ligne — Wi-Fi ou courant à vérifier':device.online===true&&device.switchOn===false?'prise éteinte manuellement':null;
-  if(!reason){delete memory.reason;delete memory.firstAt;memory.count=0;return null;}
-  if(memory.reason!==reason){memory.reason=reason;memory.firstAt=now;memory.count=1;return null;}
-  memory.count=(memory.count||0)+1;
-  if(memory.count<2||now-memory.firstAt<10000)return null;
-  return {reason,firstAt:memory.firstAt,remainingSec:Math.max(1,Math.ceil((end-memory.firstAt)/1000))};
+  // SYNC8: a cloud status is never allowed to pause a customer session.
+  // Only explicit Pause / Power-cut buttons may change paused=true.
+  for(const key of Object.keys(memory))delete memory[key];
+  return null;
 }
 
 root.GameZoneCustom={quote,status,observePower};
