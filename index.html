@@ -239,7 +239,7 @@ button,.ni,.ctl-btn{touch-action:manipulation}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 
-<script src="./management.js?v=tuya11"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=tuya11"></script>
+<script src="./management.js?v=manuel16"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
 <script>
 /* GAMEZONE VOIX HOMME : réglage local à chaque appareil, aucune écriture Firebase. */
 (function(){
@@ -330,6 +330,36 @@ button,.ni,.ctl-btn{touch-action:manipulation}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
 </script>
+<style id="gz-rose-jaune">
+/* Palette rose et jaune : décoration uniquement, états des minuteurs conservés. */
+:root{--bg:#140e20;--surface:#21152e;--card:#2b1d39;--border:#604366;--ac:#f9a8d4;--acl:#f9a8d4;--neon:#f9a8d4;--gold:#fde047;--gl:#fef08a;--yellow:#fde047;--purple:#f9a8d4;--text:#fff8fc;--muted:#c8b5cc;--sub:#e4d5e8;--gz-rose:#f9a8d4;--gz-jaune:#fde047}
+body{background:radial-gradient(ellipse at top left,rgba(236,72,153,.09),transparent 60%),var(--bg)}
+.topbar,.bnav{background:var(--surface);border-color:#725176}
+.topbar{box-shadow:0 2px 16px rgba(236,72,153,.08)}
+.tlogo,.login-logo,.ctl-num,.pc-num{color:var(--gz-rose)}
+.tbadge{background:#473022;color:var(--gz-jaune);border:1px solid #8c6f31}
+.tclock{color:#fff4d4}
+.card,.login-card,.kpi-box,.st{background:var(--card);border-color:var(--border)}
+.ctl-card,.pc{background:linear-gradient(145deg,#32213f,#261b34);border-color:#765277;box-shadow:0 3px 14px rgba(0,0,0,.12)}
+.ctl-card.active,.pc.p-on{border-color:var(--green)}
+.ctl-card.paused,.pc.p-pause{border-color:var(--gz-jaune)}
+.pc.p-urg{border-color:var(--red)}
+.kpi-box::before,.st-p::before{background:linear-gradient(90deg,#f9a8d4,#fde047)}
+.sh h2,.mt{color:var(--gz-jaune)}
+.sl,.kpi-lbl,.ig label{color:#decce2}
+.ni.active{color:var(--gz-jaune);background:rgba(253,224,71,.06)}
+.ni{color:#c8b5cc}
+.btn-start,.ctl-start,.btn-login{background:var(--gz-rose);border-color:#fbcfe8;color:#301323}
+.btn-pause,.ctl-pause{background:#47391d;border:1px solid #a68d35;color:#fef08a}
+.btn-resume,.ctl-resume{background:#294d3d;border:1px solid #68b98e;color:#dcfce7}
+.btn-plus,.ctl-plus,.btn-edit{background:#42233d;border-color:#a16793;color:#fbcfe8}
+.btn-ok{background:var(--gz-jaune);color:#332a08}
+.ig input,.ig select{background:#1a1225;border-color:#765277;color:var(--text)}
+.ig input:focus,.ig select:focus{border-color:var(--gz-jaune);outline:2px solid rgba(253,224,71,.2);outline-offset:1px}
+button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline-offset:3px}
+#gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
+
+</style>
 </head>
 <body>
 
@@ -396,7 +426,7 @@ button,.ni,.ctl-btn{touch-action:manipulation}
     </div>
   </div>
 
-  <div id="gz-build-version" style="font-size:11px;padding:5px 12px;color:#86efac;background:#111827">TUYA11 · Pause après extinction confirmée</div>
+  <div id="gz-build-version" style="font-size:11px;padding:5px 12px;color:#86efac;background:#111827">MANUEL16 · Pause / Reprendre · PUSH14</div>
   <div class="scroll" id="scroll">
 
     <!-- ACCUEIL -->
@@ -1781,10 +1811,11 @@ async function ownerFinishExpired(i,p,a){
   if(ownerFinishLocks.has(key))return;
   ownerFinishLocks.add(key);
   try{
+    if(!(await gzConfirmFinish16(p,a)))return;
     // Clôture atomique de la séance AVANT tout appel à la prise Tuya.
     const result=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,p,i)||{};
-      if(!r.actif||(sid&&r.sessionId!==sid))return undefined;
+      if(!r.actif||(sid&&r.sessionId!==sid)||!r.poweredOffAt||r.powerCutSessionId!==sid)return undefined;
       const now=Date.now();
       if(r.paused){if(Number(r.pauseRemainingSec||0)>0)return undefined;}
       else if(!Number(r.finTs)||Number(r.finTs)>now)return undefined;
@@ -3136,14 +3167,16 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
       throw new Error('Utilise le site HTTPS, et sur iPhone installe GameZone sur l’écran d’accueil.');
     // iPhone Safari exige le clic utilisateur DIRECT pour la demande d'autorisation.
     const permission=await Notification.requestPermission();
-    if(permission!=='granted')throw new Error('Autorisation refusée par le téléphone.');
+    if(permission!=='granted')throw new Error(permission==='denied'?'Notifications bloquées pour ce site. Ouvre GameZone directement dans Chrome, puis paramètres du site > Notifications > Autoriser. Sur iPhone, ouvre GameZone depuis son icône sur l’écran d’accueil.':'Autorisation non accordée. Ouvre GameZone dans ton navigateur habituel puis clique à nouveau la cloche et autorise les notifications.');
     const token=await firebaseLoginToken();
     if(!token)throw new Error('Connecte-toi à la salle GameZone avant d’activer les notifications.');
     const keyReq=await fetch(WORKER_URL+'/?action=pushKey',{cache:'no-store'});
     const keyData=await keyReq.json();
     if(!keyData.success||!keyData.key)throw new Error('Le serveur de notifications n’est pas encore configuré.');
-    const reg=await navigator.serviceWorker.ready;
+    let readyTimer,reg;
+    try{reg=await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>{readyTimer=setTimeout(()=>reject(new Error('Service de notifications non prêt. Recharge le site dans ton navigateur habituel puis réessaie.')),12000);})]);}finally{clearTimeout(readyTimer);}
     let sub=await reg.pushManager.getSubscription();
+    if(sub&&sub.options.applicationServerKey){const old=new Uint8Array(sub.options.applicationServerKey),current=keyBytes(keyData.key);if(old.length!==current.length||old.some((b,i)=>b!==current[i])){await sub.unsubscribe();sub=null;}}
     if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(keyData.key)});
     const resp=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
       body:JSON.stringify({tenantKey:'GZ-07732',action:'subscribePush',subscription:sub.toJSON(),url:location.href.split(/[?#]/)[0],role:ROLE})});
@@ -3250,16 +3283,23 @@ async function ownerConfirmReduce(){
   if(!requests.has(key))requests.set(key,typeof crypto.randomUUID==='function'?crypto.randomUUID():('P'+Date.now()+'-'+Math.random().toString(36).slice(2,12)));
   const operationId=requests.get(key);inFlight.add(index);
   showToast('Extinction de '+post.num+' en cours… Le temps continue jusqu’à confirmation.');
-  const ctrl=new AbortController(),timeout=setTimeout(()=>ctrl.abort(),30000);
+  const ctrl=new AbortController();let timeout=setTimeout(()=>ctrl.abort(),30000);
   try{
     const token=gerant?await ensureFirebaseToken():await firebase.auth().currentUser.getIdToken();
-    const response=await fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action:'pauseConfirmed',posteNum:post.num,sessionId:state.sessionId,operationId,retryOnly}),signal:ctrl.signal});
-    const result=await response.json();
-    if(!response.ok||!result.success||!result.powerOffConfirmed)throw Error(result.error||'Extinction non confirmée : pause non validée.');
+    const sendPause=offlineConfirmed=>fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action:'pauseConfirmed',posteNum:post.num,sessionId:state.sessionId,operationId,retryOnly,offlineConfirmed}),signal:ctrl.signal});
+    let response=await sendPause(false),result=await response.json();
+    if(result.offlinePauseAvailable&&!retryOnly){
+      clearTimeout(timeout);
+      if(!confirm(post.num+' : prise hors ligne. Confirme que la télévision est débranchée ou sans courant. Mettre le temps restant en pause ? L’application ne peut pas confirmer l’extinction. La reprise sera manuelle.'))return false;
+      timeout=setTimeout(()=>ctrl.abort(),30000);
+      response=await sendPause(true);result=await response.json();
+    }
+    if(!response.ok||!result.success||(!result.powerOffConfirmed&&!result.manualOffline))throw Error(result.error||'Extinction non confirmée : pause non validée.');
+    const pauseLabel=result.manualOffline?'Pause manuelle — prise hors ligne':'Pause après extinction confirmée';
     DB._cache.active_by_poste={...(DB._cache.active_by_poste||{}),[remotePostKey(post.num)]:result.state};
-    if(gerant){refreshFromRemote();if(!result.duplicate)addJournal('y',post.num+' — Pause après extinction confirmée',state.client||'Client','');gzSpeak(speechPosteName(post.num)+', télévision éteinte et temps en pause.');}
-    else{renderControl();if(!result.duplicate)ownerPersistActivity(post.num+' — Pause après extinction confirmée',state.client||'Client','',{poste:post.num,sessionId:state.sessionId,typeActivite:'pause'});ownerSpeak(ownerSpeechPosteName(post.num)+', télévision éteinte et temps en pause.');}
-    requests.delete(key);showToast('✅ '+post.num+' : prise OFF confirmée, temps en pause.');return true;
+    if(gerant){refreshFromRemote();if(!result.duplicate)addJournal('y',post.num+' — '+pauseLabel,state.client||'Client','');gzSpeak(speechPosteName(post.num)+(result.manualOffline?', temps en pause manuelle. Extinction non vérifiable.':', télévision éteinte et temps en pause.'));}
+    else{renderControl();if(!result.duplicate)ownerPersistActivity(post.num+' — '+pauseLabel,state.client||'Client','',{poste:post.num,sessionId:state.sessionId,typeActivite:'pause'});ownerSpeak(ownerSpeechPosteName(post.num)+(result.manualOffline?', temps en pause manuelle. Extinction non vérifiable.':', télévision éteinte et temps en pause.'));}
+    requests.delete(key);showToast('✅ '+post.num+(result.manualOffline?' : temps en pause manuelle, extinction non vérifiable.':' : prise OFF confirmée, temps en pause.'));return true;
   }catch(e){showToast(e.name==='AbortError'?'Confirmation non reçue : vérifie l’état synchronisé puis réessaie Pause.':String(e.message||e));return false;}
   finally{clearTimeout(timeout);inFlight.delete(index);if(gerant&&fbForcePoll)fbForcePoll();}
  };
@@ -3283,8 +3323,31 @@ async function ownerConfirmReduce(){
    output.textContent=result.devices.map(d=>'Poste '+d.poste+' — '+d.devid+'\n'+(d.readable?('En ligne : '+(d.online===true?'oui':d.online===false?'non':'inconnu')+' ; relais : '+(d.switchCode||'non identifié')+' ; état : '+(d.switchOn===true?'ON':d.switchOn===false?'OFF':'inconnu')+(d.onlineError?'\n'+d.onlineError:'')):d.error)).join('\n\n')+'\n\nCe contrôle ne coupe aucune prise. Vérifie aussi la correspondance physique dans Smart Life.';
   }catch(e){output.textContent=String(e.message||e);}finally{button.disabled=false;}
  };
- document.body.append(button);
+ const anchor=document.getElementById('gz-build-version');if(anchor)anchor.after(button);else document.body.append(button);
 })();
 </script>
+
+<script>
+// AUTO16: server confirms physical state before closing or resuming a session.
+(function(){
+ const gerant=false,attempts=new Map();
+ window.gzConfirmFinish16=async function(post,state){
+  const key=post.num+'|'+state.sessionId,now=Date.now();if(now-(attempts.get(key)||0)<10000)return false;attempts.set(key,now);
+  try{await request('finishConfirmed',post,state);return true;}catch(e){showToast('⚠️ '+post.num+' : temps terminé, extinction non confirmée. '+e.message);return false;}
+ };
+ async function request(action,post,state){
+  const token=gerant?await ensureFirebaseToken():await firebase.auth().currentUser.getIdToken();
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);
+  try{const r=await fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action,posteNum:post.num,sessionId:state.sessionId}),signal:ctrl.signal}),v=await r.json();if(!r.ok||!v.success||!(action==='finishConfirmed'?v.powerOffConfirmed:v.powerOnConfirmed))throw Error(v.error||'Commande non confirmée');return v;}finally{clearTimeout(timer);}
+ }
+ const resuming=new Set();
+ async function resume(index){
+  if(resuming.has(index))return;const posts=gerant?postes:(DB.get('postes')||[]),post=posts[index],st=gerant?post:(post&&activeForPoste(post,index));if(!st?.actif||!st.paused)return;
+  resuming.add(index);try{const v=await request('resumeConfirmed',post,st);DB._cache.active_by_poste={...(DB._cache.active_by_poste||{}),[remotePostKey(post.num)]:v.state};if(gerant){refreshFromRemote();gzSpeak(speechPosteName(post.num)+', temps repris.');}else{renderControl();ownerSpeak(ownerSpeechPosteName(post.num)+', temps repris.');}showToast('▶ '+post.num+' : reprise confirmée');}catch(e){showToast('⚠️ '+e.message);}finally{resuming.delete(index);}
+ }
+ if(gerant)reprendrePoste=resume;else ownerResume=resume;
+})();
+</script>
+
 </body>
 </html>

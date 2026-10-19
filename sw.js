@@ -1,6 +1,6 @@
 // Historique prive Patron / partage Gerant — version 27
-const CACHE='gamezone-bah-v65-20261016-tuya11-patron-serveur-push';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./management.js?v=tuya11','./custom-time.js?v=tuya11'];
+const CACHE='gamezone-bah-v65-20261016-manuel16-rose-jaune-patron-serveur-push';
+const ASSETS=['./','./index.html','./manifest.webmanifest','./management.js?v=manuel16','./custom-time.js?v=manuel16'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });
