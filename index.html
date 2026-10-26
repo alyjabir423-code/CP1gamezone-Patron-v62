@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="GZ Patron">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>GameZone Bah V65 Gym4 — Patron</title>
+<title>GameZone Bah V63 — Patron</title>
 <style>
 /* Police système : la page Patron s'affiche même si Google Fonts est inaccessible. */
 :root{--bg:#0a0f1e;--surface:#0f1628;--card:#162040;--border:#1e2d52;--gold:#f59e0b;--gl:#fcd34d;--green:#10b981;--red:#ef4444;--blue:#6366f1;--purple:#8b5cf6;--text:#f0f4ff;--muted:#64748b;--sub:#94a3b8;--fd:'Rajdhani',sans-serif;--fb:'Inter',sans-serif;--r:14px;--rs:9px}
@@ -239,7 +239,6 @@ button,.ni,.ctl-btn{touch-action:manipulation}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 
-<script src="./management.js?v=manuel16"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
 <script>
 /* GAMEZONE VOIX HOMME : réglage local à chaque appareil, aucune écriture Firebase. */
 (function(){
@@ -325,41 +324,11 @@ button,.ni,.ctl-btn{touch-action:manipulation}
     b.title='Notifications autorisées sur ce téléphone';
    }catch(err){alert('Impossible d’activer les notifications : '+err.message);}
   };
-  const clock=bar.querySelector('.tclock');if(clock&&clock.parentElement)clock.parentElement.insertBefore(b,clock);else bar.appendChild(b);
+  const clock=bar.querySelector('.tclock');if(clock)bar.insertBefore(b,clock);else bar.appendChild(b);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
 </script>
-<style id="gz-rose-jaune">
-/* Palette rose et jaune : décoration uniquement, états des minuteurs conservés. */
-:root{--bg:#140e20;--surface:#21152e;--card:#2b1d39;--border:#604366;--ac:#f9a8d4;--acl:#f9a8d4;--neon:#f9a8d4;--gold:#fde047;--gl:#fef08a;--yellow:#fde047;--purple:#f9a8d4;--text:#fff8fc;--muted:#c8b5cc;--sub:#e4d5e8;--gz-rose:#f9a8d4;--gz-jaune:#fde047}
-body{background:radial-gradient(ellipse at top left,rgba(236,72,153,.09),transparent 60%),var(--bg)}
-.topbar,.bnav{background:var(--surface);border-color:#725176}
-.topbar{box-shadow:0 2px 16px rgba(236,72,153,.08)}
-.tlogo,.login-logo,.ctl-num,.pc-num{color:var(--gz-rose)}
-.tbadge{background:#473022;color:var(--gz-jaune);border:1px solid #8c6f31}
-.tclock{color:#fff4d4}
-.card,.login-card,.kpi-box,.st{background:var(--card);border-color:var(--border)}
-.ctl-card,.pc{background:linear-gradient(145deg,#32213f,#261b34);border-color:#765277;box-shadow:0 3px 14px rgba(0,0,0,.12)}
-.ctl-card.active,.pc.p-on{border-color:var(--green)}
-.ctl-card.paused,.pc.p-pause{border-color:var(--gz-jaune)}
-.pc.p-urg{border-color:var(--red)}
-.kpi-box::before,.st-p::before{background:linear-gradient(90deg,#f9a8d4,#fde047)}
-.sh h2,.mt{color:var(--gz-jaune)}
-.sl,.kpi-lbl,.ig label{color:#decce2}
-.ni.active{color:var(--gz-jaune);background:rgba(253,224,71,.06)}
-.ni{color:#c8b5cc}
-.btn-start,.ctl-start,.btn-login{background:var(--gz-rose);border-color:#fbcfe8;color:#301323}
-.btn-pause,.ctl-pause{background:#47391d;border:1px solid #a68d35;color:#fef08a}
-.btn-resume,.ctl-resume{background:#294d3d;border:1px solid #68b98e;color:#dcfce7}
-.btn-plus,.ctl-plus,.btn-edit{background:#42233d;border-color:#a16793;color:#fbcfe8}
-.btn-ok{background:var(--gz-jaune);color:#332a08}
-.ig input,.ig select{background:#1a1225;border-color:#765277;color:var(--text)}
-.ig input:focus,.ig select:focus{border-color:var(--gz-jaune);outline:2px solid rgba(253,224,71,.2);outline-offset:1px}
-button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline-offset:3px}
-#gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
-
-</style>
 </head>
 <body>
 
@@ -421,12 +390,11 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <span class="tbadge">Patron</span>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <button type="button" id="gz-notify-btn" onclick="alert('Chargement des notifications : attends la fin du chargement puis réessaie.')" title="Activer les notifications GameZone" aria-label="Activer les notifications GameZone" style="flex-shrink:0;background:#1e293b;color:white;border:1px solid #64748b;border-radius:8px;padding:7px;min-width:38px;cursor:pointer">🔔</button><div class="tclock" id="clock">00:00</div>
+      <div class="tclock" id="clock">00:00</div>
       <button class="btn-out" onclick="doLogout()">⏏</button>
     </div>
   </div>
 
-  <div id="gz-build-version" style="font-size:11px;padding:5px 12px;color:#86efac;background:#111827">MANUEL16 · Pause / Reprendre · PUSH14</div>
   <div class="scroll" id="scroll">
 
     <!-- ACCUEIL -->
@@ -492,9 +460,8 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <!-- PATRON UNIQUEMENT : corrections manuelles ; jamais affichees dans l’application Gerant. -->
       <div class="owner-report-card" id="patron-revenue-correction" style="padding:13px 14px;border:1px solid rgba(250,204,21,.42);margin-top:12px">
         <div style="font-size:14px;font-weight:700;color:#facc15">🔒 Correction de recette — Patron uniquement</div>
-        <div style="font-size:11px;color:var(--sub);line-height:1.6;margin:5px 0 12px">Choisis le jour actuel ou une journée précédente enregistrée. Une correction ne crée ni faux client, ni nouvelle séance et ne touche pas aux prises. Motif obligatoire. Le journal privé est réservé au Patron.</div>
+        <div style="font-size:11px;color:var(--sub);line-height:1.6;margin:5px 0 12px">Uniquement pour les ventes du jour. Une correction ne crée ni faux client, ni nouvelle séance et ne touche pas aux prises. Motif obligatoire. Le journal privé est réservé au Patron.</div>
         <div id="patron-corr-live-total" style="color:#4ade80;font-size:12px;margin-bottom:10px">Recette du jour : chargement Firebase…</div>
-        <div class="ig"><label for="patron-corr-date">Journée à corriger (journée de gestion dès 07h)</label><input type="date" id="patron-corr-date" onchange="patronPopulateRevenuePostes()"></div>
         <div class="ig"><label for="patron-corr-poste">Poste concerné</label><select id="patron-corr-poste" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"></select></div>
         <div class="ig"><label for="patron-corr-sens">Opération</label><select id="patron-corr-sens" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"><option value="add">+ Ajouter une vente réelle oubliée</option><option value="subtract">− Retirer un montant saisi par erreur</option></select></div>
         <div class="ig"><label for="patron-corr-amount">Montant en F CFA (multiple de 100)</label><input id="patron-corr-amount" type="number" inputmode="numeric" min="100" max="100000" step="100" placeholder="Ex. 200" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"/></div>
@@ -582,7 +549,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
     <div class="mh"></div>
     <div class="mt" id="owner-start-title">Nouvelle session</div>
     <div class="ig"><label>Nom du client</label><input type="text" id="owner-client" placeholder="Ex: Koné Moussa" autocomplete="off"></div>
-    <div class="ig"><label>Durée</label><div class="dctl-grid" id="owner-start-durations"></div><div style="grid-column:1/-1;margin-top:10px"><label for="gz-custom-start">Minutes exactes à saisir (1 = 1 min, 5 = 5 min)</label><input id="gz-custom-start" type="number" min="1" max="1440" step="1" placeholder="Ex. 1, 5 ou 15" oninput="gzChooseCustom('start',this.value)" style="width:100%;box-sizing:border-box"><div id="gz-price-start" aria-live="polite" style="font-size:12px;margin-top:6px">Prix proportionnel, arrondi aux 10 F les plus proches (minimum 10 F).</div></div></div>
+    <div class="ig"><label>Durée</label><div class="dctl-grid" id="owner-start-durations"></div></div>
     <div class="ig"><label>Paiement</label><div class="pctl-grid" id="owner-start-payments"></div></div>
     <div class="ma"><button class="btn-cancel" onclick="closeModal('mo-owner-start')">Annuler</button><button class="btn-ok" onclick="ownerConfirmStart()">Activer ✓</button></div>
   </div>
@@ -593,7 +560,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
   <div class="ms">
     <div class="mh"></div>
     <div class="mt" id="owner-plus-title">Ajouter du temps</div>
-    <div class="ig"><label>Temps à ajouter</label><div class="dctl-grid" id="owner-plus-durations"></div><div style="grid-column:1/-1;margin-top:10px"><label for="gz-custom-plus">Minutes exactes à saisir (1 = 1 min, 5 = 5 min)</label><input id="gz-custom-plus" type="number" min="1" max="1440" step="1" placeholder="Ex. 1, 5 ou 15" oninput="gzChooseCustom('plus',this.value)" style="width:100%;box-sizing:border-box"><div id="gz-price-plus" aria-live="polite" style="font-size:12px;margin-top:6px">Prix proportionnel, arrondi aux 10 F les plus proches (minimum 10 F).</div></div></div>
+    <div class="ig"><label>Temps à ajouter</label><div class="dctl-grid" id="owner-plus-durations"></div></div>
     <div class="ig"><label>Paiement</label><div class="pctl-grid" id="owner-plus-payments"></div></div>
     <div class="ma"><button class="btn-cancel" onclick="closeModal('mo-owner-plus')">Annuler</button><button class="btn-ok" onclick="ownerConfirmPlus()">Ajouter le temps ✓</button></div>
   </div>
@@ -646,8 +613,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
   <div class="ms">
     <div class="mh"></div>
     <div class="mt" id="mo-poste-title">Nouveau poste</div>
-    <div class="ig"><label>Nom affiché de votre choix</label><input type="text" id="p-display-name" maxlength="48" placeholder="Ex. Salon VIP"></div>
-    <div class="ig"><label>Identifiant du poste (conservé après création)</label><input type="text" id="p-num" placeholder="Ex: P01"></div>
+    <div class="ig"><label>Numéro / Nom du poste</label><input type="text" id="p-num" placeholder="Ex: P01"></div>
     <div class="ig"><label>Type de console</label>
       <select id="p-type" onchange="gzToggleCustomConsole()">
         <option value="PS5">PS5</option>
@@ -893,7 +859,7 @@ function gzCloudTimerSync(poste, attempt=0){
       if(!token)throw Error('Jeton Firebase absent');
       const payload={tenantKey:currentTenantKey,action:poste==null?'syncAllTimers':'syncTimer'};
       if(poste!=null)payload.poste=String(poste);
-      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),25000);
       let resp;
       try {resp=await fetch(TUYA_WORKER_URL,{method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
@@ -902,6 +868,7 @@ function gzCloudTimerSync(poste, attempt=0){
       if(!resp.ok)throw Error('Worker alarm HTTP '+resp.status);
       const result=await resp.json().catch(()=>null);
       if(!result || result.success!==true || result.scheduler!=='durable-object' || !Number.isFinite(Number(result.scheduledAt)) )throw Error('Alarme serveur absente — déployer Worker v63');
+      if(result.relayConfirmed)showToast('✓ Minuteur local synchronisé avec le téléphone relais');
     }catch(e){
       console.warn('Minuterie serveur non synchronisée:',poste,e&&e.message);
       if(attempt<4)gzCloudTimerSync(poste,attempt+1);
@@ -1043,7 +1010,7 @@ function gzSharedPlugOccupant(root, poste, idx){
     const other=all[j];
     if(!other||j===idx||String(other.num||'')===String(poste.num||'')||String(other.devid||'').trim()!==id)continue;
     const st=rootReadActive(root,other,j)||{};
-    if(Number(st.pausePendingUntil)>Date.now()||st.actif||(st.starting&&Date.now()<Number(st.startingUntil||0))||(st.cleanup&&Date.now()<Number(st.cleanupUntil||0)))return other;
+    if(st.actif||(st.starting&&Date.now()<Number(st.startingUntil||0))||(st.cleanup&&Date.now()<Number(st.cleanupUntil||0)))return other;
   }
   return null;
 }
@@ -1144,7 +1111,7 @@ function ownerVoiceStartKey(sid){return 'gz_patron_voice_start_'+String(currentT
 function ownerVoiceFiveKey(sid,cycle){return 'gz_patron_voice_5_'+String(currentTenantKey||'')+'_'+String(sid||'')+'_'+String(Number(cycle)||0);}
 function ownerMarkExistingVoiceSessions(){const postes=DB.get('postes')||[];postes.forEach((p,i)=>{const a=activeForPoste(p,i)||{};if(a.actif&&a.sessionId)try{localStorage.setItem(ownerVoiceStartKey(a.sessionId),'1');}catch(e){}});}
 function ownerAnnounceStartOnce(sid,num,min,isBonus){if(!sid)return;const k=ownerVoiceStartKey(sid);try{if(localStorage.getItem(k)==='1')return;}catch(e){}const n=Math.max(1,Math.round(Number(min)||0));const ok=ownerSpeak((isBonus?'Bonus client fidèle. ':'')+ownerSpeechPosteName(num)+' est activé pour '+n+' minutes.');if(ok)try{localStorage.setItem(k,'1');}catch(e){}}
-function ownerAnnounceFiveOnce(p,a){if(!a||!a.sessionId)return;const k=ownerVoiceFiveKey(a.sessionId,a.bonusGrantedAt||0);try{if(localStorage.getItem(k)==='1')return;}catch(e){}const ok=ownerSpeak(GameZoneManagement.displayName(p)+', il reste '+Math.max(1,Math.ceil(remainingActive(a)/60))+' minutes avant l’extinction de la télévision.');if(ok)try{localStorage.setItem(k,'1');}catch(e){}}
+function ownerAnnounceFiveOnce(p,a){if(!a||!a.sessionId)return;const k=ownerVoiceFiveKey(a.sessionId,a.bonusGrantedAt||0);try{if(localStorage.getItem(k)==='1')return;}catch(e){}const ok=ownerSpeak(ownerSpeechPosteName(p.num)+', il reste cinq minutes avant l’extinction de la télévision.');if(ok)try{localStorage.setItem(k,'1');}catch(e){}}
 
 // V26 : journal de gestion du Patron séparé du journal partagé des séances.
 // Les actions privées ne sont pas copiées dans activity_daily et ne sont pas visibles par le Gérant.
@@ -1247,7 +1214,7 @@ async function ownerTuyaCommand(poste,turnOn){
     });
     const d=await r.json();
     if(!r.ok||!d.success){gzTuyaError=gzTuyaReason(r,d,'Commande');console.log('Tuya patron refusé:',d);return false;}
-    const confirmed=d.device?.online===true && d.device?.switchOn===turnOn;
+    const confirmed=await ownerVerifySwitch(poste,turnOn);
     if(!confirmed&&!gzTuyaError)gzTuyaError="Commande acceptée, état ON/OFF non confirmé";
     if(confirmed&&turnOn)ownerClearOff(poste);
     return confirmed;
@@ -1277,10 +1244,10 @@ function renderOwnerPayments(containerId,selectedVar){
 }
 function ownerChoosePay(containerId,kind,id,el){document.querySelectorAll('#'+containerId+' .pctl-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');if(kind==='start')ownerSelPay=id;else ownerPlusPay=id;}
 function renderOwnerDurations(containerId,post,kind){
-  const el=document.getElementById(containerId);if(!el)return;gzCustomReset(kind);const arr=ownerTarifs(post);const selected=kind==='start'?ownerSelMin:ownerPlusMin;
+  const el=document.getElementById(containerId);if(!el)return;const arr=ownerTarifs(post);const selected=kind==='start'?ownerSelMin:ownerPlusMin;
   el.innerHTML=arr.length?arr.map(t=>`<div class="dctl-opt ${Number(t.min)===Number(selected)?'sel':''}" onclick="ownerChooseDuration('${containerId}','${kind}',${Number(t.min)},this)"><div class="dctl-min">${esc(t.lbl||((t.min||0)+' min'))}</div><div class="dctl-price">${money(t.prix).toLocaleString('fr-FR')} F</div></div>`).join(''):'<div style="grid-column:1/-1;font-size:12px;color:var(--muted)">Aucun tarif configuré pour '+esc(post.type)+'</div>';
 }
-function ownerChooseDuration(containerId,kind,min,el){gzCustomReset(kind);document.querySelectorAll('#'+containerId+' .dctl-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');if(kind==='start')ownerSelMin=min;else ownerPlusMin=min;gzChoosePreset(kind,ownerTarifs((DB.get('postes')||[])[ownerPosteIdx]),min);}
+function ownerChooseDuration(containerId,kind,min,el){document.querySelectorAll('#'+containerId+' .dctl-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');if(kind==='start')ownerSelMin=min;else ownerPlusMin=min;}
 
 function ownerPosteOrderValue(p,idx){const m=String((p&&p.num)||'').match(/\d+/);return m?Number(m[0]):1000+Number(idx||0);}
 function ownerOrderedPostesEntries(list){return (list||[]).map((p,i)=>({p,i})).sort((a,b)=>ownerPosteOrderValue(a.p,a.i)-ownerPosteOrderValue(b.p,b.i));}
@@ -1310,15 +1277,15 @@ function renderControl(){
     const rest=remainingActive(a),timer=a.actif?fmtRest(rest):'—:——',amount=money(a.montantSession),cls=a.paused?'paused':(a.actif?'active':'');
     const expired=a.actif&&rest===0&&((!a.paused&&Number(a.finTs)>0)||(a.paused&&Number(a.pauseRemainingSec)<=0));
     const progressColor=rest<=300?'#ef4444':rest<=600?'#facc15':'#22c55e';
-    const badge=expired?'FIN EN COURS':a.paused?'PAUSE':(a.actif?'EN FONCTION':'LIBRE');
+    const badge=expired?'FIN EN COURS':a.paused?'PAUSE':(a.actif?'EN JEU':'LIBRE');
     const total=Math.max(0,Number(a.tempsTotal)||0);const pct=a.actif&&total>0?Math.max(0,Math.min(100,(rest/total)*100)):0;
     // OFF TV est volontairement réservé à l'interface Patron.
     // Il termine la session à 00:00 SANS retirer le montant déjà encaissé.
     const activeButtons=a.paused
-      ? `<button class="ctl-btn ctl-resume" onclick="ownerResume(${i})">▶ REPRENDRE</button><button class="ctl-btn ctl-off" onclick="gzRetryPausedPower(${i})">${a.pausePowerOffConfirmed?'OFF CONFIRMÉ':'RÉESSAYER OFF'}</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`
-      : `<button class="ctl-btn ctl-pause" onclick="ownerPause(${i})">⏸ PAUSE</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`;
+      ? `<button class="ctl-btn ctl-resume" onclick="ownerResume(${i})">▶ REPRENDRE</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`
+      : `<button class="ctl-btn ctl-pause" onclick="ownerPause(${i})">⏸ PAUSE</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`;
     return `<div class="ctl-card ${cls}">
-      <div class="ctl-head"><div><div class="ctl-num">${esc(GameZoneManagement.displayName(p))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
+      <div class="ctl-head"><div><div class="ctl-num">${esc(ownerSpeechPosteName(p.num))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
       <div class="ctl-timer-row"><div class="ctl-timer ${a.paused?'pause':(a.actif?'on':'free')}">${timer}</div>${a.actif?`<div class="ctl-money">${amount.toLocaleString('fr-FR')} F</div>`:''}</div>
       <div class="ctl-progress"><div class="ctl-progress-bar" style="width:${pct}%;background:${progressColor}"></div></div>
       <div class="ctl-client">${a.actif?esc(a.client||'Client'):'Disponible'}</div>
@@ -1336,7 +1303,7 @@ function ownerRenderBonusCard(postes){
   const details=actifs.length?actifs.map(x=>{
     const btn=x.a.paused?'▶ REPRENDRE':'⏸ PAUSE';
     const click=x.a.paused?'ownerResume':'ownerPause';
-    return '<div class="bonus-master-live"><b>'+esc(GameZoneManagement.displayName(x.p))+'</b> · '+esc(x.a.client||'Client')+' · 🎁 BONUS +'+ownerOfferedMinutes(x.a)+' min gratuites · <strong>bonus restant '+fmtRest(ownerBonusLeftSeconds(x.a))+'</strong> · temps total poste '+fmtRest(remainingActive(x.a))+
+    return '<div class="bonus-master-live"><b>'+esc(ownerSpeechPosteName(x.p.num))+'</b> · '+esc(x.a.client||'Client')+' · 🎁 BONUS +'+ownerOfferedMinutes(x.a)+' min gratuites · <strong>bonus restant '+fmtRest(ownerBonusLeftSeconds(x.a))+'</strong> · temps total poste '+fmtRest(remainingActive(x.a))+
       '<div class="gz-bonus-commands"><button class="ctl-btn ctl-pause" onclick="'+click+'('+x.i+')">'+btn+'</button>'+
       '<button class="ctl-btn ctl-plus" onclick="ownerOpenBonusFor('+x.i+')">＋TEMPS BONUS</button>'+
       '<button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel('+x.i+')">ANNULER SESSION</button>'+
@@ -1348,7 +1315,7 @@ function ownerRenderBonusCard(postes){
   const bonusRest=actifs.length?Math.min(...actifs.map(x=>ownerBonusLeftSeconds(x.a))):0;
   const bonusTone=actifs.length?gzProgressTone(bonusRest,actifs.every(x=>x.a.paused)):'';
   const bonusBar='<div class="gz-yellow-meta">⏱ BONUS GRATUIT RESTANT — '+(actifs.length?fmtRest(bonusLeft):'Aucun bonus actif')+'</div><div class="gz-yellow-progress"><div class="gz-yellow-fill '+bonusTone+'" style="width:'+bonusPct.toFixed(2)+'%"></div></div>';
-  return '<div class="ctl-card bonus-master"><div class="bonus-master-title">🎁 CASE 7 — BONUS CLIENT FIDÈLE</div><div class="bonus-master-note">Automatique dès 1 000 F. +TEMPS BONUS ajoute gratuitement des minutes (1 min possible). ANNULER SESSION annule la séance entière et peut retirer la recette : confirmation requise. OFF TV termine sans retirer la recette.</div>'+bonusBar+details+gzOccupancyHtml((DB.get('postes')||[]).map((p,i)=>Object.assign({},p,activeForPoste(p,i)||{})))+'<button class="bonus-owner-btn" onclick="ownerOpenBonus()">🎁 OFFRIR / AJOUTER UN BONUS</button></div>';
+  return '<div class="ctl-card bonus-master"><div class="bonus-master-title">🎁 CASE 7 — BONUS CLIENT FIDÈLE</div><div class="bonus-master-note">Automatique dès 1 000 F. +TEMPS BONUS ajoute gratuitement des minutes (1 min possible). ANNULER SESSION annule la séance entière et peut retirer la recette : confirmation requise. OFF TV termine sans retirer la recette.</div>'+bonusBar+details+'<button class="bonus-owner-btn" onclick="ownerOpenBonus()">🎁 OFFRIR / AJOUTER UN BONUS</button></div>';
 }
 function ownerOpenBonusFor(idx){
   ownerOpenBonus();
@@ -1358,7 +1325,7 @@ function ownerOpenBonusFor(idx){
 function ownerChooseBonusDuration(min,el){ownerBonusMin=Math.max(1,Number(min)||30);document.querySelectorAll('#owner-bonus-durations .dctl-opt').forEach(x=>x.classList.remove('sel'));if(el)el.classList.add('sel');const custom=document.getElementById('owner-bonus-custom');if(custom)custom.value='';ownerBonusPostChanged();}
 function ownerOpenBonus(){
   const postes=DB.get('postes')||[];if(!postes.length)return showToast('⚠️ Aucun poste configuré');ownerBonusMin=30;
-  const sel=document.getElementById('owner-bonus-poste');sel.innerHTML=ownerOrderedPostesEntries(postes).map(({p,i})=>{const a=activeForPoste(p,i)||{};return '<option value="'+i+'">'+esc(GameZoneManagement.displayName(p))+' — '+(a.actif?('ACTIF · '+esc(a.client||'Client')):'LIBRE')+'</option>';}).join('');
+  const sel=document.getElementById('owner-bonus-poste');sel.innerHTML=ownerOrderedPostesEntries(postes).map(({p,i})=>{const a=activeForPoste(p,i)||{};return '<option value="'+i+'">'+esc(ownerSpeechPosteName(p.num))+' — '+(a.actif?('ACTIF · '+esc(a.client||'Client')):'LIBRE')+'</option>';}).join('');
   document.getElementById('owner-bonus-client').value='';document.querySelectorAll('#owner-bonus-durations .dctl-opt').forEach((x,i)=>x.classList.toggle('sel',i===0));ownerBonusPostChanged();openModal('mo-owner-bonus');
 }
 function ownerBonusPostChanged(){
@@ -1372,10 +1339,10 @@ async function ownerConfirmBonus(){
   const local=activeForPoste(p,idx)||{},min=Math.floor(Number(ownerBonusMin)||30),now=Date.now();if(min<1||min>720)return showToast('⚠️ Durée bonus entre 1 et 720 minutes');let nom=(document.getElementById('owner-bonus-client').value||'').trim();if(local.actif)nom=local.client||nom;if(!nom)return showToast('⚠️ Entrez le nom du client');
   try{
     if(!local.actif&&p.devid){const on=await ownerTuyaCommand(p,true);if(!on)return showToast('⚠️ TV non confirmée : bonus NON activé');}
-    let startedNew=!local.actif,sid=startedNew?('bonus-'+String(p.num)+'-'+now+'-'+Math.random().toString(36).slice(2,8)):local.sessionId,finalTs=0;
+    let sid=local.sessionId||('bonus-'+String(p.num)+'-'+now),startedNew=!local.actif,finalTs=0;
     const res=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,Object.assign({},p,local),idx)||{};
-      if(startedNew){if(Number(r.pausePendingUntil)>Date.now()||r.actif || (r.starting&&Date.now()<Number(r.startingUntil||0)))return;const st={actif:true,client:nom,finTs:now+min*60000,tempsTotal:min*60,dureeMin:min,paused:false,pauseRemainingSec:0,montantSession:0,montantJourSession:0,paiementsSession:{},sessionId:sid,startedAt:now,bonus:true,bonusOnly:true,bonusSource:'patron',bonusDurationMin:min,bonusMinutesAdded:min,bonusGrantedAt:now,updatedAt:now};rootWriteActive(root,p,idx,st);finalTs=st.finTs;}
+      if(startedNew){if(r.actif || (r.starting&&Date.now()<Number(r.startingUntil||0)))return;const st={actif:true,client:nom,finTs:now+min*60000,tempsTotal:min*60,dureeMin:min,paused:false,pauseRemainingSec:0,montantSession:0,montantJourSession:0,paiementsSession:{},sessionId:sid,startedAt:now,bonus:true,bonusOnly:true,bonusSource:'patron',bonusDurationMin:min,bonusMinutesAdded:min,bonusGrantedAt:now,updatedAt:now};rootWriteActive(root,p,idx,st);finalTs=st.finTs;}
       else{if(!r.actif||(local.sessionId&&r.sessionId&&r.sessionId!==local.sessionId))return;const u=Object.assign({},r);if(u.paused)u.pauseRemainingSec=(Number(u.pauseRemainingSec)||0)+min*60;else u.finTs=(Number(u.finTs)||Date.now())+min*60000;u.tempsTotal=(Number(u.tempsTotal)||0)+min*60;u.dureeMin=(Number(u.dureeMin)||0)+min;u.bonus=true;u.bonusOnly=!!u.bonusOnly;u.bonusSource='patron';u.bonusDurationMin=min;u.bonusMinutesAdded=(Number(u.bonusMinutesAdded)||0)+min;u.bonusGrantedAt=now;u.updatedAt=now;finalTs=u.paused?0:u.finTs;rootWriteActive(root,Object.assign({},p,local),idx,u);sid=u.sessionId||sid;}
       return root;
     },undefined,false);
@@ -1428,7 +1395,7 @@ function ownerDayActivities(dayKey){
 function ownerRenderJournal(){
   const list=document.getElementById('owner-journal-list');if(!list)return;const postes=DB.get('postes')||[];const active=postes.map((p,i)=>({p,a:activeForPoste(p,i)||{}})).filter(x=>x.a.actif);const events=ownerDayActivities(businessDateKey(new Date()));
   if(!active.length&&!events.length){list.innerHTML='<div class="owner-je"><div class="owner-jdetail">Aucune activité pour cette journée.</div></div>';return;}
-  const ah=active.map(x=>{const a=x.a,p=x.p,rest=remainingActive(a),debut=a.startedAt?ownerFmtClock(a.startedAt):'—',fin=a.paused?'EN PAUSE':(a.finTs?ownerFmtClock(a.finTs):'—');return `<div class="owner-je ${a.paused?'owner-jpause':'owner-jactive'}"><span class="owner-jtime">${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span><span class="owner-jdot ${a.paused?'y':'g'}"></span><div class="owner-jbody"><div class="owner-jmain">${esc(GameZoneManagement.displayName(p))} — ${a.paused?'PAUSE':'ACTIF'}</div><div class="owner-jdetail">${esc(a.client||'—')} · Début ${debut} · Fin prévue ${fin} · Temps activé ${fmtRest(Number(a.tempsTotal)||0)}</div><div class="owner-jlive">Temps restant : ${fmtRest(rest)}</div></div><span class="owner-jamount">${money(a.montantSession).toLocaleString('fr-FR')} F</span></div>`;}).join('');
+  const ah=active.map(x=>{const a=x.a,p=x.p,rest=remainingActive(a),debut=a.startedAt?ownerFmtClock(a.startedAt):'—',fin=a.paused?'EN PAUSE':(a.finTs?ownerFmtClock(a.finTs):'—');return `<div class="owner-je ${a.paused?'owner-jpause':'owner-jactive'}"><span class="owner-jtime">${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span><span class="owner-jdot ${a.paused?'y':'g'}"></span><div class="owner-jbody"><div class="owner-jmain">${esc(p.num)} — ${a.paused?'PAUSE':'ACTIF'}</div><div class="owner-jdetail">${esc(a.client||'—')} · Début ${debut} · Fin prévue ${fin} · Temps activé ${fmtRest(Number(a.tempsTotal)||0)}</div><div class="owner-jlive">Temps restant : ${fmtRest(rest)}</div></div><span class="owner-jamount">${money(a.montantSession).toLocaleString('fr-FR')} F</span></div>`;}).join('');
   const eh=events.slice(0,80).map(e=>`<div class="owner-je"><span class="owner-jtime">${esc(e.t||ownerFmtClock(e.ts).slice(0,5))}</span><span class="owner-jdot ${esc(e.color||'p')}"></span><div class="owner-jbody"><div class="owner-jmain">${esc(e.main||'Activité')}</div>${e.detail?`<div class="owner-jdetail">${esc(e.detail)}</div>`:''}${e.motif?`<div class="owner-jmotif">Motif : ${esc(e.motif)}</div>`:''}${GymProofFree.eventHtml(e)}</div>${e.amount?`<span class="owner-jamount">${esc(e.amount)}</span>`:''}</div>`).join('');list.innerHTML=ah+eh;
 }
 async function ownerPauseAllForPowerOutage(){
@@ -1455,46 +1422,22 @@ let patronAuditActiveRoom='',patronAuditRef=null,patronAuditEvents={};
 function patronAuditRoom(){return 'gz_'+String(currentTenantKey||'');}
 function patronMoneySigned(n){return (n>=0?'+':'−')+Math.abs(n).toLocaleString('fr-FR')+' F';}
 function patronCorrectionStatus(msg){const el=document.getElementById('patron-corr-result');if(el)el.textContent=msg;}
-function patronSelectedCorrectionDay(){const el=document.getElementById('patron-corr-date');return el&&el.value||businessDateKey(new Date());}
 function patronPopulateRevenuePostes(){
- const select=document.getElementById('patron-corr-poste');if(!select)return;
- const dateEl=document.getElementById('patron-corr-date'),current=businessDateKey(new Date());
- if(dateEl){dateEl.max=current;if(!dateEl.value)dateEl.value=current;}
- const key=patronSelectedCorrectionDay(),root=DB._cache||{},day=key===current?(root.sessions||{}):((root.daily||{})[key]||{});
- const posts=DB.get('postes')||[],keys=[...new Set([...posts.map(p=>p.num),...Object.keys(day.parPoste||{})])],old=select.value;
- select.innerHTML=keys.map(k=>{const p=posts.find(p=>p.num===k);return '<option value="'+esc(k)+'">'+esc(p?GameZoneManagement.displayName(p):k)+'</option>';}).join('');
- if(keys.includes(old))select.value=old;
+  const s=document.getElementById('patron-corr-poste');if(!s)return;
+  const old=s.value;
+  const postes=(DB.get('postes')||[]).filter(p=>p&&/^Poste\s*[1-6]$/i.test(String(p.num||'')));
+  s.innerHTML=postes.map(p=>'<option value="'+esc(p.num)+'">'+esc(p.num)+'</option>').join('');
+  if(postes.some(p=>p.num===old))s.value=old;
 }
-function patronCorrectionDaySnapshot(root){return GameZoneManagement.snapshot(root,patronSelectedCorrectionDay(),businessDateKey(new Date()),today());}
-async function patronCorrectRevenue(){
- if(patronCorrectionBusy)return;
- const uid=firebase.auth().currentUser&&firebase.auth().currentUser.uid;
- if(!loggedIn||!uid||!fbRoot||currentTenantKey!==ROOM_KEY)return patronCorrectionStatus('Connecte-toi en Patron à CP1');
- const key=patronSelectedCorrectionDay(),poste=document.getElementById('patron-corr-poste').value;
- const how=document.getElementById('patron-corr-sens').value,amount=Number(document.getElementById('patron-corr-amount').value);
- const reason=String(document.getElementById('patron-corr-reason').value||'').trim();
- if(!poste||!['add','subtract'].includes(how)||!Number.isSafeInteger(amount)||amount<100||amount>100000||amount%100||reason.length<8)return patronCorrectionStatus('Choisis le poste, un montant multiple de 100 F et un motif de 8 caractères minimum');
- const btn=document.getElementById('patron-corr-confirm');patronCorrectionBusy=true;btn.disabled=true;
- try{
-  if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
-  if((await firebase.database().ref('access/'+uid+'/rooms/'+patronAuditRoom()).once('value')).val()!=='patron')throw Error('Accès Patron requis');
-  const raw=firebase.database().ref(patronAuditRoom()),room=(await raw.once('value')).val()||{};
-  const current=businessDateKey(new Date()),day=GameZoneManagement.snapshot(room,key,current,today());
-  const op={id:'C'+Date.now()+'_'+Math.random().toString(36).slice(2,10),key,poste,reason,delta:how==='add'?amount:-amount,beforeTotal:Number(day.ss.recettes)||0,beforePoste:Number((day.ss.parPoste||{})[poste])||0};
-  GameZoneManagement.applyCorrection(room,op,current,today());
-  if(Object.values(patronAuditEvents||{}).some(e=>e&&e.dateKey===key&&e.poste===poste&&Number(e.delta)===op.delta&&Date.now()-Number(e.creeLe||0)<120000))throw Error('Correction similaire récente : vérifie le journal privé');
-  if(!confirm('CORRECTION PATRON — '+key+'\n'+GameZoneManagement.displayName((room.postes||[]).find(p=>p.num===poste)||{num:poste})+'\n'+patronMoneySigned(op.delta)+'\nTotal : '+op.beforeTotal+' F → '+(op.beforeTotal+op.delta)+' F\nMotif : '+reason+'\nConfirmer ?'))return;
-  const audit={id:op.id,uid,poste,dateKey:key,creeLe:Date.now(),delta:op.delta,montant:amount,motif:reason,sens:how,avantPoste:op.beforePoste,apresPoste:op.beforePoste+op.delta,avantTotal:op.beforeTotal,apresTotal:op.beforeTotal+op.delta};
-  const auditRef=firebase.database().ref(patronAuditPrefix+patronAuditRoom()+'/'+op.id);await auditRef.set(audit);
-  let issue='';
-  const tx=await raw.transaction(data=>{try{return GameZoneManagement.applyCorrection(data,op,businessDateKey(new Date()),today());}catch(e){issue=e.message;return undefined;}},undefined,false);
-  if(!tx.committed)throw Error(issue||'Correction non appliquée');
-  DB._cache=tx.snapshot.val()||DB._cache;
-  patronCorrectionStatus('✅ Correction du '+key+' appliquée : '+patronMoneySigned(op.delta));
-  document.getElementById('patron-corr-amount').value='';document.getElementById('patron-corr-reason').value='';
-  patronRenderPrivateAudit();ownerRenderReport();renderHome();
- }catch(e){patronCorrectionStatus('⚠️ '+(e.message||e));}
- finally{patronCorrectionBusy=false;btn.disabled=false;}
+function patronCorrectionDaySnapshot(root){
+  const ss=root&&root.sessions||{};
+  const todayKey=businessDateKey(new Date());
+  if(ss.date!==today())throw new Error('Journée clôturée / en cours de basculement. Aucune correction.');
+  const day=root.daily&&root.daily[todayKey];
+  if(!day || money(day.recettes)!==money(ss.recettes))throw new Error('Écart entre rapport journalier et session : correction bloquée.');
+  const pp=ss.parPoste||{}, sum=Object.values(pp).reduce((n,v)=>n+money(v),0);
+  if(sum!==money(ss.recettes))throw new Error('Recettes déjà incohérentes : total et postes différents. Vérifie le rapport.');
+  return {ss: ss, day:day, dayKey:todayKey};
 }
 function patronPrivateAuditEntries(){return Object.entries(patronAuditEvents||{}).filter(([id,item])=>item&&typeof item==='object').sort((a,b)=>Number(b[1].creeLe||0)-Number(a[1].creeLe||0));}
 function patronRenderPrivateAudit(){
@@ -1522,6 +1465,70 @@ function patronConnectPrivateAudit(){
     if(el)el.textContent='⚠️ Journal privé indisponible : publie d’abord les nouvelles règles Firebase.';
   });
 }
+async function patronCorrectRevenue(){
+  const btn=document.getElementById('patron-corr-confirm');
+  if(patronCorrectionBusy)return;
+  const s=document.getElementById('patron-corr-poste'),mode=document.getElementById('patron-corr-sens');
+  const amountEl=document.getElementById('patron-corr-amount'),reasonEl=document.getElementById('patron-corr-reason');
+  const poste=s&&s.value,how=mode&&mode.value,amount=Number(amountEl&&amountEl.value),reason=String(reasonEl&&reasonEl.value||'').trim();
+  if(!loggedIn||!fbRoot||!firebase.auth().currentUser||currentTenantKey!==ROOM_KEY)return patronCorrectionStatus('Connecte-toi en Patron à la salle CP1 Gaming.');
+  if(!/^Poste\s*[1-6]$/i.test(poste||'')||(DB.get('postes')||[]).every(p=>p.num!==poste))return patronCorrectionStatus('Choisis un poste TV existant.');
+  if(!['add','subtract'].includes(how)||!Number.isSafeInteger(amount)||amount<100||amount>100000||amount%100!==0)return patronCorrectionStatus('Montant invalide : entre 100 F et 100 000 F, par 100 F.');
+  if(reason.length<8)return patronCorrectionStatus('Indique un motif précis de 8 caractères minimum.');
+  const uid=firebase.auth().currentUser.uid,delta=how==='add'?amount:-amount;
+  patronCorrectionBusy=true;if(btn)btn.disabled=true;
+  try{
+    // Refuse tout règlement hors ligne. La lecture est refaite juste avant la transaction.
+    const conn=await firebase.database().ref('.info/connected').once('value');
+    if(conn.val()!==true)throw new Error('Internet ou Firebase indisponible : aucun montant modifié.');
+    const role=await firebase.database().ref('access/'+uid+'/rooms/'+patronAuditRoom()).once('value');
+    if(role.val()!=='patron')throw new Error('Compte non autorisé.');
+    const read=await fbRoot.once('value');const root=read.val()||{};
+    const day=patronCorrectionDaySnapshot(root);
+    const beforeP=money(day.ss.parPoste&&day.ss.parPoste[poste]);const beforeT=money(day.ss.recettes);
+    if(beforeP+delta<0||beforeT+delta<0)throw new Error('Montant insuffisant pour retirer '+amount+' F de '+poste+'.');
+    const idem=Object.values(patronAuditEvents||{}).some(e=>e&&e.dateKey===day.dayKey&&e.poste===poste&&Number(e.delta)===delta&&Date.now()-Number(e.creeLe||0)<120000);
+    if(idem)throw new Error('Une correction identique a déjà été demandée récemment : vérifie le journal privé avant de recommencer.');
+    const msg='CONFIRMATION PATRON — '+poste+'\n'+patronMoneySigned(delta)+'\nMontant du poste : '+beforeP+' F → '+(beforeP+delta)+' F\nTotal salle : '+beforeT+' F → '+(beforeT+delta)+' F\nMotif : '+reason+'\nAucune séance ni prise ne sera modifiée. Continuer ?';
+    if(!confirm(msg)){patronCorrectionStatus('Annulée. Aucune recette modifiée.');return;}
+    // Une clé d'opération unique : audit privé créé AVANT la transaction.
+    // Si la transaction échoue, l'audit reste Non confirmée sans fausser la recette.
+    const id='C'+Date.now()+'_'+Math.random().toString(36).slice(2,10);
+    const audit={id,uid,poste,dateKey:day.dayKey,creeLe:Date.now(),delta,montant:amount,motif:reason,sens:how,
+      avantPoste:beforeP,apresPoste:beforeP+delta,avantTotal:beforeT,apresTotal:beforeT+delta};
+    await firebase.database().ref(patronAuditPrefix+patronAuditRoom()+'/'+id).set(audit);
+    patronCorrectionStatus('Journal privé enregistré. Vérification et transaction du montant en cours…');
+    let issue='';
+    const tx=await fbRoot.transaction(function(data){
+      try{
+        if(!data||typeof data!=='object')throw new Error('Salle introuvable');
+        if((data.patron_adjustment_once||{})[id])throw new Error('Correction déjà appliquée');
+        const fresh=patronCorrectionDaySnapshot(data);
+        const p=fresh.ss.parPoste||{};
+        if(fresh.dayKey!==day.dayKey||money(fresh.ss.recettes)!==beforeT||money(p[poste])!==beforeP)
+          throw new Error('Une vente a changé depuis la vérification. Correction refusée, recharge le rapport.');
+        if(money(p[poste])+delta<0||money(fresh.ss.recettes)+delta<0)throw new Error('Recette insuffisante.');
+        const updated=deepClone(fresh.ss);
+        updated.parPoste=Object.assign({},updated.parPoste||{});
+        updated.parPoste[poste]=money(p[poste])+delta;
+        updated.recettes=money(updated.recettes)+delta;
+        const archive=Object.assign({},data.daily[fresh.dayKey]||{},deepClone(updated));
+        data.sessions=updated;
+        data.daily=data.daily||{};data.daily[fresh.dayKey]=archive;
+        data.patron_adjustment_once=data.patron_adjustment_once||{};data.patron_adjustment_once[id]=true;
+        // AUCUNE entree dans activity_daily ni journal partagé du Gérant.
+        return data;
+      }catch(e){issue=e.message||'Vérification refusée';return undefined;}
+    },undefined,false);
+    if(!tx||!tx.committed)throw new Error(issue||'Transaction non confirmée. Aucun montant ajouté. Journal privé marqué non confirmé.');
+    if(tx.snapshot&&tx.snapshot.val)DB._cache=tx.snapshot.val()||DB._cache;
+    patronCorrectionStatus('✅ '+poste+' : '+patronMoneySigned(delta)+'. Recette TV : '+(beforeT+delta).toLocaleString('fr-FR')+' F. Synchronisation avec le Gérant.');
+    amountEl.value='';reasonEl.value='';
+    patronRenderPrivateAudit();ownerRenderReport();renderHome();
+  }catch(e){patronCorrectionStatus('⚠️ '+(e.message||String(e)));console.warn('Correction privée :',e);}
+  finally{patronCorrectionBusy=false;if(btn)btn.disabled=false;}
+}
+
 function ownerRenderReport(){
   patronPopulateRevenuePostes();patronConnectPrivateAudit();patronRenderPrivateAudit();
   {const el=document.getElementById('patron-corr-live-total');const snap=DB.get('sessions')||{};if(el)el.textContent='Recette du jour lue dans Firebase : '+(snap.date===today()?money(snap.recettes).toLocaleString('fr-FR'):'0')+' F. Aucune régularisation automatique.';}
@@ -1529,7 +1536,7 @@ function ownerRenderReport(){
   if(byId('or-date'))byId('or-date').textContent=bd.toLocaleDateString('fr-FR',{day:'numeric',month:'long'});if(byId('or-rec'))byId('or-rec').textContent=money(ss.recettes).toLocaleString('fr-FR')+' FCFA';if(byId('or-active'))byId('or-active').textContent=active.length;if(byId('or-done'))byId('or-done').textContent=Math.max(0,Number(ss.count)||0);if(byId('or-plugs'))byId('or-plugs').textContent=plugs.length;
   [['or-day',rev.day],['or-yesterday',rev.yesterday],['or-week',rev.week],['or-month',rev.month],['or-total',rev.total]].forEach(([id,v])=>{if(byId(id))byId(id).textContent=money(v).toLocaleString('fr-FR')+' FCFA';});
   const pay=byId('or-payments');if(pay){const ent=Object.entries(ss.payStats||{});pay.innerHTML=ent.length?ent.map(([id,v])=>{const p=OWNER_PAYS.find(x=>x.id===id);return `<div class="owner-rrow"><span class="owner-rkey">${p?p.emoji+' '+p.lbl:id}</span><span class="owner-rval purple">${money(v).toLocaleString('fr-FR')} FCFA</span></div>`;}).join(''):'<div class="owner-rrow"><span class="owner-rkey">Aucune donnée</span></div>';}
-  const pp=byId('or-postes');if(pp)pp.innerHTML=postes.length?postes.map(p=>`<div class="owner-rrow" style="display:block"><div style="font-weight:700;margin-bottom:4px">${esc(GameZoneManagement.displayName(p))} — ${esc(gzPosteTypeLabel(p))}</div><div style="font-size:10px;color:#7f8498">Jour : ${money(rev.perPoste.day[p.num]).toLocaleString('fr-FR')} F · Semaine : ${money(rev.perPoste.week[p.num]).toLocaleString('fr-FR')} F · Mois : ${money(rev.perPoste.month[p.num]).toLocaleString('fr-FR')} F · Total : ${money(rev.perPoste.total[p.num]).toLocaleString('fr-FR')} F</div></div>`).join(''):'<div class="owner-rrow"><span class="owner-rkey">Aucun poste</span></div>';
+  const pp=byId('or-postes');if(pp)pp.innerHTML=postes.length?postes.map(p=>`<div class="owner-rrow" style="display:block"><div style="font-weight:700;margin-bottom:4px">${esc(p.num)} — ${esc(gzPosteTypeLabel(p))}</div><div style="font-size:10px;color:#7f8498">Jour : ${money(rev.perPoste.day[p.num]).toLocaleString('fr-FR')} F · Semaine : ${money(rev.perPoste.week[p.num]).toLocaleString('fr-FR')} F · Mois : ${money(rev.perPoste.month[p.num]).toLocaleString('fr-FR')} F · Total : ${money(rev.perPoste.total[p.num]).toLocaleString('fr-FR')} F</div></div>`).join(''):'<div class="owner-rrow"><span class="owner-rkey">Aucun poste</span></div>';
   const cancels=(DB.get('annulations')||[]).filter(a=>a&&a.dateKey===businessDateKey(new Date())).sort((a,b)=>(Number(b.ts)||0)-(Number(a.ts)||0));if(byId('or-cancel-count'))byId('or-cancel-count').textContent=cancels.length+' annulation'+(cancels.length>1?'s':'');const cl=byId('or-cancels');if(cl)cl.innerHTML=cancels.length?cancels.map(a=>`<div class="owner-cancel-card"><div class="owner-cancel-head"><span class="owner-cancel-post">↩ ${esc(a.poste||'Poste')}</span><span class="owner-cancel-money">-${money(a.montantRetireJour!=null?a.montantRetireJour:a.montant).toLocaleString('fr-FR')} F</span></div><div class="owner-cancel-meta">${esc(a.client||'—')} · Annulé à ${esc(a.heure||ownerFmtClock(a.ts))} · Temps restant ${fmtRest(a.tempsRestantSec||0)}</div><div class="owner-cancel-reason">Motif : ${esc(a.raison||'Non indiqué')}</div><div class="owner-cancel-meta">Par : ${esc(a.gerant||'—')}</div></div>`).join(''):'<div class="owner-rrow"><span class="owner-rkey">Aucune annulation aujourd\'hui</span></div>';
 }
 async function ownerEnsureDailyRollover(){
@@ -1566,18 +1573,11 @@ async function ownerConfirmCancel(){
   const totalAmount=money(local.montantSession),todayAmount=startedKey===dayKey?totalAmount:Math.min(totalAmount,money(local.montantJourSession));
   const rest=remainingActive(local),totalSec=Math.max(0,Number(local.tempsTotal)||0),used=Math.max(0,totalSec-rest),detail=Object.assign({},local.paiementsSession||{});
   try{
-    showToast('Annulation en cours : vérification de l’extinction…');
-    if(p.devid && !(await gzPauseViaServer(ownerCancelIdx)))return;
-    const confirmed=activeForPoste(p,ownerCancelIdx)||{};
-    if(p.devid && (!confirmed.paused || confirmed.pausePowerOffConfirmed!==true || confirmed.sessionId!==sid)){
-      showToast('Extinction non confirmée : annulation non finalisée.');return;
-    }
     const res=await fbRoot.transaction(root=>{
       root=root||{};root.refunded_sessions=root.refunded_sessions||{};root.closed_sessions=root.closed_sessions||{};
       if(sid&&root.refunded_sessions[sid])return root;
       const remote=rootReadActive(root,Object.assign({},p,local),ownerCancelIdx)||{};
       if(!remote.actif||(sid&&remote.sessionId&&remote.sessionId!==sid))return;
-      if(p.devid && (!remote.paused || remote.pausePowerOffConfirmed!==true || Number(remote.updatedAt)!==Number(confirmed.updatedAt)))return;
       const refund=Math.max(0,todayAmount);
       const ss=freshSessionSnapshotFromRoot(root);ss.recettes=Math.max(0,money(ss.recettes)-refund);ss.parPoste=ownerSubtractPosteBreakdown(ss.parPoste||{},p.num,refund);ss.payStats=ownerSubtractPaymentBreakdown(ss.payStats||{},detail,refund);
       if(startedKey===dayKey){ss.sessionsParPoste=Object.assign({},ss.sessionsParPoste||{});ss.sessionsParPoste[p.num]=Math.max(0,Math.floor(Number(ss.sessionsParPoste[p.num])||0)-1);if(ss.sessionsParPoste[p.num]===0)delete ss.sessionsParPoste[p.num];}
@@ -1591,7 +1591,7 @@ async function ownerConfirmCancel(){
     if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;
     ownerSpeak(ownerSpeechPosteName(p.num)+', temps annulé.');closeModal('mo-owner-cancel');
     ownerPersistActivity(p.num+' — Vente annulée par le patron',`${local.client||'Client'} · Début ${ownerFmtClock(local.startedAt)} · Annulé ${ownerFmtClock(now)} · utilisé ${fmtRest(used)} · restant ${fmtRest(rest)} · Motif: ${reason}`,'-'+todayAmount.toLocaleString('fr-FR')+' F',{poste:p.num,client:local.client||'',sessionId:sid,typeActivite:'annulee',tempsUtiliseSec:used,tempsRestantSec:rest,montant:-todayAmount,raison:reason});
-    // Physical OFF was confirmed before the accounting transaction; never send a late OFF.
+    if(p.devid)await ownerReliableOff(p);
     renderControl();renderHome();showToast(`↩ ${p.num} annulé · ${todayAmount.toLocaleString('fr-FR')} F retirés`);
   }catch(e){console.log('Annulation patron:',e);showToast('⚠️ Annulation impossible — vérifiez Internet');}
   finally{setTimeout(()=>ownerCancelLocks.delete(lock),800);}
@@ -1605,7 +1605,7 @@ async function ownerConfirmStart(){
   try{
     const nom=document.getElementById('owner-client').value.trim();
     if(!nom)return showToast('⚠️ Entrez le nom du client');
-    const tar=gzSelectedTariff('start',ownerTarifs(p),ownerSelMin);
+    const tar=ownerTarifs(p).find(t=>Number(t.min)===Number(ownerSelMin));
     if(!tar)return showToast('⚠️ Choisissez une durée');
     const prix=money(tar.prix),min=Number(tar.min)||0,pay=ownerSelPay;
     if(!prix||!min)return showToast('⚠️ Tarif invalide');
@@ -1615,7 +1615,7 @@ async function ownerConfirmStart(){
     const reservation=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,p,idx)||{};
       if(gzSharedPlugOccupant(root,p,idx))return undefined;
-      if(Number(r.pausePendingUntil)>Date.now()||r.actif||(r.starting&&Date.now()<Number(r.startingUntil||0))||(r.cleanup&&Date.now()<Number(r.cleanupUntil||0)))return undefined;
+      if(r.actif||(r.starting&&Date.now()<Number(r.startingUntil||0))||(r.cleanup&&Date.now()<Number(r.cleanupUntil||0)))return undefined;
       rootWriteActive(root,p,idx,{actif:false,starting:true,startingUntil:Date.now()+45000,
         client:nom,sessionId:sid,finTs:0,paused:false,montantSession:0,updatedAt:Date.now()});
       return root;
@@ -1662,7 +1662,7 @@ async function ownerConfirmPlus(){
   const posts=DB.get('postes')||[],idx=ownerPosteIdx,p=posts[idx];
   if(!p)return showToast('⚠️ Poste introuvable');
   if(!navigator.onLine||!fbRoot)return showToast('⚠️ Internet ou Firebase indisponible');
-  const tariff=gzSelectedTariff('plus',ownerTarifs(p),ownerPlusMin);
+  const tariff=ownerTarifs(p).find(t=>Number(t.min)===Number(ownerPlusMin));
   if(!tariff)return showToast('⚠️ Durée non disponible');
   const prix=money(tariff.prix),mins=Number(tariff.min)||0,payKey=ownerPlusPay;
   if(prix<=0||mins<=0)return showToast('⚠️ Tarif incorrect');
@@ -1714,8 +1714,7 @@ async function ownerConfirmPlus(){
   finally{if(btn)btn.disabled=false;}
 }
 
-async function ownerPause(i){return gzPauseViaServer(i);}
-
+async function ownerPause(i){const postes=DB.get('postes')||[];const p=postes[i];if(!p)return;const a=activeForPoste(p,i);if(!a.actif||a.paused)return;const rest=remainingActive(a),sid=a.sessionId||'';try{const res=await fbRoot.transaction(root=>{root=root||{};const r=rootReadActive(root,Object.assign({},p,a),i)||{};if(!r.actif||(sid&&r.sessionId&&r.sessionId!==sid))return;rootWriteActive(root,Object.assign({},p,a),i,Object.assign({},r,{paused:true,pauseRemainingSec:rest,finTs:0,updatedAt:Date.now()}));return root;},undefined,false);if(!res.committed)return showToast('⚠️ Poste modifié ailleurs');ownerSpeak(ownerSpeechPosteName(p.num)+', temps mis en pause.');ownerPersistActivity(p.num+' — Pause par le patron',(a.client||'Client')+' · '+fmtRest(rest)+' restantes','',{poste:p.num,sessionId:sid,typeActivite:'pause'});if(p.devid)await ownerReliableOff(p);showToast('⏸ '+p.num+' en pause');}catch(e){showToast('⚠️ Pause impossible');}}
 async function ownerResume(i){
   const postes=DB.get('postes')||[],p=postes[i];if(!p)return;
   const a=activeForPoste(p,i)||{},sid=a.sessionId||'';
@@ -1738,8 +1737,6 @@ async function ownerResume(i){
 }
 
 async function ownerPowerOff(i){
-  return ownerOpenCancel(i); // Arrêt manuel Patron = annulation de vente avec motif.
-
   const postes=DB.get('postes')||[];
   const p=postes[i];
   if(!p)return;
@@ -1818,11 +1815,10 @@ async function ownerFinishExpired(i,p,a){
   if(ownerFinishLocks.has(key))return;
   ownerFinishLocks.add(key);
   try{
-    if(!(await gzConfirmFinish16(p,a)))return;
     // Clôture atomique de la séance AVANT tout appel à la prise Tuya.
     const result=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,p,i)||{};
-      if(!r.actif||(sid&&r.sessionId!==sid)||!r.poweredOffAt||r.powerCutSessionId!==sid)return undefined;
+      if(!r.actif||(sid&&r.sessionId!==sid))return undefined;
       const now=Date.now();
       if(r.paused){if(Number(r.pauseRemainingSec||0)>0)return undefined;}
       else if(!Number(r.finTs)||Number(r.finTs)>now)return undefined;
@@ -1840,7 +1836,14 @@ async function ownerFinishExpired(i,p,a){
     },undefined,false);
     if(!result||!result.committed)return;
     if(result.snapshot&&typeof result.snapshot.val==='function')DB._cache=result.snapshot.val()||DB._cache;
-    // OFF is already confirmed for this session; do not send a second OFF.
+    // V34 : priorité au OFF physique ; les animations et journaux viennent après.
+    try{
+      // V34 : lecture ciblée pour éviter de charger tout l'historique avant OFF.
+      const live=(await fbRoot.child('active_by_poste').child(remotePostKey(p.num)).once('value')).val()||{};
+      if(!live.actif&&live.cleanup&&live.sessionId===sid&&Date.now()<Number(live.cleanupUntil||0)){
+        if(p.devid){const off=await ownerTuyaCommand(p,false);if(!off)setStatusP('⚠️ '+p.num+' LIBRE mais OFF non confirmé dans Smart Life','danger');}
+      }
+    }catch(e){console.warn('OFF après clôture Patron:',e);}
     renderControl();renderHome();
     ownerSpeak('Temps terminé pour '+ownerSpeechPosteName(p.num)+'.');
     ownerTextVoiceNotify('GameZone — Fin de session',ownerSpeechPosteName(p.num)+' : temps terminé, télévision éteinte.','');
@@ -2104,7 +2107,7 @@ function renderHome(){
         const w=(rev.perPoste.week[p.num]||0).toLocaleString('fr-FR');
         const t=(rev.perPoste.total[p.num]||0).toLocaleString('fr-FR');
         return `<div class="hpr" style="flex-direction:column;align-items:stretch;gap:2px">
-          <div style="font-size:12px;font-weight:600">${esc(GameZoneManagement.displayName(p))} — ${esc(gzPosteTypeLabel(p))}</div>
+          <div style="font-size:12px;font-weight:600">${esc(p.num)} — ${esc(gzPosteTypeLabel(p))}</div>
           <div style="font-size:10px;color:var(--muted)">Jour : ${d} F · Semaine : ${w} F · Total : ${t} F</div>
         </div>`;
       }).join('')
@@ -2121,7 +2124,7 @@ function renderHome(){
     const recPoste=rev.perPoste.day[p.num]||0;
     return `<div class="hpr">
       <div class="prise-dot ${a.actif&&hasPrise?'pd-on':hasPrise?'pd-off':'pd-none'}"></div>
-      <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--gold);min-width:36px">${esc(GameZoneManagement.displayName(p))}</div>
+      <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:var(--gold);min-width:36px">${p.num}</div>
       <div style="flex:1"><div style="font-size:12px;font-weight:500">${esc(gzPosteTypeLabel(p))}</div>
       <div style="font-size:10px;color:var(--muted)">${hasPrise?'🔌 Prise liée':'⚠️ Sans prise'} · ${recPoste.toLocaleString('fr-FR')} FCFA aujourd'hui</div></div>
       ${a.actif?`<div style="text-align:right"><div style="font-family:var(--fd);font-size:16px;color:var(--green)">${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}</div><div style="font-size:10px;color:var(--muted)">${a.client}</div></div>`
@@ -2139,7 +2142,7 @@ function renderPostes(){
   list.innerHTML=postes.map((p,i)=>`
     <div class="crow">
       <div class="prise-dot ${p.devid?'pd-off':'pd-none'}"></div>
-      <div style="font-family:var(--fd);font-size:17px;font-weight:700;color:var(--gold);min-width:36px">${esc(GameZoneManagement.displayName(p))}</div>
+      <div style="font-family:var(--fd);font-size:17px;font-weight:700;color:var(--gold);min-width:36px">${p.num}</div>
       <div style="flex:1">
         <div style="font-size:13px;font-weight:500">${esc(gzPosteTypeLabel(p))}</div>
         <div style="font-size:10px;color:var(--muted)">${p.devid?(gzSharedPlugPartners(p).length?'🔌 Prise partagée avec '+esc(gzSharedPlugPartners(p).map(x=>x.num).join(', ')):'🔌 Cloud Tuya lié'):'⚠️ Prise non configurée'}</div>
@@ -2171,8 +2174,6 @@ function openModalPoste(idx=-1){
     const p=(DB.get('postes')||[])[idx];
     document.getElementById('mo-poste-title').textContent='Modifier le poste';
     document.getElementById('p-num').value=p.num||'';
-    document.getElementById('p-num').readOnly=true;
-    document.getElementById('p-display-name').value=GameZoneManagement.displayName(p);
     gzRefreshPosteTypeSelect(p.type||'Autres');
     document.getElementById('p-custom-type').value=p.typeCustom||'';
     document.getElementById('p-ip').value=p.ip||'';
@@ -2181,7 +2182,6 @@ function openModalPoste(idx=-1){
     document.getElementById('p-ver').value=p.ver||'3.3';
   } else {
     document.getElementById('mo-poste-title').textContent='Nouveau poste';
-    document.getElementById('p-num').readOnly=false;document.getElementById('p-display-name').value='';
     ['p-num','p-type','p-ip','p-devid','p-key'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('p-ver').value='3.3';
     gzRefreshPosteTypeSelect('PS5');
@@ -2193,20 +2193,29 @@ function openModalPoste(idx=-1){
 }
 function editPoste(i){openModalPoste(i);}
 
-async function savePoste(){
- const idx=Number(document.getElementById('p-edit-idx').value),type=document.getElementById('p-type').value.trim();
- const values={num:document.getElementById('p-num').value.trim(),displayName:document.getElementById('p-display-name').value.trim(),type,typeCustom:type==='Autres'?document.getElementById('p-custom-type').value.trim():'',devid:document.getElementById('p-devid').value.trim(),ip:'',ver:'3.3'};
- try{
-  if(!loggedIn||!fbRoot||!firebase.auth().currentUser)throw Error('Connexion Patron requise');
-  if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
-  const raw=firebase.database().ref(patronAuditRoom()),before=(await raw.once('value')).val()||{};
-  const expected=JSON.stringify((before.postes||[])[idx]||null);let issue='';
-  const tx=await raw.transaction(room=>{try{if(!room||JSON.stringify((room.postes||[])[idx]||null)!==expected)throw Error('Le poste a changé ailleurs : actualise');const list=GameZoneManagement.updatePostes(room,idx,values);return Object.assign({},room,{postes:list});}catch(e){issue=e.message;return undefined;}},undefined,false);
-  if(!tx.committed)throw Error(issue||'Modification refusée');
-  DB._cache=tx.snapshot.val()||DB._cache;
-  await ownerPersistActivity('Paramètres de poste modifiés',values.displayName,'',{poste:values.num,typeActivite:'parametres_poste'});
-  closeModal('mo-poste');renderPostes();renderHome();showToast('✅ Poste enregistré');
- }catch(e){showToast('⚠️ '+e.message);}
+function savePoste(){
+  const num=document.getElementById('p-num').value.trim();
+  const type=document.getElementById('p-type').value.trim();
+  const typeCustom=type==='Autres'?document.getElementById('p-custom-type').value.trim():'';
+  if(!num||!type){showToast('⚠️ Nom et type obligatoires');return;}
+  const postes=DB.get('postes')||[];
+  const idx=parseInt(document.getElementById('p-edit-idx').value);
+  const old=(idx>=0&&postes[idx])?postes[idx]:{};
+  if(postes.some((x,i)=>i!==idx&&String(x.num||'').trim().toLowerCase()===num.toLowerCase()))return showToast('⚠️ Ce nom de poste existe déjà. Choisissez un nom différent.');
+  const active=idx>=0?activeForPoste(old,idx):{};
+  if(active&&active.actif&&(old.num!==num||String(old.devid||'').trim()!==document.getElementById('p-devid').value.trim()))return showToast('⚠️ Terminez cette session avant de modifier son nom ou sa prise.');
+  const obj={
+    ...old,
+    num,type,typeCustom,
+    devid:document.getElementById('p-devid').value.trim(),
+    ip:'',
+    ver:'3.3'
+  };
+  delete obj.key;
+  if(idx>=0){postes[idx]=obj;showToast('✅ Poste modifié');}
+  else{postes.push(obj);showToast('✅ Poste ajouté');}
+  DB.set('postes',postes);
+  closeModal('mo-poste');renderPostes();renderHome();
 }
 
 function delPoste(i){
@@ -2411,7 +2420,7 @@ function renderTarifs(){
   list.innerHTML=[...tarifs].sort((a,b)=>a.min-b.min).map(t=>{
     const i=all.indexOf(t);
     return `<div class="trow">
-      <div style="flex:1"><div style="font-size:13px">${esc(t.lbl)}</div><div style="font-size:10px;color:var(--muted)">${t.min} min</div></div>
+      <div style="flex:1"><div style="font-size:13px">${t.lbl}</div><div style="font-size:10px;color:var(--muted)">${t.min} min</div></div>
       <div style="font-size:14px;font-weight:700;color:var(--gold);min-width:100px;text-align:right">${t.prix.toLocaleString()} FCFA</div>
       <button class="btn-edit" onclick="editTarif(${i})">✏️</button>
       <button class="btn-del" onclick="delTarif(${i})">🗑</button>
@@ -2435,27 +2444,22 @@ function openModalTarif(idx=-1){
   openModal('mo-tarif');setTimeout(()=>document.getElementById('t-min').focus(),200);
 }
 function editTarif(i){openModalTarif(i);}
-async function gzSaveTarifChange(index,values){
- if(!loggedIn||!firebase.auth().currentUser||!fbRoot)throw Error('Connexion Patron requise');
- if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
- const ref=firebase.database().ref(patronAuditRoom()+'/tarifs');
- const before=(await ref.once('value')).val()||[],expected=JSON.stringify(before[index]||null);let issue='';
- const tx=await ref.transaction(items=>{try{
-  const list=Array.isArray(items)?items.slice():[];
-  if(JSON.stringify(list[index]||null)!==expected)throw Error('Ce tarif a changé ailleurs : actualise');
-  if(values){if(!values.console||!values.lbl||values.lbl.length>64||!Number.isSafeInteger(values.min)||values.min<=0||!Number.isSafeInteger(values.prix)||values.prix<=0)throw Error('Nom, durée et prix entiers positifs obligatoires');if(index>=0)list[index]=values;else list.push(values);}
-  else{if(index<0||!list[index])throw Error('Tarif introuvable');list.splice(index,1);}
-  return list;
- }catch(e){issue=e.message;return undefined;}},undefined,false);
- if(!tx.committed)throw Error(issue||'Modification refusée');
- DB._cache.tarifs=tx.snapshot.val()||[];
- await ownerPersistActivity(values?'Tarif enregistré':'Tarif supprimé',values?values.console+' · '+values.lbl+' · '+values.min+' min · '+values.prix+' F':'Suppression du tarif sélectionné','',{typeActivite:'parametres_tarifs'});
+function saveTarif(){
+  const console_=document.getElementById('t-console').value;
+  const min=parseInt(document.getElementById('t-min').value);
+  const lbl=document.getElementById('t-lbl').value.trim();
+  const prix=parseInt(document.getElementById('t-prix').value);
+  if(!min||!lbl||!prix){showToast('⚠️ Remplissez tous les champs');return;}
+  const tarifs=DB.get('tarifs')||[];
+  const idx=parseInt(document.getElementById('t-edit-idx').value);
+  if(idx>=0){tarifs[idx]={console:console_,min,lbl,prix};showToast('✅ Tarif modifié');}
+  else{tarifs.push({console:console_,min,lbl,prix});showToast('✅ Tarif ajouté');}
+  DB.set('tarifs',tarifs);activeConsoleTab=console_;closeModal('mo-tarif');renderTarifs();
 }
-async function saveTarif(){
- const values={console:document.getElementById('t-console').value,min:Number(document.getElementById('t-min').value),lbl:document.getElementById('t-lbl').value.trim(),prix:Number(document.getElementById('t-prix').value)};
- try{await gzSaveTarifChange(Number(document.getElementById('t-edit-idx').value),values);activeConsoleTab=values.console;closeModal('mo-tarif');renderTarifs();showToast('✅ Tarif enregistré');}catch(e){showToast('⚠️ '+e.message);}
+function delTarif(i){
+  if(!confirm('Supprimer ?'))return;
+  const tarifs=DB.get('tarifs')||[];tarifs.splice(i,1);DB.set('tarifs',tarifs);renderTarifs();showToast('Supprimé');
 }
-async function delTarif(i){if(!confirm('Supprimer ce tarif ?'))return;try{await gzSaveTarifChange(i,null);renderTarifs();showToast('✅ Tarif supprimé');}catch(e){showToast('⚠️ '+e.message);}}
 
 // GÉRANTS — droits individuels Firebase, sans mot de passe en clair.
 // IMPORTANT : les règles de la base doivent être mises à jour AVANT d'utiliser ces fonctions.
@@ -2853,7 +2857,7 @@ window.GymProofFree=(function(){
     if(!token)throw new Error('Connexion Firebase requise');
     const payload={kind:'image/jpeg',dataUrl,createdAt:Date.now(),name:String(file.name||'photo.jpg').slice(0,100)};
     const resp=await fetch(photoPath(room,sid,base)+'?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    if(!resp.ok)throw new Error('Photo non enregistrée (HTTP '+resp.status+'). '+(resp.status===401||resp.status===403?'Publie les règles Firebase GYM6, puis reconnecte-toi.':'Vérifie Internet puis réessaie.'));
+    if(!resp.ok)throw new Error('Sauvegarde photo refusée ('+resp.status+'). Vérifie les nouvelles règles Firebase V36.');
     return {url:'',path:'gym_proofs/'+room+'/'+sid,kind:'photo-db',type:'image/jpeg',name:payload.name,size:dataUrl.length};
   }
   function videoProof(url){return {url:driveLink(url),path:'',kind:'video-drive',type:'video/drive',name:'Vidéo Google Drive'};}
@@ -2914,7 +2918,7 @@ window.GymProofFree=(function(){
 
   // V18 : supprimer la voix déclenchée par pointerdown AVANT toute validation.
   window.ownerSpeakNow=function(message){return ownerSpeak(message);};
-  window.ownerAnnounceFiveOnce=function(poste,actif){if(!actif||!actif.sessionId)return;const k=ownerVoiceFiveKey(actif.sessionId,actif.bonusGrantedAt||0);try{if(localStorage.getItem(k)==='1')return;}catch(_e){}if(ownerSpeak(GameZoneManagement.displayName(poste)+', il reste '+Math.max(1,Math.ceil(remainingActive(actif)/60))+' minutes avant l’extinction de la télévision.'))try{localStorage.setItem(k,'1');}catch(_e){}};
+  window.ownerAnnounceFiveOnce=function(poste,actif){if(!actif||!actif.sessionId)return;const k=ownerVoiceFiveKey(actif.sessionId,actif.bonusGrantedAt||0);try{if(localStorage.getItem(k)==='1')return;}catch(_e){}if(ownerSpeak(ownerSpeechPosteName(poste.num)+', il reste cinq minutes avant l’extinction de la télévision.'))try{localStorage.setItem(k,'1');}catch(_e){}};
   ['visibilitychange','pageshow','focus'].forEach(ev=>window.addEventListener(ev,()=>{try{if('speechSynthesis'in window)window.speechSynthesis.resume();}catch(_e){}}));
 
   // Bonus : 20, 30, 60 ou n'importe quelle durée personnalisée.
@@ -2940,7 +2944,7 @@ window.GymProofFree=(function(){
     try{
       const tx=await fbRoot.transaction(root=>{
         root=root||{};const r=rootReadActive(root,p,i)||{};
-        if(Number(r.pausePendingUntil)>Date.now()||r.actif||(r.starting&&Date.now()<Number(r.startingUntil||0))||
+        if(r.actif||(r.starting&&Date.now()<Number(r.startingUntil||0))||
            (r.cleanup&&Date.now()<Number(r.cleanupUntil||0)))return undefined;
         rootWriteActive(root,p,i,Object.assign({},r,{cleanup:true,cleanupUntil:Date.now()+15000,
            cleanupTag:tag,updatedAt:Date.now()}));return root;
@@ -2958,8 +2962,7 @@ window.GymProofFree=(function(){
     }
   }
 
-  async function ownerAutoPauseOnly(i,reason,frozenRest){return false; // SYNC8 manual pause only.
-const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!a.actif||a.paused)return;const rest=remainingActive(a),sid=a.sessionId||'';try{const res=await fbRoot.transaction(root=>{root=root||{};const rr=rootReadActive(root,Object.assign({},p,a),i)||{};if(!rr.actif||rr.paused||Number(rr.finTs)<=Date.now()||(sid&&rr.sessionId&&rr.sessionId!==sid)||Number(rr.updatedAt||0)!==Number(a.updatedAt||0))return undefined;rootWriteActive(root,Object.assign({},p,a),i,Object.assign({},rr,{paused:true,pauseRemainingSec:(Number.isFinite(frozenRest)&&frozenRest>0?frozenRest:remainingActive(rr)),finTs:0,pauseReason:reason,updatedAt:Date.now()}));return root;},undefined,false);if(res&&res.committed){ownerPersistActivity(p.num+' — Pause automatique',(a.client||'Client')+' · '+reason+' · '+fmtRest(rest)+' protégées','',{poste:p.num,client:a.client||'',sessionId:sid,typeActivite:'pause_auto'});const m=ownerSpeechPosteName(p.num)+' mis en pause automatiquement : '+reason+'.';ownerTextVoiceNotify('GameZone — Pause automatique',m,m);}}catch(e){console.log(e);}}
+  async function ownerAutoPauseOnly(i,reason){const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!a.actif||a.paused)return;const rest=remainingActive(a),sid=a.sessionId||'';try{const res=await fbRoot.transaction(root=>{root=root||{};const rr=rootReadActive(root,Object.assign({},p,a),i)||{};if(!rr.actif||rr.paused||(sid&&rr.sessionId&&rr.sessionId!==sid)||Number(rr.updatedAt||0)!==Number(a.updatedAt||0))return undefined;rootWriteActive(root,Object.assign({},p,a),i,Object.assign({},rr,{paused:true,pauseRemainingSec:rest,finTs:0,pauseReason:reason,updatedAt:Date.now()}));return root;},undefined,false);if(res&&res.committed){ownerPersistActivity(p.num+' — Pause automatique',(a.client||'Client')+' · '+reason+' · '+fmtRest(rest)+' protégées','',{poste:p.num,client:a.client||'',sessionId:sid,typeActivite:'pause_auto'});const m=ownerSpeechPosteName(p.num)+' mis en pause automatiquement : '+reason+'.';ownerTextVoiceNotify('GameZone — Pause automatique',m,m);}}catch(e){console.log(e);}}
   const gzOffHistoryP=Object.create(null);
   // V39/V16: confirmer une transition ON -> OFF, jamais un simple statut OFF périmé.
   // Le changement de séance ou une reprise réinitialise la preuve d'état ON.
@@ -2988,8 +2991,8 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
       const offlineIds=new Set(offline.map(d=>d.devid));
       const postes=DB.get('postes')||[];
       const affected=postes.filter(p=>p&&p.devid&&offlineIds.has(p.devid));
-      if(affected.length>=2){setStatusP('☁️ Plusieurs prises hors ligne : panne réseau/Wi-Fi ou courant à vérifier. État électrique inconnu : vérifier les TV ; pause manuelle si coupure réelle.','warn');}
-      else if(affected.length===1){setStatusP('☁️ '+ownerSpeechPosteName(affected[0].num)+' hors ligne : Wi-Fi/courant à vérifier. État électrique inconnu : vérifier la TV.','warn');}
+      if(affected.length>=2){setStatusP('☁️ Plusieurs prises hors ligne : panne réseau/Wi-Fi ou courant à vérifier. Ne prouve PAS une coupure générale. Temps inchangés.','warn');}
+      else if(affected.length===1){setStatusP('☁️ '+ownerSpeechPosteName(affected[0].num)+' hors ligne : Wi-Fi/courant à vérifier. Minuteur inchangé, pause manuelle possible.','warn');}
       else if(offline.length){setStatusP('☁️ Tuya signale une prise hors ligne ; vérifier le réseau/courant.','warn');}
       else setStatusP('', 'info');
       // Ne pas mettre tous les postes en pause depuis la simple présence de prises offline.
@@ -2997,13 +3000,12 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
         const p=postes[i];if(!p||!p.devid)continue;
         const st=by[p.devid];if(!st)continue;
         const a=activeForPoste(p,i)||{};
-        const rec=gzOffHistoryP[p.num]||(gzOffHistoryP[p.num]={});
-        if(!a.actif){delete gzOffHistoryP[p.num];if(st.online===true&&st.switchOn===true)setStatusP('⚠️ '+p.num+' : prise ON sans session, vérifier manuellement.','warn');continue;}
-        const decision=GameZoneCustom.observePower(rec,st,a,Date.now());
-        if(decision){
+        const rec=gzOffHistoryP[p.devid]||(gzOffHistoryP[p.devid]={});
+        if(!a.actif){delete gzOffHistoryP[p.devid];if(st.online===true&&st.switchOn===true)setStatusP('⚠️ '+p.num+' : prise ON sans session, vérifier manuellement.','warn');continue;}
+        if(gzManualOffConfirmedP(rec,st,a,Date.now())){
           // Transaction Firebase sécurisée par session; les deux appareils ne doublent pas la pause.
-          await ownerAutoPauseOnly(i,decision.reason,decision.remainingSec);
-          setStatusP('⏸ '+ownerSpeechPosteName(p.num)+' : anomalie confirmée, pause et reprise manuelle.','warn');
+          await ownerAutoPauseOnly(i,'prise éteinte manuellement');
+          setStatusP('⏸ '+ownerSpeechPosteName(p.num)+' : arrêt manuel confirmé, temps mis en pause.','warn');
         }
       }
     }catch(e){setStatusP('☁️ Tuya indisponible : minuteurs non interrompus.','warn');}
@@ -3011,7 +3013,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
   }
   window.addEventListener('online',()=>setTimeout(monitorRoomStatusP,1200));window.addEventListener('offline',()=>setStatusP('📶 Problème de connexion Internet — état des prises non vérifiable.','warn'));setInterval(monitorRoomStatusP,10000);setTimeout(monitorRoomStatusP,2500);
 
-  window.GZ_GYM_GET_TOKEN=async()=>{const u=firebase.auth().currentUser;if(!u)throw new Error('Connexion Firebase requise');return u.getIdToken(true);};
+  window.GZ_GYM_GET_TOKEN=async()=>{const u=firebase.auth().currentUser;if(!u)throw new Error('Connexion Firebase requise');return u.getIdToken();};
   window.GZ_GYM_DB_URL=()=>firebaseConfig.databaseURL;
   async function uploadGymProofP(file,sid){
     if(gymProofModeP==='video')return GymProofFree.videoProof(document.getElementById('gym-drive-url-p').value);
@@ -3042,26 +3044,15 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     if(gymProofModeP!=='video'||!gymProofP)return showToast('🎥 Filme une vidéo d’abord');
     try{const result=await GZCameraProof.share(gymProofP);if(result==='share')showToast('✅ Si la vidéo est sur Drive, colle son lien avant ACTIVER');if(result==='download')showToast('✅ Vidéo enregistrée : importe-la dans Drive, puis colle son lien');}catch(e){showToast('⚠️ '+e.message);}
   };
-  function ensureGymModalP(){if(document.getElementById('mo-gym-p'))return;const m=document.createElement('div');m.className='mo';m.id='mo-gym-p';m.innerHTML=`<div class="ms"><div class="mh"></div><div class="mt" style="color:#22c55e">🏃 CASE 8 — GYMNASTIQUE</div><div class="ig"><label>Nom du client</label><input id="gym-client-p" type="text" placeholder="Nom du client" autocomplete="off"></div><div class="ig"><label>Mouvement</label><div id="gym-moves-p" class="gym-opt-grid"></div></div><div class="ig"><label>Durée</label><div id="gym-time-p" class="gym-opt-grid"></div></div><div class="ig"><label>Paiement</label><div id="gym-pay-p" class="gym-opt-grid"></div></div><div class="gym-proof-box"><b>📸 Preuve obligatoire avant validation</b><div>Photo ou vidéo FILMÉE MAINTENANT obligatoire. PHOTO : sauvegardée en petit JPEG dans Firebase. VIDÉO : filmer ici, puis partager vers Google Drive et coller le lien.</div><div class="gym-proof-actions"><button type="button" onclick="gymCapturePhotoP()">📸 PRENDRE PHOTO</button><button type="button" onclick="gymCaptureVideoP()">🎥 FILMER VIDÉO</button></div><div id="gym-capture-preview-p" style="display:none"></div><div id="gym-drive-zone-p" style="display:none"><button type="button" class="gym-video-share" onclick="gymShareVideoP()" style="display:block;width:100%;padding:10px;border:0;border-radius:8px;margin:6px 0">📤 PARTAGER / ENREGISTRER MA VIDÉO</button><a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener" style="color:#93c5fd">Ouvrir Google Drive pour déposer la vidéo</a><div style="margin:6px 0">Partage la vidéo seulement avec le patron et le gérant, puis colle le lien ici.</div><input type="url" id="gym-drive-url-p" style="width:100%;border-radius:7px;padding:10px;background:#1e293b;color:white" placeholder="https://drive.google.com/file/d/..."></div><div id="gym-proof-name-p" class="gym-proof-name">Aucune preuve capturée</div></div><div id="gym-result-p" role="status" aria-live="polite" style="font-size:13px;line-height:1.5;white-space:normal;color:#fbbf24;margin:10px 0"></div><div class="ma"><button class="btn-cancel" onclick="closeModal('mo-gym-p')">Retour</button><button class="btn-ok" onclick="gymConfirmStartP()">ACTIVER ✓</button></div></div>`;document.body.appendChild(m);}
+  function ensureGymModalP(){if(document.getElementById('mo-gym-p'))return;const m=document.createElement('div');m.className='mo';m.id='mo-gym-p';m.innerHTML=`<div class="ms"><div class="mh"></div><div class="mt" style="color:#22c55e">🏃 CASE 8 — GYMNASTIQUE</div><div class="ig"><label>Nom du client</label><input id="gym-client-p" type="text" placeholder="Nom du client" autocomplete="off"></div><div class="ig"><label>Mouvement</label><div id="gym-moves-p" class="gym-opt-grid"></div></div><div class="ig"><label>Durée</label><div id="gym-time-p" class="gym-opt-grid"></div></div><div class="ig"><label>Paiement</label><div id="gym-pay-p" class="gym-opt-grid"></div></div><div class="gym-proof-box"><b>📸 Preuve obligatoire avant validation</b><div>Photo ou vidéo FILMÉE MAINTENANT obligatoire. PHOTO : sauvegardée en petit JPEG dans Firebase. VIDÉO : filmer ici, puis partager vers Google Drive et coller le lien.</div><div class="gym-proof-actions"><button type="button" onclick="gymCapturePhotoP()">📸 PRENDRE PHOTO</button><button type="button" onclick="gymCaptureVideoP()">🎥 FILMER VIDÉO</button></div><div id="gym-capture-preview-p" style="display:none"></div><div id="gym-drive-zone-p" style="display:none"><button type="button" class="gym-video-share" onclick="gymShareVideoP()" style="display:block;width:100%;padding:10px;border:0;border-radius:8px;margin:6px 0">📤 PARTAGER / ENREGISTRER MA VIDÉO</button><a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener" style="color:#93c5fd">Ouvrir Google Drive pour déposer la vidéo</a><div style="margin:6px 0">Partage la vidéo seulement avec le patron et le gérant, puis colle le lien ici.</div><input type="url" id="gym-drive-url-p" style="width:100%;border-radius:7px;padding:10px;background:#1e293b;color:white" placeholder="https://drive.google.com/file/d/..."></div><div id="gym-proof-name-p" class="gym-proof-name">Aucune preuve capturée</div></div><div class="ma"><button class="btn-cancel" onclick="closeModal('mo-gym-p')">Retour</button><button class="btn-ok" onclick="gymConfirmStartP()">ACTIVER ✓</button></div></div>`;document.body.appendChild(m);}
   function fillGymP(){ensureGymModalP();document.getElementById('gym-client-p').value='';gymMinP=30;gymPayP='especes';gymMoveP=GYM_MOVES[0];gymProofP=null;gymProofModeP='photo';document.getElementById('gym-drive-zone-p').style.display='none';document.getElementById('gym-drive-url-p').value='';{const pv=document.getElementById('gym-capture-preview-p');if(pv.dataset.blobUrl){URL.revokeObjectURL(pv.dataset.blobUrl);delete pv.dataset.blobUrl;}pv.innerHTML='';pv.style.display='none';}document.getElementById('gym-proof-name-p').textContent='Aucune preuve capturée';document.getElementById('gym-moves-p').innerHTML=GYM_MOVES.map((x,i)=>`<button type="button" class="gym-opt ${i===0?'sel':''}" onclick="gymSelectMoveP(this)" data-v="${escp(x)}">${escp(x)}</button>`).join('');document.getElementById('gym-time-p').innerHTML=GYM_TARIFFS.map((x,i)=>`<button type="button" class="gym-opt ${i===0?'sel':''}" onclick="gymSelectTimeP(${x.min},this)">${x.lbl}<small>${x.prix} F</small></button>`).join('');document.getElementById('gym-pay-p').innerHTML=OWNER_PAYS.map((x,i)=>`<button type="button" class="gym-opt ${i===0?'sel':''}" onclick="gymSelectPayP('${x.id}',this)">${x.emoji} ${x.lbl}</button>`).join('');}
 
   window.gymSelectMoveP=function(el){gymMoveP=el.dataset.v||GYM_MOVES[0];document.querySelectorAll('#gym-moves-p .gym-opt').forEach(z=>z.classList.remove('sel'));el.classList.add('sel');};
   window.gymSelectTimeP=function(min,el){gymMinP=Math.max(1,Number(min)||30);document.querySelectorAll('#gym-time-p .gym-opt').forEach(z=>z.classList.remove('sel'));el.classList.add('sel');};
   window.gymSelectPayP=function(id,el){gymPayP=id||'especes';document.querySelectorAll('#gym-pay-p .gym-opt').forEach(z=>z.classList.remove('sel'));el.classList.add('sel');};
 
-  window.gymOpenP=function(){try{if(gp().actif)return;fillGymP();openModal('mo-gym-p');}catch(e){console.error(e);showToast('Gymnastique : '+e.message);}};
-  function gymStartStatusP(msg){const status=document.getElementById('gym-result-p');if(status)status.textContent=msg;return showToast(msg);}
-  const gymConfirmStartImplP=async function(){const nom=(document.getElementById('gym-client-p').value||'').trim();if(!nom)return gymStartStatusP('⚠️ Entrez le nom du client');if(!gymProofP)return gymStartStatusP('📸 Prends une photo ou filme une vidéo avec la caméra avant ACTIVER');if(gymProofModeP==='video'&&!document.getElementById('gym-drive-url-p').value.trim())return gymStartStatusP('🎥 Colle le lien Drive de la vidéo que tu viens de filmer');const tar=gpTar(gymMinP);if(!tar)return;const now=Date.now(),sid='GYM-'+now+'-pat';gymStartStatusP('⏳ Envoi de la preuve...');try{const proof=await uploadGymProofP(gymProofP,sid);const st={actif:true,client:nom,mouvement:gymMoveP,finTs:now+gymMinP*60000,tempsTotal:gymMinP*60,dureeMin:gymMinP,paused:false,pauseRemainingSec:0,montantSession:tar.prix,ventesParJour:{[businessDateKey(new Date(now))]:tar.prix},paiement:gymPayP,sessionId:sid,startedAt:now,updatedAt:now,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveType:proof.type,preuveNom:proof.name};const tx=await fbRoot.transaction(root=>{root=root||{};if(root.gym&&root.gym.actif)return undefined;root.gym=st;const ss=freshSessionSnapshotFromRoot(root);ss.recettes=money(ss.recettes)+tar.prix;ss.parPoste['Gymnastique']=money(ss.parPoste['Gymnastique'])+tar.prix;ss.sessionsParPoste['Gymnastique']=Math.max(0,Number(ss.sessionsParPoste['Gymnastique'])||0)+1;ss.payStats[gymPayP]=money(ss.payStats[gymPayP])+tar.prix;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(!tx||!tx.committed)return gymStartStatusP('⚠️ Gym déjà occupé');if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerPersistActivity('🏃 Gymnastique — Session démarrée',nom+' · '+gymMoveP+' · '+gymMinP+' min · preuve photo/vidéo enregistrée',tar.prix+' F',{poste:'Gymnastique',client:nom,sessionId:sid,typeActivite:'gym_demarrage',mouvement:gymMoveP,dureeSec:gymMinP*60,montant:tar.prix,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveSalle:currentTenantKey,preuveType:proof.type,heureDebut:now,heureFinPrevue:now+gymMinP*60000});ownerSpeak('Gymnastique activée pour '+gymMinP+' minutes.');closeModal('mo-gym-p');gymStartStatusP('✅ Gym '+gymMinP+' min activé');renderControl();ownerRenderReport();}catch(e){console.log(e);gymStartStatusP('⚠️ '+(e.message||'Activation gym impossible'));}};
-  let gymStartBusyP=false;
-  window.gymConfirmStartP=async function(){
-    if(gymStartBusyP)return;
-    gymStartBusyP=true;
-    const btn=document.querySelector('#mo-gym-p .btn-ok'),status=document.getElementById('gym-result-p');
-    if(btn){btn.disabled=true;btn.textContent='VALIDATION EN COURS…';}
-    if(status)status.textContent='Enregistrement de la preuve et de la séance…';
-    try{return await gymConfirmStartImplP();}
-    finally{gymStartBusyP=false;if(btn){btn.disabled=false;btn.textContent='ACTIVER ✓';}}
-  };
+  window.gymOpenP=function(){if(gp().actif)return;fillGymP();openModal('mo-gym-p');};
+  window.gymConfirmStartP=async function(){const nom=(document.getElementById('gym-client-p').value||'').trim();if(!nom)return showToast('⚠️ Entrez le nom du client');if(!gymProofP)return showToast('📸 Prends une photo ou filme une vidéo avec la caméra avant ACTIVER');if(gymProofModeP==='video'&&!document.getElementById('gym-drive-url-p').value.trim())return showToast('🎥 Colle le lien Drive de la vidéo que tu viens de filmer');const tar=gpTar(gymMinP);if(!tar)return;const now=Date.now(),sid='GYM-'+now+'-pat';showToast('⏳ Envoi de la preuve...');try{const proof=await uploadGymProofP(gymProofP,sid);const st={actif:true,client:nom,mouvement:gymMoveP,finTs:now+gymMinP*60000,tempsTotal:gymMinP*60,dureeMin:gymMinP,paused:false,pauseRemainingSec:0,montantSession:tar.prix,ventesParJour:{[businessDateKey(new Date(now))]:tar.prix},paiement:gymPayP,sessionId:sid,startedAt:now,updatedAt:now,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveType:proof.type,preuveNom:proof.name};const tx=await fbRoot.transaction(root=>{root=root||{};if(root.gym&&root.gym.actif)return undefined;root.gym=st;const ss=freshSessionSnapshotFromRoot(root);ss.recettes=money(ss.recettes)+tar.prix;ss.parPoste['Gymnastique']=money(ss.parPoste['Gymnastique'])+tar.prix;ss.sessionsParPoste['Gymnastique']=Math.max(0,Number(ss.sessionsParPoste['Gymnastique'])||0)+1;ss.payStats[gymPayP]=money(ss.payStats[gymPayP])+tar.prix;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(!tx||!tx.committed)return showToast('⚠️ Gym déjà occupé');if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerPersistActivity('🏃 Gymnastique — Session démarrée',nom+' · '+gymMoveP+' · '+gymMinP+' min · preuve photo/vidéo enregistrée',tar.prix+' F',{poste:'Gymnastique',client:nom,sessionId:sid,typeActivite:'gym_demarrage',mouvement:gymMoveP,dureeSec:gymMinP*60,montant:tar.prix,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveSalle:currentTenantKey,preuveType:proof.type,heureDebut:now,heureFinPrevue:now+gymMinP*60000});ownerSpeak('Gymnastique activée pour '+gymMinP+' minutes.');closeModal('mo-gym-p');showToast('✅ Gym '+gymMinP+' min activé');renderControl();ownerRenderReport();}catch(e){console.log(e);showToast('⚠️ '+(e.message||'Activation gym impossible'));}};
   window.gymPauseP=async function(){const g=gp();if(!g.actif||g.paused)return;const rest=gpRest(g);try{const tx=await fbRoot.transaction(root=>{root=root||{};if(!root.gym||!root.gym.actif)return undefined;root.gym=Object.assign({},root.gym,{paused:true,pauseRemainingSec:rest,finTs:0,updatedAt:Date.now()});return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps mis en pause.');ownerPersistActivity('🏃 Gymnastique — Pause',(g.client||'Client')+' · '+gpFmt(rest)+' restantes','',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_pause'});renderControl();}}catch(e){showToast('⚠️ Pause gym impossible');}};
   window.gymResumeP=async function(){const g=gp();if(!g.actif||!g.paused)return;const rest=Math.max(1,Number(g.pauseRemainingSec)||0);try{const tx=await fbRoot.transaction(root=>{root=root||{};if(!root.gym||!root.gym.actif||!root.gym.paused)return undefined;root.gym=Object.assign({},root.gym,{paused:false,pauseRemainingSec:0,finTs:Date.now()+rest*1000,updatedAt:Date.now()});return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps repris.');ownerPersistActivity('🏃 Gymnastique — Reprise',g.client||'Client','',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_reprise'});renderControl();}}catch(e){showToast('⚠️ Reprise gym impossible');}};
   window.gymPlusP=async function(min){const g=gp();if(!g.actif)return;const tar=gpTar(min);if(!tar)return;try{const tx=await fbRoot.transaction(root=>{root=root||{};const x=root.gym||{};if(!x.actif)return undefined;const u=Object.assign({},x);if(u.paused)u.pauseRemainingSec=(Number(u.pauseRemainingSec)||0)+min*60;else u.finTs=(Number(u.finTs)||Date.now())+min*60000;u.tempsTotal=(Number(u.tempsTotal)||0)+min*60;u.montantSession=money(u.montantSession)+tar.prix;const dayKey=businessDateKey(new Date());
@@ -3133,8 +3124,8 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     }catch(e){console.error('Annulation Gym',e);showToast('⚠️ Annulation non enregistrée : '+(e.message||'erreur Firebase'));}
     finally{gymCancellationPendingP=false;}
   };
-  function renderGymP(){const box=document.getElementById('control-postes');if(!box)return;const old=document.getElementById('gym-card-p'),g=gp(),rest=gpRest(g),expired=g.actif&&rest===0;const sig=JSON.stringify(g)+'|'+expired;if(old&&old.dataset.gymState===sig){const clock=old.querySelector('.gz-gym-clock');if(clock)clock.textContent=g.actif?gpFmt(rest):'00:00';const fill=old.querySelector('.gz-yellow-fill');if(fill){fill.style.width=(g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)):0)+'%';fill.className='gz-yellow-fill '+(g.actif?gzProgressTone(rest,!!g.paused):'');}return;}if(old)old.remove();const card=document.createElement('div');card.dataset.gymState=sig;card.id='gym-card-p';card.className='ctl-card gym-card '+(g.actif?(g.paused?'paused':'active'):'');const proof=GymProofFree.cardHtml(g,currentTenantKey);card.innerHTML=`<div class="gym-head"><div><b>🏃 CASE 8 — GYMNASTIQUE</b><small>Vélo · Abdos · Jambes · Bras</small></div><span>${g.paused?'PAUSE':(g.actif?'EN COURS':'LIBRE')}</span></div><div class="gz-gym-remaining-label">⏱ TEMPS RESTANT — ${g.paused?'EN PAUSE':'DÉCOMPTE ACTIF'}</div><div class="gym-timer-row"><strong class="gz-gym-clock">${g.actif?gpFmt(rest):'00:00'}</strong><em>${g.actif?money(g.montantSession)+' F':''}</em></div><div class="gz-yellow-progress"><div class="gz-yellow-fill ${g.actif?gzProgressTone(rest,!!g.paused):''}" style="width:${g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)).toFixed(2):0}%"></div></div><div class="gym-client">${g.actif?escp(g.client||'Client')+' · '+escp(g.mouvement||'Gymnastique'):'Disponible · 30 min = 100 F · 1 h = 200 F'}</div>${proof}<div class="gym-actions">${expired?'<span>⏳ Temps terminé — libération automatique</span>':!g.actif?`<button onclick="gymOpenP()">DÉMARRER</button>`:(g.paused?`<button class="gz-gym-action" onclick="gymResumeP()">▶ REPRENDRE</button>`:`<button class="gz-gym-action" onclick="gymPauseP()">⏸ PAUSE</button>`)}${g.actif&&!expired?`<button class="gz-gym-action" onclick="gymPlusP(30)">+ 30 min / 100 F</button><button class="gz-gym-action" onclick="gymPlusP(60)">+ 1 h / 200 F</button><button class="gz-gym-action gz-gym-cancel" onclick="gymOpenCancelP()">↩ ANNULER LA SÉANCE</button>`:''}</div><div class="gym-no-cancel">🔒 Annulation réservée au Patron · Motif obligatoire · Sans effacer les anciennes recettes.</div>`;box.appendChild(card);}
-  const oldRC=window.renderControl;window.renderControl=function(){const gymSaved=document.getElementById('gym-card-p');const r=oldRC&&oldRC.apply(this,arguments);if(gymSaved&&!document.getElementById('gym-card-p')){const grid=document.getElementById('control-postes');if(grid)grid.appendChild(gymSaved);}try{document.querySelectorAll('#control-postes .ctl-card').forEach(c=>{const badge=c.querySelector('.b-off'),type=c.querySelector('.ctl-type');if(badge&&type&&!/LIBRE/i.test(type.textContent))type.textContent=type.textContent+' · LIBRE';});renderGymP();}catch(e){console.log(e);}return r;};
+  function renderGymP(){const box=document.getElementById('control-postes');if(!box)return;const old=document.getElementById('gym-card-p');if(old)old.remove();const g=gp(),rest=gpRest(g),expired=g.actif&&rest===0,card=document.createElement('div');card.id='gym-card-p';card.className='ctl-card gym-card '+(g.actif?(g.paused?'paused':'active'):'');const proof=GymProofFree.cardHtml(g,currentTenantKey);card.innerHTML=`<div class="gym-head"><div><b>🏃 CASE 8 — GYMNASTIQUE</b><small>Vélo · Abdos · Jambes · Bras</small></div><span>${g.paused?'PAUSE':(g.actif?'EN COURS':'LIBRE')}</span></div><div class="gz-gym-remaining-label">⏱ TEMPS RESTANT — ${g.paused?'EN PAUSE':'DÉCOMPTE ACTIF'}</div><div class="gym-timer-row"><strong class="gz-gym-clock">${g.actif?gpFmt(rest):'00:00'}</strong><em>${g.actif?money(g.montantSession)+' F':''}</em></div><div class="gz-yellow-progress"><div class="gz-yellow-fill ${g.actif?gzProgressTone(rest,!!g.paused):''}" style="width:${g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)).toFixed(2):0}%"></div></div><div class="gym-client">${g.actif?escp(g.client||'Client')+' · '+escp(g.mouvement||'Gymnastique'):'Disponible · 30 min = 100 F · 1 h = 200 F'}</div>${proof}<div class="gym-actions">${expired?'<span>⏳ Temps terminé — libération automatique</span>':!g.actif?`<button onclick="gymOpenP()">DÉMARRER</button>`:(g.paused?`<button class="gz-gym-action" onclick="gymResumeP()">▶ REPRENDRE</button>`:`<button class="gz-gym-action" onclick="gymPauseP()">⏸ PAUSE</button>`)}${g.actif&&!expired?`<button class="gz-gym-action" onclick="gymPlusP(30)">+ 30 min / 100 F</button><button class="gz-gym-action" onclick="gymPlusP(60)">+ 1 h / 200 F</button><button class="gz-gym-action gz-gym-cancel" onclick="gymOpenCancelP()">↩ ANNULER LA SÉANCE</button>`:''}</div><div class="gym-no-cancel">🔒 Annulation réservée au Patron · Motif obligatoire · Sans effacer les anciennes recettes.</div>`;box.appendChild(card);}
+  const oldRC=window.renderControl;window.renderControl=function(){const r=oldRC&&oldRC.apply(this,arguments);try{document.querySelectorAll('#control-postes .ctl-card').forEach(c=>{const badge=c.querySelector('.b-off'),type=c.querySelector('.ctl-type');if(badge&&type&&!/LIBRE/i.test(type.textContent))type.textContent=type.textContent+' · LIBRE';});renderGymP();}catch(e){console.log(e);}return r;};
   async function finishGymP(){if(gymTimerBusyP)return;const g=gp();if(!g.actif||gpRest(g)>0)return;gymTimerBusyP=true;try{const sid=g.sessionId||'';const tx=await fbRoot.transaction(root=>{root=root||{};const x=root.gym||{};if(!x.actif||(sid&&x.sessionId&&x.sessionId!==sid))return undefined;root.gym=Object.assign({},x,{actif:false,finTs:0,paused:false,pauseRemainingSec:0,updatedAt:Date.now(),endedAt:Date.now()});const ss=freshSessionSnapshotFromRoot(root);ss.count=Math.max(0,Number(ss.count)||0)+1;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps terminé.');ownerPersistActivity('🏃 Gymnastique — Temps écoulé',(g.client||'Client')+' · '+(g.mouvement||'Gymnastique')+' · session terminée',money(g.montantSession)+' F',{poste:'Gymnastique',client:g.client||'',sessionId:sid,typeActivite:'gym_terminee',mouvement:g.mouvement||'',preuveUrl:g.preuveUrl||'',preuvePath:g.preuvePath||'',preuveKind:g.preuveKind||'',preuveSalle:currentTenantKey});renderControl();ownerRenderReport();}}catch(e){console.log(e);}finally{gymTimerBusyP=false;}}
   setInterval(()=>{try{if(loggedIn){finishGymP();const c=document.getElementById('gym-card-p');if(c)renderGymP();}}catch(_e){}},1000);
 
@@ -3167,16 +3158,14 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
       throw new Error('Utilise le site HTTPS, et sur iPhone installe GameZone sur l’écran d’accueil.');
     // iPhone Safari exige le clic utilisateur DIRECT pour la demande d'autorisation.
     const permission=await Notification.requestPermission();
-    if(permission!=='granted')throw new Error(permission==='denied'?'Notifications bloquées pour ce site. Ouvre GameZone directement dans Chrome, puis paramètres du site > Notifications > Autoriser. Sur iPhone, ouvre GameZone depuis son icône sur l’écran d’accueil.':'Autorisation non accordée. Ouvre GameZone dans ton navigateur habituel puis clique à nouveau la cloche et autorise les notifications.');
+    if(permission!=='granted')throw new Error('Autorisation refusée par le téléphone.');
     const token=await firebaseLoginToken();
     if(!token)throw new Error('Connecte-toi à la salle GameZone avant d’activer les notifications.');
     const keyReq=await fetch(WORKER_URL+'/?action=pushKey',{cache:'no-store'});
     const keyData=await keyReq.json();
     if(!keyData.success||!keyData.key)throw new Error('Le serveur de notifications n’est pas encore configuré.');
-    let readyTimer,reg;
-    try{reg=await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>{readyTimer=setTimeout(()=>reject(new Error('Service de notifications non prêt. Recharge le site dans ton navigateur habituel puis réessaie.')),12000);})]);}finally{clearTimeout(readyTimer);}
+    const reg=await navigator.serviceWorker.ready;
     let sub=await reg.pushManager.getSubscription();
-    if(sub&&sub.options.applicationServerKey){const old=new Uint8Array(sub.options.applicationServerKey),current=keyBytes(keyData.key);if(old.length!==current.length||old.some((b,i)=>b!==current[i])){await sub.unsubscribe();sub=null;}}
     if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(keyData.key)});
     const resp=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
       body:JSON.stringify({tenantKey:'GZ-07732',action:'subscribePush',subscription:sub.toJSON(),url:location.href.split(/[?#]/)[0],role:ROLE})});
@@ -3202,152 +3191,5 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
   else setTimeout(bind,0);
 })();
 </script>
-<script>
-// SYNC8: OFF is retried only by an explicit user action, never from an old queue.
-(function(){
- const gerant=false;
- window.gzRecordPausePower=async function(poste,index,confirmed){
-  if(!fbRoot)return;
-  const result=await fbRoot.transaction(root=>{root=root||{};const live=rootReadActive(root,poste,index)||{};
-    if(!live.actif||!live.paused||live.sessionId!==poste.sessionId)return undefined;
-    rootWriteActive(root,poste,index,{...live,pausePowerOffConfirmed:confirmed===true,pausePowerCheckedAt:Date.now(),updatedAt:Date.now()});return root;},undefined,false);
-  if(result&&result.snapshot){if(gerant)syncFromTransactionResult(result);else{DB._cache=result.snapshot.val()||DB._cache;renderControl();}}
- };
- const busy=new Set();
- window.gzRetryPausedPower=async function(index){
-  if(busy.has(index)||!fbRoot)return;busy.add(index);
-  try{
-    const snapshot=await fbRoot.once('value'),root=snapshot.val()||{},p=(root.postes||[])[index];
-    if(!p)return showToast('Poste introuvable');
-    const live=rootReadActive(root,p,index)||{};
-    if(!live.actif||!live.paused)return showToast('Le poste a changé : aucune commande OFF envoyée.');
-    const entry={...p,sessionId:live.sessionId};
-    const ok=gerant?await eteindrePrise(entry,'pause'):await ownerReliableOff(entry);
-    await gzRecordPausePower(entry,index,ok);
-    showToast(ok?'✅ Prise éteinte : temps toujours en pause.':'⚠️ OFF non confirmé. Vérifie cette prise dans Smart Life.');
-  }catch(e){showToast('OFF non confirmé : '+String(e.message||e).slice(0,110));}
-  finally{busy.delete(index);}
- };
-})();
-</script>
-
-<script>
-let ownerReduceChoice=null;
-function ownerOpenReduce(index){
- const posts=DB.get('postes')||[],post=posts[index],state=post&&activeForPoste(post,index);
- if(!post||!state||!state.actif)return showToast('Choisis un poste en cours.');
- if(!state.sessionId)return showToast('Actualise la séance avant de réduire le temps.');
- let modal=document.getElementById('mo-owner-reduce');
- if(!modal){modal=document.createElement('div');modal.className='mo';modal.id='mo-owner-reduce';modal.innerHTML=`<div class="ms"><div class="mh"></div><div class="mt" id="owner-reduce-title">Diminuer le temps</div><p id="owner-reduce-current" style="color:#d1d5db"></p><div class="ig"><label>Minutes à retirer</label><input id="owner-reduce-minutes" type="number" inputmode="numeric" min="1" max="1440" step="1" value="1"></div><p style="font-size:12px;line-height:1.6;color:#fbbf24">La recette et le tarif restent inchangés. Si le temps arrive à zéro, la séance se termine et l’extinction est demandée.</p><div id="owner-reduce-result" role="status" aria-live="polite" style="font-size:12px;line-height:1.5"></div><div class="ma"><button class="btn-cancel" onclick="closeModal('mo-owner-reduce')">RETOUR</button><button id="owner-reduce-confirm" class="btn-ok" onclick="ownerConfirmReduce()">RETIRER LE TEMPS</button></div></div>`;document.body.appendChild(modal);}
- const operationId=typeof crypto.randomUUID==='function'?crypto.randomUUID():('R'+Date.now()+'-'+Math.random().toString(36).slice(2,12));
- ownerReduceChoice={index,post,sessionId:state.sessionId,updatedAt:Number(state.updatedAt||0),operationId};
- document.getElementById('owner-reduce-title').textContent=GameZoneManagement.displayName(post)+' — Diminuer le temps';
- document.getElementById('owner-reduce-current').textContent='Temps restant : '+fmtRest(remainingActive(state))+(state.paused?' · EN PAUSE':'');
- document.getElementById('owner-reduce-minutes').value='1';document.getElementById('owner-reduce-result').textContent='';openModal('mo-owner-reduce');
-}
-async function ownerConfirmReduce(){
- const choice=ownerReduceChoice,button=document.getElementById('owner-reduce-confirm'),status=document.getElementById('owner-reduce-result');
- if(!choice||button.disabled)return;
- const minutes=Number(document.getElementById('owner-reduce-minutes').value);
- if(!Number.isSafeInteger(minutes)||minutes<1||minutes>1440){status.textContent='Entre un nombre entier de minutes de 1 à 1440.';return;}
- if(choice.sentMinutes!==undefined&&choice.sentMinutes!==minutes){status.textContent='Rouvre le bouton − Temps pour choisir une nouvelle durée.';return;}
- button.disabled=true;status.textContent='Réduction en cours…';
- const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),15000);
- try{
-  const user=firebase.auth().currentUser;if(!user)throw Error('Connexion Patron requise');
-  const token=await user.getIdToken();choice.sentMinutes=minutes;
-  const response=await fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action:'reduceTime',posteNum:choice.post.num,minutes,sessionId:choice.sessionId,expectedUpdatedAt:choice.updatedAt,operationId:choice.operationId}),signal:controller.signal});
-  const result=await response.json();if(!response.ok||!result.success)throw Error(result.error||'Réduction non confirmée');
-  DB._cache.active_by_poste={...(DB._cache.active_by_poste||{}),[remotePostKey(choice.post.num)]:result.state};renderControl();
-  if(!result.duplicate)ownerPersistActivity(choice.post.num+' — Temps diminué par le patron',fmtRest(result.removedSeconds)+' retirées · recette conservée','',{poste:choice.post.num,sessionId:choice.sessionId,typeActivite:'reduction_temps',dureeRetireeSec:result.removedSeconds});
-  if(!result.schedulerConfirmed)gzCloudTimerSync(choice.post.num);
-  closeModal('mo-owner-reduce');ownerReduceChoice=null;
-  ownerSpeak(ownerSpeechPosteName(choice.post.num)+', temps diminué de '+Math.ceil(result.removedSeconds/60)+' minutes.');
-  showToast(result.schedulerConfirmed?'✅ Temps réduit, recette conservée.':'⚠️ Temps réduit ; alarme serveur à confirmer. Garde GameZone ouvert.');
- }catch(e){status.textContent=e.name==='AbortError'?'Réponse interrompue : réessaie ici avec la même durée pour vérifier sans double réduction.':String(e.message||e);}
- finally{clearTimeout(timeout);button.disabled=false;}
-}
-</script>
-
-<script>
-// TUYA11: no local clock is frozen before the server confirms relay OFF.
-(function(){
- const gerant=false,requests=new Map(),inFlight=new Set();
- window.gzPauseViaServer=async function(index,retryOnly=false){
-  if(inFlight.has(index)||!fbRoot)return false;
-  const list=gerant?postes:(DB.get('postes')||[]),post=list[index];
-  const state=gerant?post:(post&&activeForPoste(post,index));
-  if(!post||!state||!state.actif||!state.sessionId)return showToast('Séance introuvable : actualise les postes.');
-  if(retryOnly&&!state.paused)return showToast('Séance reprise : aucune nouvelle commande OFF envoyée.');
-  const key=post.num+'|'+state.sessionId;
-  if(!requests.has(key))requests.set(key,typeof crypto.randomUUID==='function'?crypto.randomUUID():('P'+Date.now()+'-'+Math.random().toString(36).slice(2,12)));
-  const operationId=requests.get(key);inFlight.add(index);
-  showToast('Extinction de '+post.num+' en cours… Le temps continue jusqu’à confirmation.');
-  const ctrl=new AbortController();let timeout=setTimeout(()=>ctrl.abort(),30000);
-  try{
-    const token=gerant?await ensureFirebaseToken():await firebase.auth().currentUser.getIdToken();
-    const sendPause=offlineConfirmed=>fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action:'pauseConfirmed',posteNum:post.num,sessionId:state.sessionId,operationId,retryOnly,offlineConfirmed}),signal:ctrl.signal});
-    let response=await sendPause(false),result=await response.json();
-    if(result.offlinePauseAvailable&&!retryOnly){
-      clearTimeout(timeout);
-      if(!confirm(post.num+' : prise hors ligne. Confirme que la télévision est débranchée ou sans courant. Mettre le temps restant en pause ? L’application ne peut pas confirmer l’extinction. La reprise sera manuelle.'))return false;
-      timeout=setTimeout(()=>ctrl.abort(),30000);
-      response=await sendPause(true);result=await response.json();
-    }
-    if(!response.ok||!result.success||(!result.powerOffConfirmed&&!result.manualOffline))throw Error(result.error||'Extinction non confirmée : pause non validée.');
-    const pauseLabel=result.manualOffline?'Pause manuelle — prise hors ligne':'Pause après extinction confirmée';
-    DB._cache.active_by_poste={...(DB._cache.active_by_poste||{}),[remotePostKey(post.num)]:result.state};
-    if(gerant){refreshFromRemote();if(!result.duplicate)addJournal('y',post.num+' — '+pauseLabel,state.client||'Client','');gzSpeak(speechPosteName(post.num)+(result.manualOffline?', temps en pause manuelle. Extinction non vérifiable.':', télévision éteinte et temps en pause.'));}
-    else{renderControl();if(!result.duplicate)ownerPersistActivity(post.num+' — '+pauseLabel,state.client||'Client','',{poste:post.num,sessionId:state.sessionId,typeActivite:'pause'});ownerSpeak(ownerSpeechPosteName(post.num)+(result.manualOffline?', temps en pause manuelle. Extinction non vérifiable.':', télévision éteinte et temps en pause.'));}
-    requests.delete(key);showToast('✅ '+post.num+(result.manualOffline?' : temps en pause manuelle, extinction non vérifiable.':' : prise OFF confirmée, temps en pause.'));return true;
-  }catch(e){showToast(e.name==='AbortError'?'Confirmation non reçue : vérifie l’état synchronisé puis réessaie Pause.':String(e.message||e));return false;}
-  finally{clearTimeout(timeout);inFlight.delete(index);if(gerant&&fbForcePoll)fbForcePoll();}
- };
- window.gzRetryPausedPower=index=>window.gzPauseViaServer(index,true);
-})();
-</script>
-
-<script>
-// Read-only Tuya check: no relay or Firebase state is changed.
-(function(){
- const button=document.createElement('button');button.type='button';button.textContent='🔎 Vérifier Tuya';button.style.cssText='margin:12px;padding:12px;border-radius:10px;background:#25223c;color:white;border:1px solid #706080';
- button.onclick=async()=>{
-  if(!fbRoot||!firebase.auth().currentUser)return showToast('Connecte-toi au compte Patron.');
-  button.disabled=true;
-  const dialog=document.createElement('dialog'),title=document.createElement('h3'),output=document.createElement('pre'),close=document.createElement('button');
-  title.textContent='Diagnostic Tuya — lecture seule';output.textContent='Vérification des six prises…';output.style.cssText='white-space:pre-wrap;font:14px sans-serif;line-height:1.6';close.textContent='Fermer';close.onclick=()=>dialog.close();dialog.append(title,output,close);dialog.style.cssText='background:#171625;color:white;border:1px solid #706080;border-radius:16px;max-width:90vw';document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
-  try{
-   const token=await firebase.auth().currentUser.getIdToken();
-   const response=await fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action:'diagnosticTuya'})}),result=await response.json();
-   if(!response.ok||!result.success)throw Error(result.error||'Diagnostic indisponible');
-   output.textContent=result.devices.map(d=>'Poste '+d.poste+' — '+d.devid+'\n'+(d.readable?('En ligne : '+(d.online===true?'oui':d.online===false?'non':'inconnu')+' ; relais : '+(d.switchCode||'non identifié')+' ; état : '+(d.switchOn===true?'ON':d.switchOn===false?'OFF':'inconnu')+(d.onlineError?'\n'+d.onlineError:'')):d.error)).join('\n\n')+'\n\nCe contrôle ne coupe aucune prise. Vérifie aussi la correspondance physique dans Smart Life.';
-  }catch(e){output.textContent=String(e.message||e);}finally{button.disabled=false;}
- };
- const anchor=document.getElementById('gz-build-version');if(anchor)anchor.after(button);else document.body.append(button);
-})();
-</script>
-
-<script>
-// AUTO16: server confirms physical state before closing or resuming a session.
-(function(){
- const gerant=false,attempts=new Map();
- window.gzConfirmFinish16=async function(post,state){
-  const key=post.num+'|'+state.sessionId,now=Date.now();if(now-(attempts.get(key)||0)<10000)return false;attempts.set(key,now);
-  try{await request('finishConfirmed',post,state);return true;}catch(e){showToast('⚠️ '+post.num+' : temps terminé, extinction non confirmée. '+e.message);return false;}
- };
- async function request(action,post,state){
-  const token=gerant?await ensureFirebaseToken():await firebase.auth().currentUser.getIdToken();
-  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);
-  try{const r=await fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action,posteNum:post.num,sessionId:state.sessionId}),signal:ctrl.signal}),v=await r.json();if(!r.ok||!v.success||!(action==='finishConfirmed'?v.powerOffConfirmed:v.powerOnConfirmed))throw Error(v.error||'Commande non confirmée');return v;}finally{clearTimeout(timer);}
- }
- const resuming=new Set();
- async function resume(index){
-  if(resuming.has(index))return;const posts=gerant?postes:(DB.get('postes')||[]),post=posts[index],st=gerant?post:(post&&activeForPoste(post,index));if(!st?.actif||!st.paused)return;
-  resuming.add(index);try{const v=await request('resumeConfirmed',post,st);DB._cache.active_by_poste={...(DB._cache.active_by_poste||{}),[remotePostKey(post.num)]:v.state};if(gerant){refreshFromRemote();gzSpeak(speechPosteName(post.num)+', temps repris.');}else{renderControl();ownerSpeak(ownerSpeechPosteName(post.num)+', temps repris.');}showToast('▶ '+post.num+' : reprise confirmée');}catch(e){showToast('⚠️ '+e.message);}finally{resuming.delete(index);}
- }
- if(gerant)reprendrePoste=resume;else ownerResume=resume;
-})();
-</script>
-
 </body>
 </html>
