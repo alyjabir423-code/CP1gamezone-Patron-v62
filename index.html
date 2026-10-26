@@ -1566,11 +1566,18 @@ async function ownerConfirmCancel(){
   const totalAmount=money(local.montantSession),todayAmount=startedKey===dayKey?totalAmount:Math.min(totalAmount,money(local.montantJourSession));
   const rest=remainingActive(local),totalSec=Math.max(0,Number(local.tempsTotal)||0),used=Math.max(0,totalSec-rest),detail=Object.assign({},local.paiementsSession||{});
   try{
+    showToast('Annulation en cours : vérification de l’extinction…');
+    if(p.devid && !(await gzPauseViaServer(ownerCancelIdx)))return;
+    const confirmed=activeForPoste(p,ownerCancelIdx)||{};
+    if(p.devid && (!confirmed.paused || confirmed.pausePowerOffConfirmed!==true || confirmed.sessionId!==sid)){
+      showToast('Extinction non confirmée : annulation non finalisée.');return;
+    }
     const res=await fbRoot.transaction(root=>{
       root=root||{};root.refunded_sessions=root.refunded_sessions||{};root.closed_sessions=root.closed_sessions||{};
       if(sid&&root.refunded_sessions[sid])return root;
       const remote=rootReadActive(root,Object.assign({},p,local),ownerCancelIdx)||{};
       if(!remote.actif||(sid&&remote.sessionId&&remote.sessionId!==sid))return;
+      if(p.devid && (!remote.paused || remote.pausePowerOffConfirmed!==true || Number(remote.updatedAt)!==Number(confirmed.updatedAt)))return;
       const refund=Math.max(0,todayAmount);
       const ss=freshSessionSnapshotFromRoot(root);ss.recettes=Math.max(0,money(ss.recettes)-refund);ss.parPoste=ownerSubtractPosteBreakdown(ss.parPoste||{},p.num,refund);ss.payStats=ownerSubtractPaymentBreakdown(ss.payStats||{},detail,refund);
       if(startedKey===dayKey){ss.sessionsParPoste=Object.assign({},ss.sessionsParPoste||{});ss.sessionsParPoste[p.num]=Math.max(0,Math.floor(Number(ss.sessionsParPoste[p.num])||0)-1);if(ss.sessionsParPoste[p.num]===0)delete ss.sessionsParPoste[p.num];}
@@ -1584,7 +1591,7 @@ async function ownerConfirmCancel(){
     if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;
     ownerSpeak(ownerSpeechPosteName(p.num)+', temps annulé.');closeModal('mo-owner-cancel');
     ownerPersistActivity(p.num+' — Vente annulée par le patron',`${local.client||'Client'} · Début ${ownerFmtClock(local.startedAt)} · Annulé ${ownerFmtClock(now)} · utilisé ${fmtRest(used)} · restant ${fmtRest(rest)} · Motif: ${reason}`,'-'+todayAmount.toLocaleString('fr-FR')+' F',{poste:p.num,client:local.client||'',sessionId:sid,typeActivite:'annulee',tempsUtiliseSec:used,tempsRestantSec:rest,montant:-todayAmount,raison:reason});
-    if(p.devid)await ownerReliableOff(p);
+    // Physical OFF was confirmed before the accounting transaction; never send a late OFF.
     renderControl();renderHome();showToast(`↩ ${p.num} annulé · ${todayAmount.toLocaleString('fr-FR')} F retirés`);
   }catch(e){console.log('Annulation patron:',e);showToast('⚠️ Annulation impossible — vérifiez Internet');}
   finally{setTimeout(()=>ownerCancelLocks.delete(lock),800);}
