@@ -893,7 +893,7 @@ function gzCloudTimerSync(poste, attempt=0){
       if(!token)throw Error('Jeton Firebase absent');
       const payload={tenantKey:currentTenantKey,action:poste==null?'syncAllTimers':'syncTimer'};
       if(poste!=null)payload.poste=String(poste);
-      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),9000);
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);
       let resp;
       try {resp=await fetch(TUYA_WORKER_URL,{method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
@@ -1247,7 +1247,7 @@ async function ownerTuyaCommand(poste,turnOn){
     });
     const d=await r.json();
     if(!r.ok||!d.success){gzTuyaError=gzTuyaReason(r,d,'Commande');console.log('Tuya patron refusé:',d);return false;}
-    const confirmed=await ownerVerifySwitch(poste,turnOn);
+    const confirmed=d.device?.online===true && d.device?.switchOn===turnOn;
     if(!confirmed&&!gzTuyaError)gzTuyaError="Commande acceptée, état ON/OFF non confirmé";
     if(confirmed&&turnOn)ownerClearOff(poste);
     return confirmed;
@@ -1833,14 +1833,7 @@ async function ownerFinishExpired(i,p,a){
     },undefined,false);
     if(!result||!result.committed)return;
     if(result.snapshot&&typeof result.snapshot.val==='function')DB._cache=result.snapshot.val()||DB._cache;
-    // V34 : priorité au OFF physique ; les animations et journaux viennent après.
-    try{
-      // V34 : lecture ciblée pour éviter de charger tout l'historique avant OFF.
-      const live=(await fbRoot.child('active_by_poste').child(remotePostKey(p.num)).once('value')).val()||{};
-      if(!live.actif&&live.cleanup&&live.sessionId===sid&&Date.now()<Number(live.cleanupUntil||0)){
-        if(p.devid){const off=await ownerTuyaCommand(p,false);if(!off)setStatusP('⚠️ '+p.num+' LIBRE mais OFF non confirmé dans Smart Life','danger');}
-      }
-    }catch(e){console.warn('OFF après clôture Patron:',e);}
+    // OFF is already confirmed for this session; do not send a second OFF.
     renderControl();renderHome();
     ownerSpeak('Temps terminé pour '+ownerSpeechPosteName(p.num)+'.');
     ownerTextVoiceNotify('GameZone — Fin de session',ownerSpeechPosteName(p.num)+' : temps terminé, télévision éteinte.','');
