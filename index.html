@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="GZ Patron">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>GameZone Bah V65 Gym4 — Patron</title>
+<title>GameZone CP1 V65 Gym4 — Patron</title>
 <style>
 /* Police système : la page Patron s'affiche même si Google Fonts est inaccessible. */
 :root{--bg:#0a0f1e;--surface:#0f1628;--card:#162040;--border:#1e2d52;--gold:#f59e0b;--gl:#fcd34d;--green:#10b981;--red:#ef4444;--blue:#6366f1;--purple:#8b5cf6;--text:#f0f4ff;--muted:#64748b;--sub:#94a3b8;--fd:'Rajdhani',sans-serif;--fb:'Inter',sans-serif;--r:14px;--rs:9px}
@@ -321,7 +321,7 @@ button,.ni,.ctl-btn{touch-action:manipulation}
     const permission=await Notification.requestPermission();
     if(permission!=='granted')return alert('Notifications non autorisées. Vérifie les réglages du téléphone.');
     const registration=await navigator.serviceWorker.ready;
-    await registration.showNotification('GameZone Bah — notifications activées',{body:'Ce test confirme les notifications locales. Les alertes à distance nécessitent la configuration FCM/Web Push.',tag:'gz-notification-test'});
+    await registration.showNotification('GameZone CP1 — notifications activées',{body:'Ce test confirme les notifications locales. Les alertes à distance nécessitent la configuration FCM/Web Push.',tag:'gz-notification-test'});
     b.title='Notifications autorisées sur ce téléphone';
    }catch(err){alert('Impossible d’activer les notifications : '+err.message);}
   };
@@ -360,11 +360,11 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-</head>
+<script src="./youssef-relay.js?v=complete03"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
-  <div style="font-family:'Rajdhani',sans-serif;font-size:20px;color:#c084fc;letter-spacing:2px">👑 GAMEZONE CI</div>
+  <div style="font-family:'Rajdhani',sans-serif;font-size:20px;color:#c084fc;letter-spacing:2px">👑 GAMEZONE CP1</div>
   <div style="font-size:12px;color:#9ca3af">Connexion au serveur...</div>
 </div>
 
@@ -400,7 +400,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 
 <div id="login-screen">
   <div class="login-icon">👑</div>
-  <div class="login-logo" id="ll-logo">GAMEZONE CI</div>
+  <div class="login-logo" id="ll-logo">GAMEZONE CP1</div>
   <div class="login-sub">Espace Propriétaire · Sécurisé</div>
   <div class="login-card">
     <div class="ig"><label>E-mail Patron</label><input type="email" id="lu" placeholder="votre@email.com" autocomplete="username"></div>
@@ -410,7 +410,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
   </div>
   <div style="margin-top:20px;padding:12px 16px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3);border-radius:10px;max-width:340px;width:100%;text-align:center">
     <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:2px">🔐 Connexion sécurisée Firebase</div>
-    <div style="font-size:11px;color:var(--muted)">GameZone Bah V62 · accès réservé au compte Patron autorisé.</div>
+    <div style="font-size:11px;color:var(--muted)">GameZone CP1 V62 · accès réservé au compte Patron autorisé.</div>
   </div>
 </div>
 
@@ -465,7 +465,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <div style="font-size:10px;color:var(--muted);margin:-4px 2px 10px;line-height:1.45">⏻ <b style="color:#fca5a5">OFF TV</b> est réservé au Patron : il éteint la TV, met le temps à 00:00 et libère le poste sans retirer la recette.</div>
       <div class="sh"><h2>Postes</h2><span id="ctl-active-count">0 actif</span></div>
       <div class="control-grid" id="control-postes"></div>
-      <div class="sh" style="margin-top:18px"><h2>Activité</h2><span>07h00 → 06h59</span></div>
+      <div class="sh" style="margin-top:18px"><h2>Activité</h2><span>00h00 → 23h59</span></div>
       <div class="owner-jbox"><div class="owner-jhdr">Journal de session</div><div id="owner-journal-list"></div></div>
     </div>
 
@@ -494,7 +494,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
         <div style="font-size:14px;font-weight:700;color:#facc15">🔒 Correction de recette — Patron uniquement</div>
         <div style="font-size:11px;color:var(--sub);line-height:1.6;margin:5px 0 12px">Choisis le jour actuel ou une journée précédente enregistrée. Une correction ne crée ni faux client, ni nouvelle séance et ne touche pas aux prises. Motif obligatoire. Le journal privé est réservé au Patron.</div>
         <div id="patron-corr-live-total" style="color:#4ade80;font-size:12px;margin-bottom:10px">Recette du jour : chargement Firebase…</div>
-        <div class="ig"><label for="patron-corr-date">Journée à corriger (journée de gestion dès 07h)</label><input type="date" id="patron-corr-date" onchange="patronPopulateRevenuePostes()"></div>
+        <div class="ig"><label for="patron-corr-date">Journée à corriger (journée de gestion dès 08h)</label><input type="date" id="patron-corr-date" onchange="patronPopulateRevenuePostes()"></div>
         <div class="ig"><label for="patron-corr-poste">Poste concerné</label><select id="patron-corr-poste" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"></select></div>
         <div class="ig"><label for="patron-corr-sens">Opération</label><select id="patron-corr-sens" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"><option value="add">+ Ajouter une vente réelle oubliée</option><option value="subtract">− Retirer un montant saisi par erreur</option></select></div>
         <div class="ig"><label for="patron-corr-amount">Montant en F CFA (multiple de 100)</label><input id="patron-corr-amount" type="number" inputmode="numeric" min="100" max="100000" step="100" placeholder="Ex. 200" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"/></div>
@@ -509,7 +509,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 
     <!-- HISTORIQUE PROPRIÉTAIRE -->
     <div class="page" id="page-history">
-      <div class="sh"><h2>Historique</h2><span>07h00 → 06h59</span></div>
+      <div class="sh"><h2>Historique</h2><span>00h00 → 23h59</span></div>
       <div class="sh"><h2>Par jour</h2></div><div class="owner-report-card"><div class="owner-hist-list" id="oh-days"></div></div>
       <div class="sh"><h2>Par mois</h2></div><div class="owner-report-card"><div class="owner-hist-list" id="oh-months"></div></div>
     </div>
@@ -518,7 +518,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
     <div class="page" id="page-postes">
       <div class="sh"><h2>Postes & Prises Tuya</h2><span id="nb-postes">0</span></div>
       <div class="info-box">
-        🔐 Chaque poste peut être lié à une <b>Smart Plug Tuya</b>. Renseignez uniquement son <b>Device ID</b>. Les clés Tuya restent protégées dans Cloudflare Worker.
+        🔐 Chaque poste peut être lié à une <b>Smart Plug Tuya</b>. Renseignez uniquement son <b>Device ID</b>. Les clés Tuya restent protégées dans relais OPPO CP1.
       </div>
       <div class="card" id="list-postes"></div>
       <button class="btn-add" onclick="openModalPoste()">+ Ajouter un poste</button>
@@ -549,14 +549,14 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <div class="info-box" style="margin-bottom:12px">🔐 Chaque gérant a son identifiant et son mot de passe personnel. Utilisez <b>BLOQUER</b> pour lui retirer aussitôt l'accès. Le mot de passe n'est ni enregistré ni affiché ici.</div>
       <div class="card" id="list-gerants"></div>
       <button class="btn-add" onclick="openModalGerant()">+ Ajouter un gérant</button>
-      <button class="btn-add" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.4);color:#93c5fd;margin-top:10px" onclick="gzImportCp1()">🔐 Associer le compte CP1 existant</button>
+      
     </div>
 
     <!-- PARAMÈTRES -->
     <div class="page" id="page-params">
       <div class="sh"><h2>Paramètres</h2></div>
       <div class="info-box">
-        🔐 <b>Tuya sécurisé.</b> Le Client ID et le Client Secret sont conservés uniquement dans Cloudflare Worker et ne sont plus enregistrés dans Firebase ni dans cette application.
+        🔐 <b>Tuya sécurisé.</b> Le Client ID et le Client Secret sont conservés uniquement dans relais OPPO CP1 et ne sont plus enregistrés dans Firebase ni dans cette application.
       </div>
       <div class="info-box" style="margin-top:10px">
         ✅ Firebase Authentication actif<br>✅ Worker Tuya sécurisé actif<br>✅ Salle : <b>CP1 Gaming (GZ-07732)</b>
@@ -663,14 +663,14 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <div style="font-size:10px;color:var(--muted)">Exemple : PS2. Si des tarifs PS2 existent, ils seront utilisés ; sinon, les tarifs génériques « Autres » restent disponibles.</div>
     </div>
 
-    <div style="margin:16px 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">🔌 Prise Tuya Cloud</div>
-    <div class="info-box">Seul le <b>Device ID</b> est enregistré pour le poste. Les clés Tuya restent protégées dans Cloudflare.</div>
+    <div style="margin:16px 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">🔌 Prise relais OPPO</div>
+    <div class="info-box">Seul le <b>Device ID</b> est enregistré pour le poste. Les clés Tuya restent protégées dans le téléphone relais.</div>
     <div class="ig"><label>Device ID</label><input type="text" id="p-devid" placeholder="Depuis Tuya Developer" autocomplete="off"></div>
     <div style="font-size:11px;color:#fbbf24;margin:6px 0 12px">🔌 Deux consoles peuvent partager le même Device ID. Débranchez toujours celle qui n'est pas utilisée ; une seule session sur cette prise sera autorisée.</div>
     <input type="hidden" id="p-ip" value="">
     <input type="hidden" id="p-key" value="">
     <input type="hidden" id="p-ver" value="3.3">
-    <button class="test-btn" onclick="testerPrise()">🧪 Vérifier le Worker sécurisé</button>
+    <button class="test-btn" onclick="testerPrise()">🧪 Vérifier le relais</button>
     <div class="test-result" id="test-result"></div>
     <input type="hidden" id="p-edit-idx" value="-1">
     <div class="ma">
@@ -768,9 +768,7 @@ const firebaseConfig = {
   databaseURL: "https://gamezone-bah-nouveau-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "gamezone-bah-nouveau",
   storageBucket: "gamezone-bah-nouveau.firebasestorage.app",
-  messagingSenderId: "479092137641",
-  appId: "1:479092137641:web:62484287e9e7127ec613b8"
-};
+    };
 firebase.initializeApp(firebaseConfig);
 const ROOM_KEY='GZ-07732';
 let fbRoot=null;
@@ -801,125 +799,15 @@ function gzIsFinancialCounterPath(path){
   return false;
 }
 
-function GZScopedRoomRef(rawRef){
-  function clone(o){return o==null?o:JSON.parse(JSON.stringify(o));}
-  function eq(a,b){return JSON.stringify(a)===JSON.stringify(b);}
-  function snapshot(value){return {val:function(){return clone(value);}};}
-  function delta(p,a,b,changes){
-    if(eq(a,b))return;
-    if(gzIsFinancialCounterPath(p)&&typeof a==='number'&&Number.isFinite(a)&&typeof b==='number'&&Number.isFinite(b)){
-      const n=b-a;
-      if(n) changes[p]=firebase.database.ServerValue.increment(n);
-      return;
-    }
-    if(a&&b&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){
-      const keys=new Set([...Object.keys(a),...Object.keys(b)]);
-      for(const k of keys) delta(p+'/'+k,a[k],b[k],changes);
-      return;
-    }
-    changes[p]=b===undefined?null:clone(b);
-  }
-  return {
-    child: k=>rawRef.child(k),
-    once: (...args)=>rawRef.once(...args),
-    on: (...args)=>rawRef.on(...args),
-    off: (...args)=>rawRef.off(...args),
-    update: values=>rawRef.update(values),
-    transaction: async function(fn){
-      if(typeof navigator!=='undefined' && navigator.onLine===false) throw Error('Connexion Internet absente : aucune vente enregistree.');
-      const original=(await rawRef.once('value')).val()||{};
-      const next=fn(clone(original));
-      if(next===undefined)return {committed:false,snapshot:snapshot(original)};
-      const patch={};
-      const keys=new Set([...Object.keys(original),...Object.keys(next)]);
-      for(const k of keys){
-        if(eq(original[k],next[k]))continue;
-        if(k==='active_postes' && next.active_by_poste)continue;
-        if(k==='active_by_poste'){
-          const a=original[k]||{},b=next[k]||{};
-          for(const sub of new Set([...Object.keys(a),...Object.keys(b)])){
-            if(!eq(a[sub],b[sub]))patch[k+'/'+sub]=b[sub]===undefined?null:clone(b[sub]);
-          }
-        }else if(k==='sessions' && original.sessions && next.sessions && original.sessions.date!==next.sessions.date){
-          patch.sessions=clone(next.sessions);
-        }else if(k==='sessions'||k==='daily'||k==='activity_daily'||k==='closed_sessions'||k==='refunded_sessions'||k==='rollovers'||k==='patron_adjustment_once'){
-          delta(k,original[k]||{},next[k]||{},patch);
-        }else{
-          patch[k]=next[k]===undefined?null:clone(next[k]);
-        }
-      }
-      if(!Object.keys(patch).length)return {committed:false,snapshot:snapshot(original)};
-      // Pas de baisse silencieuse sans annulation, remboursement ou nouveau jour.
-      const reduction=(Number(next.sessions?.recettes)||0)<(Number(original.sessions?.recettes)||0);
-      const newDay=String(next.sessions?.date||'')!==String(original.sessions?.date||'');
-      const refund=!eq(next.refunded_sessions,original.refunded_sessions)||!eq(next.annulations,original.annulations);
-      const privateAdjust=!eq(next.patron_adjustment_once,original.patron_adjustment_once);
-      if(reduction&&!newDay&&!refund&&!privateAdjust) throw Error('Baisse de recette refusee sans justification.');
-      // Verifier la seance au moment de la modification. Ceci ne remplace PAS une transaction serveur.
-      if(original.active_by_poste&&next.active_by_poste&&
-          !eq(original.active_by_poste,next.active_by_poste)){
-        const serverMap=(await rawRef.child('active_by_poste').once('value')).val()||{};
-        for(const [k,v] of Object.entries(next.active_by_poste)){
-          if(!eq(v,original.active_by_poste[k])&&!eq(serverMap[k]||null,original.active_by_poste[k]||null))
-            throw Error('Poste modifie sur un autre appareil. Actualise avant de continuer.');
-        }
-      }
-      if(!newDay && Object.keys(patch).some(k=>k==='sessions' || k.startsWith('sessions/') || k.startsWith('daily/'))){
-        const freshSessions=(await rawRef.child('sessions').once('value')).val()||{};
-        if(String(freshSessions.date||'')!==String(original.sessions?.date||''))
-          throw Error('Journée modifiée sur un autre appareil. Recharger avant la vente.');
-      }
-      await rawRef.update(patch); // Ecriture atomique multipath, pas de .write globale.
-      gzCloudTimerSyncChanges(original,next); // après écriture Firebase confirmée
-      return {committed:true,snapshot:snapshot(next)};
-    }
-  };
-}
+function GZScopedRoomRef(rawRef){return CP1Relay.roomRef(rawRef);}
 
 
-// V58/V35 : synchronisation de l'alarme OFF auprès du Worker Cloudflare.
+// V58/V35 : synchronisation de l'alarme OFF auprès du Worker le téléphone relais.
 // La seule source de vérité est Firebase, jamais l'heure envoyée par le navigateur.
 let gzCloudSyncAllDone=false;
 const gzCloudSyncTimers=new Map();
-function gzCloudTimerSync(poste, attempt=0){
-  if(!currentTenantKey)return;
-  const k=poste==null?'__all__':String(poste);
-  if(gzCloudSyncTimers.has(k))clearTimeout(gzCloudSyncTimers.get(k));
-  const delay=attempt===0?180:Math.min(60000,1500*Math.pow(2,attempt));
-  gzCloudSyncTimers.set(k,setTimeout(async function(){
-    gzCloudSyncTimers.delete(k);
-    try{
-      const token=await (firebase.auth().currentUser ? firebase.auth().currentUser.getIdToken() : '');
-      if(!token)throw Error('Jeton Firebase absent');
-      const payload={tenantKey:currentTenantKey,action:poste==null?'syncAllTimers':'syncTimer'};
-      if(poste!=null)payload.poste=String(poste);
-      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);
-      let resp;
-      try {resp=await fetch(TUYA_WORKER_URL,{method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-        body:JSON.stringify(payload),cache:'no-store',signal:ctrl.signal});}
-      finally{clearTimeout(timer);}
-      if(!resp.ok)throw Error('Worker alarm HTTP '+resp.status);
-      const result=await resp.json().catch(()=>null);
-      if(!result || result.success!==true || result.scheduler!=='durable-object' || !Number.isFinite(Number(result.scheduledAt)) )throw Error('Alarme serveur absente — déployer Worker v63');
-    }catch(e){
-      console.warn('Minuterie serveur non synchronisée:',poste,e&&e.message);
-      if(attempt<4)gzCloudTimerSync(poste,attempt+1);
-      else if(typeof loggedIn!=='undefined' && loggedIn)showToast('⚠️ Minuteur serveur non confirmé : garder GameZone ouvert');
-    }
-  },delay));
-}
-function gzCloudTimerSyncChanges(original,next){
-  const a=(original&&original.active_by_poste)||{};
-  const b=(next&&next.active_by_poste)||{};
-  for(const k of new Set([...Object.keys(a),...Object.keys(b)])){
-    if(JSON.stringify(a[k])!==JSON.stringify(b[k])){
-      // Le poste a une clé Firebase déjà encodée, ici il faut revenir au num réel.
-      let poste=k;try{poste=decodeURIComponent(k);}catch(e){}
-      gzCloudTimerSync(poste);
-    }
-  }
-}
+function gzCloudTimerSync(){return;}
+function gzCloudTimerSyncChanges(){return;}
 window.addEventListener('online',()=>gzCloudTimerSync(null));
 window.addEventListener('pageshow',()=>{if(gzCloudSyncAllDone)gzCloudTimerSync(null);});
 
@@ -1002,7 +890,7 @@ const OWNER_PAYS=[
   {id:'mtn',lbl:'MTN MoMo',emoji:'🟡'},
   {id:'wave',lbl:'Wave',emoji:'🌊'}
 ];
-const TUYA_WORKER_URL='https://gamezone-bah-nouvauxcp1.bahmamadou4234.workers.dev';
+const TUYA_WORKER_URL='./__youssef_relay__';
 let currentTenantKey=null;
 let ownerPosteIdx=-1, ownerSelMin=0, ownerSelPay='especes', ownerPlusMin=0, ownerPlusPay='especes', ownerCancelIdx=-1;
 let ownerBonusMin=30;
@@ -1102,7 +990,12 @@ function gzApplyAutomaticBonus(state,consoleType){
 }
 
 function blankRemoteActive(base){return Object.assign({},base||{},{actif:false,starting:false,startingUntil:0,cleanup:false,cleanupUntil:0,client:'',finTs:0,tempsTotal:0,dureeMin:0,paused:false,pauseRemainingSec:0,montantSession:0,montantJourSession:0,paiementsSession:{},sessionId:'',startedAt:0,bonus:false,bonusOnly:false,bonusSource:'',bonusDurationMin:0,bonusMinutesAdded:0,bonusGrantedAt:0,gzAutoBonusGrantedMin:0,gzAutoBonusConsole:'',updatedAt:Date.now()});}
-function businessDate(d=new Date()){return new Date(d.getTime()-(7*60*60*1000));}
+function businessDate(d=new Date()){
+  // Journée de gestion : 08:00 heure d'Abidjan (Africa/Abidjan, UTC+0).
+  // Construire une date civile locale à partir de l'heure UTC - 8 heures.
+  const t=new Date(d.getTime()-8*60*60*1000);
+  return new Date(t.getUTCFullYear(),t.getUTCMonth(),t.getUTCDate(),12,0,0);
+}
 function businessDateKey(d=new Date()){return dateKeyISO(businessDate(d));}
 function remainingActive(a){if(!a||!a.actif)return 0;if(a.paused)return Math.max(0,Math.floor(Number(a.pauseRemainingSec)||0));return Math.max(0,Math.ceil(((Number(a.finTs)||0)-Date.now())/1000));}
 function fmtRest(sec){sec=Math.max(0,Math.floor(Number(sec)||0));const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h>0?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
@@ -1193,16 +1086,8 @@ function ownerPersistActivity(main,detail,amount,meta={}){
 
 
 // CP1 uniquement : correspondances Tuya vérifiées, jamais les prises ARABI.
-const GZ_CP1_TUYA_IDS=Object.freeze({1:'bf77859fcb75e26cf11f4o',2:'bfba8b667e37b21c5dxnqz',3:'bf3928e0c6b5baa56eobvv',4:'bf7b869fe5f118b73dauab',5:'bfe898207ecd75437dx5fw',6:'bf4f7b47b4f9ec2451fgex'});
-function gzCP1DeviceId(poste){
-  const stored=String((poste&&poste.devid)||'').trim();
-  if(String(currentTenantKey||'').toUpperCase()!=='GZ-07732')return stored;
-  const raw=String((poste&&(poste.num||poste.nom||poste.name))||'');
-  const match=raw.match(/(?:poste|post|p)\s*[-_#:]?\s*([1-6])(?:\D|$)/i) || raw.match(/^([1-6])$/);
-  const correct=match?GZ_CP1_TUYA_IDS[Number(match[1])]:null;
-  if(correct&&stored&&stored!==correct)console.warn('CP1 : association Tuya corrigée pour',raw);
-  return correct||stored;
-}
+const GZ_CP1_TUYA_IDS=Object.freeze({});
+function gzCP1DeviceId(poste){try{return "relay:"+CP1Relay.poste(poste);}catch(e){return "";}}
 let gzTuyaError='';
 function gzTuyaErrorText(){return gzTuyaError?' — '+gzTuyaError:'';}
 function gzTuyaReason(response,data,phase){
@@ -1318,7 +1203,7 @@ function renderControl(){
       ? `<button class="ctl-btn ctl-resume" onclick="ownerResume(${i})">▶ REPRENDRE</button><button class="ctl-btn ctl-off" onclick="gzRetryPausedPower(${i})">${a.pausePowerOffConfirmed?'OFF CONFIRMÉ':'RÉESSAYER OFF'}</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`
       : `<button class="ctl-btn ctl-pause" onclick="ownerPause(${i})">⏸ PAUSE</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`;
     return `<div class="ctl-card ${cls}">
-      <div class="ctl-head"><div><div class="ctl-num">${esc(GameZoneManagement.displayName(p))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
+      <div class="ctl-head"><div><div class="ctl-num">${esc("("+CP1Relay.poste(p)+") "+GameZoneManagement.displayName(p)+" • ➜ "+gzPosteTypeLabel(p))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
       <div class="ctl-timer-row"><div class="ctl-timer ${a.paused?'pause':(a.actif?'on':'free')}">${timer}</div>${a.actif?`<div class="ctl-money">${amount.toLocaleString('fr-FR')} F</div>`:''}</div>
       <div class="ctl-progress"><div class="ctl-progress-bar" style="width:${pct}%;background:${progressColor}"></div></div>
       <div class="ctl-client">${a.actif?esc(a.client||'Client'):'Disponible'}</div>
@@ -1348,7 +1233,7 @@ function ownerRenderBonusCard(postes){
   const bonusRest=actifs.length?Math.min(...actifs.map(x=>ownerBonusLeftSeconds(x.a))):0;
   const bonusTone=actifs.length?gzProgressTone(bonusRest,actifs.every(x=>x.a.paused)):'';
   const bonusBar='<div class="gz-yellow-meta">⏱ BONUS GRATUIT RESTANT — '+(actifs.length?fmtRest(bonusLeft):'Aucun bonus actif')+'</div><div class="gz-yellow-progress"><div class="gz-yellow-fill '+bonusTone+'" style="width:'+bonusPct.toFixed(2)+'%"></div></div>';
-  return '<div class="ctl-card bonus-master"><div class="bonus-master-title">🎁 CASE 7 — BONUS CLIENT FIDÈLE</div><div class="bonus-master-note">Automatique dès 1 000 F. +TEMPS BONUS ajoute gratuitement des minutes (1 min possible). ANNULER SESSION annule la séance entière et peut retirer la recette : confirmation requise. OFF TV termine sans retirer la recette.</div>'+bonusBar+details+gzOccupancyHtml((DB.get('postes')||[]).map((p,i)=>Object.assign({},p,activeForPoste(p,i)||{})))+'<button class="bonus-owner-btn" onclick="ownerOpenBonus()">🎁 OFFRIR / AJOUTER UN BONUS</button></div>';
+  return '<div class="ctl-card bonus-master"><div class="bonus-master-title">🎁  BONUS CLIENT FIDÈLE</div><div class="bonus-master-note">Automatique dès 1 000 F. +TEMPS BONUS ajoute gratuitement des minutes (1 min possible). ANNULER SESSION annule la séance entière et peut retirer la recette : confirmation requise. OFF TV termine sans retirer la recette.</div>'+bonusBar+details+gzOccupancyHtml((DB.get('postes')||[]).map((p,i)=>Object.assign({},p,activeForPoste(p,i)||{})))+'<button class="bonus-owner-btn" onclick="ownerOpenBonus()">🎁 OFFRIR / AJOUTER UN BONUS</button></div>';
 }
 function ownerOpenBonusFor(idx){
   ownerOpenBonus();
@@ -1477,7 +1362,7 @@ async function patronCorrectRevenue(){
  const btn=document.getElementById('patron-corr-confirm');patronCorrectionBusy=true;btn.disabled=true;
  try{
   if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
-  if((await firebase.database().ref('access/'+uid+'/rooms/'+patronAuditRoom()).once('value')).val()!=='patron')throw Error('Accès Patron requis');
+  if((await firebase.database().ref('pilotage_v1/access/'+uid+'/rooms/'+patronAuditRoom()).once('value')).val()!=='patron')throw Error('Accès Patron requis');
   const raw=firebase.database().ref(patronAuditRoom()),room=(await raw.once('value')).val()||{};
   const current=businessDateKey(new Date()),day=GameZoneManagement.snapshot(room,key,current,today());
   const op={id:'C'+Date.now()+'_'+Math.random().toString(36).slice(2,10),key,poste,reason,delta:how==='add'?amount:-amount,beforeTotal:Number(day.ss.recettes)||0,beforePoste:Number((day.ss.parPoste||{})[poste])||0};
@@ -1534,7 +1419,7 @@ function ownerRenderReport(){
 }
 async function ownerEnsureDailyRollover(){
   const key=businessDateKey(new Date());if(!ownerRuntimeDayKey){ownerRuntimeDayKey=key;return;}if(key===ownerRuntimeDayKey||ownerRolloverBusy||!fbRoot)return;const prevKey=ownerRuntimeDayKey;ownerRuntimeDayKey=key;ownerRolloverBusy=true;
-  try{const res=await fbRoot.transaction(root=>{root=root||{};root.rollovers=root.rollovers||{};if(root.rollovers[key])return root;root.daily=root.daily||{};const prev=root.sessions||{};if(!root.daily[prevKey]||money(prev.recettes)>=money(root.daily[prevKey]&&root.daily[prevKey].recettes))root.daily[prevKey]=deepClone(prev);const zero={recettes:0,count:0,date:today(),parPoste:{},sessionsParPoste:{},payStats:{}};root.sessions=zero;root.daily[key]=deepClone(zero);const arr=Array.isArray(root.active_postes)?root.active_postes.slice():[];arr.forEach((a,i)=>{if(a&&a.actif)arr[i]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_postes=arr;if(root.active_by_poste&&typeof root.active_by_poste==='object'){const map=Object.assign({},root.active_by_poste);Object.keys(map).forEach(k=>{const a=map[k];if(a&&a.actif)map[k]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_by_poste=map;}root.rollovers[key]={ts:Date.now(),previousKey:prevKey};return root;},undefined,false);if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;showToast('🌅 07h00 — nouvelle journée de gestion');}catch(e){console.log('Rollover patron',e);}finally{ownerRolloverBusy=false;}
+  try{const res=await fbRoot.transaction(root=>{root=root||{};root.rollovers=root.rollovers||{};if(root.rollovers[key])return root;root.daily=root.daily||{};const prev=root.sessions||{};if(!root.daily[prevKey]||money(prev.recettes)>=money(root.daily[prevKey]&&root.daily[prevKey].recettes))root.daily[prevKey]=deepClone(prev);const zero={recettes:0,count:0,date:today(),parPoste:{},sessionsParPoste:{},payStats:{}};root.sessions=zero;root.daily[key]=deepClone(zero);const arr=Array.isArray(root.active_postes)?root.active_postes.slice():[];arr.forEach((a,i)=>{if(a&&a.actif)arr[i]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_postes=arr;if(root.active_by_poste&&typeof root.active_by_poste==='object'){const map=Object.assign({},root.active_by_poste);Object.keys(map).forEach(k=>{const a=map[k];if(a&&a.actif)map[k]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_by_poste=map;}root.rollovers[key]={ts:Date.now(),previousKey:prevKey};return root;},undefined,false);if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;showToast('🌅 00h00 — nouvelle journée de gestion');}catch(e){console.log('Rollover patron',e);}finally{ownerRolloverBusy=false;}
 }
 
 
@@ -1567,17 +1452,15 @@ async function ownerConfirmCancel(){
   const rest=remainingActive(local),totalSec=Math.max(0,Number(local.tempsTotal)||0),used=Math.max(0,totalSec-rest),detail=Object.assign({},local.paiementsSession||{});
   try{
     showToast('Annulation en cours : vérification de l’extinction…');
-    if(p.devid && !(await gzPauseViaServer(ownerCancelIdx)))return;
+    
     const confirmed=activeForPoste(p,ownerCancelIdx)||{};
-    if(p.devid && (!confirmed.paused || confirmed.pausePowerOffConfirmed!==true || confirmed.sessionId!==sid)){
-      showToast('Extinction non confirmée : annulation non finalisée.');return;
-    }
+    
     const res=await fbRoot.transaction(root=>{
       root=root||{};root.refunded_sessions=root.refunded_sessions||{};root.closed_sessions=root.closed_sessions||{};
       if(sid&&root.refunded_sessions[sid])return root;
       const remote=rootReadActive(root,Object.assign({},p,local),ownerCancelIdx)||{};
       if(!remote.actif||(sid&&remote.sessionId&&remote.sessionId!==sid))return;
-      if(p.devid && (!remote.paused || remote.pausePowerOffConfirmed!==true || Number(remote.updatedAt)!==Number(confirmed.updatedAt)))return;
+      
       const refund=Math.max(0,todayAmount);
       const ss=freshSessionSnapshotFromRoot(root);ss.recettes=Math.max(0,money(ss.recettes)-refund);ss.parPoste=ownerSubtractPosteBreakdown(ss.parPoste||{},p.num,refund);ss.payStats=ownerSubtractPaymentBreakdown(ss.payStats||{},detail,refund);
       if(startedKey===dayKey){ss.sessionsParPoste=Object.assign({},ss.sessionsParPoste||{});ss.sessionsParPoste[p.num]=Math.max(0,Math.floor(Number(ss.sessionsParPoste[p.num])||0)-1);if(ss.sessionsParPoste[p.num]===0)delete ss.sessionsParPoste[p.num];}
@@ -1622,7 +1505,7 @@ async function ownerConfirmStart(){
     },undefined,false);
     if(!reservation||!reservation.committed)return showToast('⚠️ Poste occupé, activation en cours ou prise partagée déjà utilisée par une autre console.');
     reserved=true;showToast('⏳ Vérification prise '+p.num);
-    powered=await ownerTuyaCommand(p,true);
+    powered=await CP1Relay.ready(p);
     if(!powered)throw new Error('Prise Tuya non confirmée ON : temps non activé'+gzTuyaErrorText());
     const tx=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,p,idx)||{};
@@ -1907,7 +1790,7 @@ function checksumKey(name){
 
 function applyBranding(){
   const cfg=DB.get('config');
-  const name=(cfg&&cfg.businessName)||'GAMEZONE CI';
+  const name=(cfg&&cfg.businessName)||'GAMEZONE CP1';
   document.title=name+' — Patron';
   document.getElementById('ll-logo').textContent=name;
   const initials=name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
@@ -1917,13 +1800,7 @@ function applyBranding(){
 function initApp2(){
   // S'assure que les listes existent (sans jamais recréer de données de démo)
   if(!DB.get('postes')) DB.set('postes',[]);
-  if(!DB.get('tarifs')) DB.set('tarifs',[
-    {console:'PS5',min:30,lbl:'30 minutes',prix:500},
-    {console:'PS5',min:60,lbl:'1 heure',prix:900},
-    {console:'PS5',min:90,lbl:'1h30',prix:1300},
-    {console:'PS5',min:120,lbl:'2 heures',prix:1700},
-    {console:'PS5',min:180,lbl:'3 heures',prix:2400},
-  ]);
+  if(!DB.get('tarifs')) DB.set('tarifs',[]);
   if(!DB.get('gerants')) DB.set('gerants',[]);
 }
 
@@ -1947,13 +1824,13 @@ async function startSecurePatron(user){
   try{
     document.getElementById('fb-loading').style.display='flex';
     const roomNode='gz_'+ROOM_KEY;
-    const rolePath='access/'+user.uid+'/rooms/'+roomNode;
+    const rolePath='pilotage_v1/access/'+user.uid+'/rooms/'+roomNode;
     // Diagnostic non sensible : le UID Firebase aide à vérifier que le bon compte a été authentifié.
     // Le rôle doit impérativement provenir de Realtime Database; aucun contournement des autorisations.
     let role;
     try {
-      const roleSnap=await firebase.database().ref(rolePath).once('value');
-      role=roleSnap.val();
+      if(user.uid!=="JO0hgBAEvlZOXCmV1jOmKmeB0sp1")throw Error('Compte Patron CP1 requis');
+      await CP1Relay.initialize();role='patron';
     } catch(readError) {
       throw new Error('Lecture du rôle Firebase impossible ('+(readError.code||readError.message||'erreur réseau')+'). Chemin : '+rolePath+'. Ne modifie pas les règles sans vérifier.');
     }
@@ -1963,7 +1840,7 @@ async function startSecurePatron(user){
       throw new Error('Accès Patron refusé. '+diagnostic+' Compare ce UID avec Authentication et access dans Firebase.');
     }
     currentTenantKey=ROOM_KEY;
-    localStorage.setItem('gz_room_key',ROOM_KEY);
+    localStorage.setItem('cp1_room_key',ROOM_KEY);
     connectTenant(ROOM_KEY);
     gzListenStaffDirectory();
     DB.onReady(function(){
@@ -2460,7 +2337,7 @@ async function delTarif(i){if(!confirm('Supprimer ce tarif ?'))return;try{await 
 // GÉRANTS — droits individuels Firebase, sans mot de passe en clair.
 // IMPORTANT : les règles de la base doivent être mises à jour AVANT d'utiliser ces fonctions.
 const GZ_STAFF_ROOM='gz_'+ROOM_KEY;
-const GZ_LEGACY_CP1={id:'cp1',nom:'CP1',uid:'uFzrF93yqie214PJvnW9IihazsN2',email:'alyjabir423@gmail.com'};
+const GZ_LEGACY_CP1={};
 let gzStaffDirectory={};
 let gzStaffDirectoryRef=null;
 let gzStaffBusy=false;
@@ -2580,8 +2457,8 @@ async function saveGerant(){
       freshUid=await gzProvisionAuth(newEmail,password);
       // Un nouveau UID remplace l'ancien pour révoquer immédiatement l'ancien mot de passe.
       const updates={};
-      if(account&&account.uid)updates['access/'+account.uid+'/rooms/'+GZ_STAFF_ROOM]=null;
-      updates['access/'+freshUid+'/rooms/'+GZ_STAFF_ROOM]='gerant';
+      if(account&&account.uid)updates['pilotage_v1/access/'+account.uid+'/rooms/'+GZ_STAFF_ROOM]=null;
+      updates['pilotage_v1/access/'+freshUid+'/rooms/'+GZ_STAFF_ROOM]='gerant';
       updates[dir]=gzStaffRecord(freshUid,newEmail,nom,true);
       await gzWriteStaffAccess(updates);
     }else if(nom!==account.nom){
@@ -2604,7 +2481,7 @@ async function gzToggleGerant(i){
   gzStaffBusy=true;
   try{
     const updates={};
-    updates['access/'+account.uid+'/rooms/'+GZ_STAFF_ROOM]=toEnabled?'gerant':null;
+    updates['pilotage_v1/access/'+account.uid+'/rooms/'+GZ_STAFF_ROOM]=toEnabled?'gerant':null;
     updates['staff_login/'+GZ_STAFF_ROOM+'/'+id+'/enabled']=toEnabled;
     updates['staff_login/'+GZ_STAFF_ROOM+'/'+id+'/updatedAt']=firebase.database.ServerValue.TIMESTAMP;
     await gzWriteStaffAccess(updates);
@@ -2622,7 +2499,7 @@ async function delGerant(i){
     const id=gzStaffId(g.id),account=gzStaffRow(id);
     if(account&&account.uid){
       const updates={};
-      updates['access/'+account.uid+'/rooms/'+GZ_STAFF_ROOM]=null;
+      updates['pilotage_v1/access/'+account.uid+'/rooms/'+GZ_STAFF_ROOM]=null;
       updates['staff_login/'+GZ_STAFF_ROOM+'/'+id]=null;
       await gzWriteStaffAccess(updates);
     }
@@ -2634,29 +2511,13 @@ async function delGerant(i){
   }catch(e){showToast('⚠️ '+gzStaffError(e));}
   finally{gzStaffBusy=false;}
 }
-async function gzImportCp1(){
-  if(gzStaffBusy)return;
-  if(gzStaffRow('cp1'))return showToast('✅ CP1 possède déjà un contrôle d’accès individuel.');
-  if(!confirm('Associer le compte GÉRANT CP1 existant, sans modifier son mot de passe ni ses recettes ?'))return;
-  gzStaffBusy=true;
-  try{
-    const g=GZ_LEGACY_CP1;
-    const updates={};
-    updates['access/'+g.uid+'/rooms/'+GZ_STAFF_ROOM]='gerant';
-    updates['staff_login/'+GZ_STAFF_ROOM+'/cp1']=gzStaffRecord(g.uid,g.email,g.nom,true);
-    await gzWriteStaffAccess(updates);
-    gzStaffDirectory.cp1={uid:g.uid,email:g.email,nom:g.nom,enabled:true};
-    await gzSaveLocalStaffProfile(g);
-    renderGerants();showToast('✅ CP1 associé : son blocage est maintenant gérable depuis PATRON.');
-  }catch(e){showToast('⚠️ '+gzStaffError(e));}
-  finally{gzStaffBusy=false;}
-}
+async function gzImportCp1(){showToast("Crée un compte propre à CP1 avec Ajouter un gérant.");}
 
 // ══════════════════════════════════════
-// PARAMÈTRES — secrets Tuya conservés uniquement dans Cloudflare
+// PARAMÈTRES — secrets Tuya conservés uniquement dans le téléphone relais
 // ══════════════════════════════════════
 function renderParams(){}
-function saveTuyaConfig(){showToast('🔐 Secrets Tuya protégés dans Cloudflare');}
+function saveTuyaConfig(){showToast('🔐 Secrets Tuya protégés dans le téléphone relais');}
 
 // NAV
 function showPage(name,el){
@@ -2694,7 +2555,7 @@ setInterval(()=>{if(!loggedIn)return;const pg=document.getElementById('page-cont
 // DÉMARRAGE SÉCURISÉ — Firebase Authentication
 // ══════════════════════════════════════
 currentTenantKey=ROOM_KEY;
-localStorage.setItem('gz_room_key',ROOM_KEY);
+localStorage.setItem('cp1_room_key',ROOM_KEY);
 document.getElementById('setup-screen').style.display='none';
 document.getElementById('reconnect-screen').style.display='none';
 document.getElementById('app').style.display='none';
@@ -3042,7 +2903,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     if(gymProofModeP!=='video'||!gymProofP)return showToast('🎥 Filme une vidéo d’abord');
     try{const result=await GZCameraProof.share(gymProofP);if(result==='share')showToast('✅ Si la vidéo est sur Drive, colle son lien avant ACTIVER');if(result==='download')showToast('✅ Vidéo enregistrée : importe-la dans Drive, puis colle son lien');}catch(e){showToast('⚠️ '+e.message);}
   };
-  function ensureGymModalP(){if(document.getElementById('mo-gym-p'))return;const m=document.createElement('div');m.className='mo';m.id='mo-gym-p';m.innerHTML=`<div class="ms"><div class="mh"></div><div class="mt" style="color:#22c55e">🏃 CASE 8 — GYMNASTIQUE</div><div class="ig"><label>Nom du client</label><input id="gym-client-p" type="text" placeholder="Nom du client" autocomplete="off"></div><div class="ig"><label>Mouvement</label><div id="gym-moves-p" class="gym-opt-grid"></div></div><div class="ig"><label>Durée</label><div id="gym-time-p" class="gym-opt-grid"></div></div><div class="ig"><label>Paiement</label><div id="gym-pay-p" class="gym-opt-grid"></div></div><div class="gym-proof-box"><b>📸 Preuve obligatoire avant validation</b><div>Photo ou vidéo FILMÉE MAINTENANT obligatoire. PHOTO : sauvegardée en petit JPEG dans Firebase. VIDÉO : filmer ici, puis partager vers Google Drive et coller le lien.</div><div class="gym-proof-actions"><button type="button" onclick="gymCapturePhotoP()">📸 PRENDRE PHOTO</button><button type="button" onclick="gymCaptureVideoP()">🎥 FILMER VIDÉO</button></div><div id="gym-capture-preview-p" style="display:none"></div><div id="gym-drive-zone-p" style="display:none"><button type="button" class="gym-video-share" onclick="gymShareVideoP()" style="display:block;width:100%;padding:10px;border:0;border-radius:8px;margin:6px 0">📤 PARTAGER / ENREGISTRER MA VIDÉO</button><a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener" style="color:#93c5fd">Ouvrir Google Drive pour déposer la vidéo</a><div style="margin:6px 0">Partage la vidéo seulement avec le patron et le gérant, puis colle le lien ici.</div><input type="url" id="gym-drive-url-p" style="width:100%;border-radius:7px;padding:10px;background:#1e293b;color:white" placeholder="https://drive.google.com/file/d/..."></div><div id="gym-proof-name-p" class="gym-proof-name">Aucune preuve capturée</div></div><div id="gym-result-p" role="status" aria-live="polite" style="font-size:13px;line-height:1.5;white-space:normal;color:#fbbf24;margin:10px 0"></div><div class="ma"><button class="btn-cancel" onclick="closeModal('mo-gym-p')">Retour</button><button class="btn-ok" onclick="gymConfirmStartP()">ACTIVER ✓</button></div></div>`;document.body.appendChild(m);}
+  function ensureGymModalP(){if(document.getElementById('mo-gym-p'))return;const m=document.createElement('div');m.className='mo';m.id='mo-gym-p';m.innerHTML=`<div class="ms"><div class="mh"></div><div class="mt" style="color:#22c55e">🏃  GYMNASTIQUE</div><div class="ig"><label>Nom du client</label><input id="gym-client-p" type="text" placeholder="Nom du client" autocomplete="off"></div><div class="ig"><label>Mouvement</label><div id="gym-moves-p" class="gym-opt-grid"></div></div><div class="ig"><label>Durée</label><div id="gym-time-p" class="gym-opt-grid"></div></div><div class="ig"><label>Paiement</label><div id="gym-pay-p" class="gym-opt-grid"></div></div><div class="gym-proof-box"><b>📸 Preuve obligatoire avant validation</b><div>Photo ou vidéo FILMÉE MAINTENANT obligatoire. PHOTO : sauvegardée en petit JPEG dans Firebase. VIDÉO : filmer ici, puis partager vers Google Drive et coller le lien.</div><div class="gym-proof-actions"><button type="button" onclick="gymCapturePhotoP()">📸 PRENDRE PHOTO</button><button type="button" onclick="gymCaptureVideoP()">🎥 FILMER VIDÉO</button></div><div id="gym-capture-preview-p" style="display:none"></div><div id="gym-drive-zone-p" style="display:none"><button type="button" class="gym-video-share" onclick="gymShareVideoP()" style="display:block;width:100%;padding:10px;border:0;border-radius:8px;margin:6px 0">📤 PARTAGER / ENREGISTRER MA VIDÉO</button><a href="https://drive.google.com/drive/my-drive" target="_blank" rel="noopener" style="color:#93c5fd">Ouvrir Google Drive pour déposer la vidéo</a><div style="margin:6px 0">Partage la vidéo seulement avec le patron et le gérant, puis colle le lien ici.</div><input type="url" id="gym-drive-url-p" style="width:100%;border-radius:7px;padding:10px;background:#1e293b;color:white" placeholder="https://drive.google.com/file/d/..."></div><div id="gym-proof-name-p" class="gym-proof-name">Aucune preuve capturée</div></div><div id="gym-result-p" role="status" aria-live="polite" style="font-size:13px;line-height:1.5;white-space:normal;color:#fbbf24;margin:10px 0"></div><div class="ma"><button class="btn-cancel" onclick="closeModal('mo-gym-p')">Retour</button><button class="btn-ok" onclick="gymConfirmStartP()">ACTIVER ✓</button></div></div>`;document.body.appendChild(m);}
   function fillGymP(){ensureGymModalP();document.getElementById('gym-client-p').value='';gymMinP=30;gymPayP='especes';gymMoveP=GYM_MOVES[0];gymProofP=null;gymProofModeP='photo';document.getElementById('gym-drive-zone-p').style.display='none';document.getElementById('gym-drive-url-p').value='';{const pv=document.getElementById('gym-capture-preview-p');if(pv.dataset.blobUrl){URL.revokeObjectURL(pv.dataset.blobUrl);delete pv.dataset.blobUrl;}pv.innerHTML='';pv.style.display='none';}document.getElementById('gym-proof-name-p').textContent='Aucune preuve capturée';document.getElementById('gym-moves-p').innerHTML=GYM_MOVES.map((x,i)=>`<button type="button" class="gym-opt ${i===0?'sel':''}" onclick="gymSelectMoveP(this)" data-v="${escp(x)}">${escp(x)}</button>`).join('');document.getElementById('gym-time-p').innerHTML=GYM_TARIFFS.map((x,i)=>`<button type="button" class="gym-opt ${i===0?'sel':''}" onclick="gymSelectTimeP(${x.min},this)">${x.lbl}<small>${x.prix} F</small></button>`).join('');document.getElementById('gym-pay-p').innerHTML=OWNER_PAYS.map((x,i)=>`<button type="button" class="gym-opt ${i===0?'sel':''}" onclick="gymSelectPayP('${x.id}',this)">${x.emoji} ${x.lbl}</button>`).join('');}
 
   window.gymSelectMoveP=function(el){gymMoveP=el.dataset.v||GYM_MOVES[0];document.querySelectorAll('#gym-moves-p .gym-opt').forEach(z=>z.classList.remove('sel'));el.classList.add('sel');};
@@ -3133,7 +2994,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     }catch(e){console.error('Annulation Gym',e);showToast('⚠️ Annulation non enregistrée : '+(e.message||'erreur Firebase'));}
     finally{gymCancellationPendingP=false;}
   };
-  function renderGymP(){const box=document.getElementById('control-postes');if(!box)return;const old=document.getElementById('gym-card-p'),g=gp(),rest=gpRest(g),expired=g.actif&&rest===0;const sig=JSON.stringify(g)+'|'+expired;if(old&&old.dataset.gymState===sig){const clock=old.querySelector('.gz-gym-clock');if(clock)clock.textContent=g.actif?gpFmt(rest):'00:00';const fill=old.querySelector('.gz-yellow-fill');if(fill){fill.style.width=(g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)):0)+'%';fill.className='gz-yellow-fill '+(g.actif?gzProgressTone(rest,!!g.paused):'');}return;}if(old)old.remove();const card=document.createElement('div');card.dataset.gymState=sig;card.id='gym-card-p';card.className='ctl-card gym-card '+(g.actif?(g.paused?'paused':'active'):'');const proof=GymProofFree.cardHtml(g,currentTenantKey);card.innerHTML=`<div class="gym-head"><div><b>🏃 CASE 8 — GYMNASTIQUE</b><small>Vélo · Abdos · Jambes · Bras</small></div><span>${g.paused?'PAUSE':(g.actif?'EN COURS':'LIBRE')}</span></div><div class="gz-gym-remaining-label">⏱ TEMPS RESTANT — ${g.paused?'EN PAUSE':'DÉCOMPTE ACTIF'}</div><div class="gym-timer-row"><strong class="gz-gym-clock">${g.actif?gpFmt(rest):'00:00'}</strong><em>${g.actif?money(g.montantSession)+' F':''}</em></div><div class="gz-yellow-progress"><div class="gz-yellow-fill ${g.actif?gzProgressTone(rest,!!g.paused):''}" style="width:${g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)).toFixed(2):0}%"></div></div><div class="gym-client">${g.actif?escp(g.client||'Client')+' · '+escp(g.mouvement||'Gymnastique'):'Disponible · 30 min = 100 F · 1 h = 200 F'}</div>${proof}<div class="gym-actions">${expired?'<span>⏳ Temps terminé — libération automatique</span>':!g.actif?`<button onclick="gymOpenP()">DÉMARRER</button>`:(g.paused?`<button class="gz-gym-action" onclick="gymResumeP()">▶ REPRENDRE</button>`:`<button class="gz-gym-action" onclick="gymPauseP()">⏸ PAUSE</button>`)}${g.actif&&!expired?`<button class="gz-gym-action" onclick="gymPlusP(30)">+ 30 min / 100 F</button><button class="gz-gym-action" onclick="gymPlusP(60)">+ 1 h / 200 F</button><button class="gz-gym-action gz-gym-cancel" onclick="gymOpenCancelP()">↩ ANNULER LA SÉANCE</button>`:''}</div><div class="gym-no-cancel">🔒 Annulation réservée au Patron · Motif obligatoire · Sans effacer les anciennes recettes.</div>`;box.appendChild(card);}
+  function renderGymP(){const box=document.getElementById('control-postes');if(!box)return;const old=document.getElementById('gym-card-p'),g=gp(),rest=gpRest(g),expired=g.actif&&rest===0;const sig=JSON.stringify(g)+'|'+expired;if(old&&old.dataset.gymState===sig){const clock=old.querySelector('.gz-gym-clock');if(clock)clock.textContent=g.actif?gpFmt(rest):'00:00';const fill=old.querySelector('.gz-yellow-fill');if(fill){fill.style.width=(g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)):0)+'%';fill.className='gz-yellow-fill '+(g.actif?gzProgressTone(rest,!!g.paused):'');}return;}if(old)old.remove();const card=document.createElement('div');card.dataset.gymState=sig;card.id='gym-card-p';card.className='ctl-card gym-card '+(g.actif?(g.paused?'paused':'active'):'');const proof=GymProofFree.cardHtml(g,currentTenantKey);card.innerHTML=`<div class="gym-head"><div><b>🏃  GYMNASTIQUE</b><small>Vélo · Abdos · Jambes · Bras</small></div><span>${g.paused?'PAUSE':(g.actif?'EN COURS':'LIBRE')}</span></div><div class="gz-gym-remaining-label">⏱ TEMPS RESTANT — ${g.paused?'EN PAUSE':'DÉCOMPTE ACTIF'}</div><div class="gym-timer-row"><strong class="gz-gym-clock">${g.actif?gpFmt(rest):'00:00'}</strong><em>${g.actif?money(g.montantSession)+' F':''}</em></div><div class="gz-yellow-progress"><div class="gz-yellow-fill ${g.actif?gzProgressTone(rest,!!g.paused):''}" style="width:${g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)).toFixed(2):0}%"></div></div><div class="gym-client">${g.actif?escp(g.client||'Client')+' · '+escp(g.mouvement||'Gymnastique'):'Disponible · 30 min = 100 F · 1 h = 200 F'}</div>${proof}<div class="gym-actions">${expired?'<span>⏳ Temps terminé — libération automatique</span>':!g.actif?`<button onclick="gymOpenP()">DÉMARRER</button>`:(g.paused?`<button class="gz-gym-action" onclick="gymResumeP()">▶ REPRENDRE</button>`:`<button class="gz-gym-action" onclick="gymPauseP()">⏸ PAUSE</button>`)}${g.actif&&!expired?`<button class="gz-gym-action" onclick="gymPlusP(30)">+ 30 min / 100 F</button><button class="gz-gym-action" onclick="gymPlusP(60)">+ 1 h / 200 F</button><button class="gz-gym-action gz-gym-cancel" onclick="gymOpenCancelP()">↩ ANNULER LA SÉANCE</button>`:''}</div><div class="gym-no-cancel">🔒 Annulation réservée au Patron · Motif obligatoire · Sans effacer les anciennes recettes.</div>`;box.appendChild(card);}
   const oldRC=window.renderControl;window.renderControl=function(){const gymSaved=document.getElementById('gym-card-p');const r=oldRC&&oldRC.apply(this,arguments);if(gymSaved&&!document.getElementById('gym-card-p')){const grid=document.getElementById('control-postes');if(grid)grid.appendChild(gymSaved);}try{document.querySelectorAll('#control-postes .ctl-card').forEach(c=>{const badge=c.querySelector('.b-off'),type=c.querySelector('.ctl-type');if(badge&&type&&!/LIBRE/i.test(type.textContent))type.textContent=type.textContent+' · LIBRE';});renderGymP();}catch(e){console.log(e);}return r;};
   async function finishGymP(){if(gymTimerBusyP)return;const g=gp();if(!g.actif||gpRest(g)>0)return;gymTimerBusyP=true;try{const sid=g.sessionId||'';const tx=await fbRoot.transaction(root=>{root=root||{};const x=root.gym||{};if(!x.actif||(sid&&x.sessionId&&x.sessionId!==sid))return undefined;root.gym=Object.assign({},x,{actif:false,finTs:0,paused:false,pauseRemainingSec:0,updatedAt:Date.now(),endedAt:Date.now()});const ss=freshSessionSnapshotFromRoot(root);ss.count=Math.max(0,Number(ss.count)||0)+1;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps terminé.');ownerPersistActivity('🏃 Gymnastique — Temps écoulé',(g.client||'Client')+' · '+(g.mouvement||'Gymnastique')+' · session terminée',money(g.montantSession)+' F',{poste:'Gymnastique',client:g.client||'',sessionId:sid,typeActivite:'gym_terminee',mouvement:g.mouvement||'',preuveUrl:g.preuveUrl||'',preuvePath:g.preuvePath||'',preuveKind:g.preuveKind||'',preuveSalle:currentTenantKey});renderControl();ownerRenderReport();}}catch(e){console.log(e);}finally{gymTimerBusyP=false;}}
   setInterval(()=>{try{if(loggedIn){finishGymP();const c=document.getElementById('gym-card-p');if(c)renderGymP();}}catch(_e){}},1000);
@@ -3144,10 +3005,10 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
 </script>
 
 <script>
-/* GameZone Bah v63 : abonnement Web Push par téléphone, UNIQUEMENT après clic.
+/* GameZone CP1 v63 : abonnement Web Push par téléphone, UNIQUEMENT après clic.
    Aucun faux message « notifications à distance activées » si le Worker n'est pas prêt. */
 (function(){
-  const WORKER_URL='https://gamezone-bah-nouvauxcp1.bahmamadou4234.workers.dev';
+  const WORKER_URL='./__youssef_relay__';
   const ROLE='PATRON';
   function keyBytes(base64){
     const padded=base64.replace(/-/g,'+').replace(/_/g,'/');
@@ -3182,7 +3043,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
       body:JSON.stringify({tenantKey:'GZ-07732',action:'subscribePush',subscription:sub.toJSON(),url:location.href.split(/[?#]/)[0],role:ROLE})});
     const answer=await resp.json().catch(()=>({}));
     if(!resp.ok||!answer.success||!answer.registered)throw new Error(answer.error||'Abonnement impossible : vérifier le Worker.');
-    await reg.showNotification('🎮 GameZone Bah — alertes activées',{body:'Ce téléphone recevra les alertes à 5 minutes et à la fin du temps, même en arrière-plan si le système le permet.',tag:'gz-push-ready'});
+    await reg.showNotification('🎮 GameZone CP1 — alertes activées',{body:'Ce téléphone recevra les alertes à 5 minutes et à la fin du temps, même en arrière-plan si le système le permet.',tag:'gz-push-ready'});
     button.title='Notifications distantes activées';
     button.textContent='🔔✓';
   }
@@ -3310,12 +3171,12 @@ async function ownerConfirmReduce(){
 <script>
 // Read-only Tuya check: no relay or Firebase state is changed.
 (function(){
- const button=document.createElement('button');button.type='button';button.textContent='🔎 Vérifier Tuya';button.style.cssText='margin:12px;padding:12px;border-radius:10px;background:#25223c;color:white;border:1px solid #706080';
+ const button=document.createElement('button');button.type='button';button.textContent='🔎 Vérifier les prises';button.style.cssText='margin:12px;padding:12px;border-radius:10px;background:#25223c;color:white;border:1px solid #706080';
  button.onclick=async()=>{
   if(!fbRoot||!firebase.auth().currentUser)return showToast('Connecte-toi au compte Patron.');
   button.disabled=true;
   const dialog=document.createElement('dialog'),title=document.createElement('h3'),output=document.createElement('pre'),close=document.createElement('button');
-  title.textContent='Diagnostic Tuya — lecture seule';output.textContent='Vérification des six prises…';output.style.cssText='white-space:pre-wrap;font:14px sans-serif;line-height:1.6';close.textContent='Fermer';close.onclick=()=>dialog.close();dialog.append(title,output,close);dialog.style.cssText='background:#171625;color:white;border:1px solid #706080;border-radius:16px;max-width:90vw';document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
+  title.textContent='Diagnostic Tuya — lecture seule';output.textContent='Vérification des sept prises…';output.style.cssText='white-space:pre-wrap;font:14px sans-serif;line-height:1.6';close.textContent='Fermer';close.onclick=()=>dialog.close();dialog.append(title,output,close);dialog.style.cssText='background:#171625;color:white;border:1px solid #706080;border-radius:16px;max-width:90vw';document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove());dialog.showModal();
   try{
    const token=await firebase.auth().currentUser.getIdToken();
    const response=await fetch(TUYA_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({tenantKey:currentTenantKey,action:'diagnosticTuya'})}),result=await response.json();
@@ -3351,5 +3212,22 @@ async function ownerConfirmReduce(){
 })();
 </script>
 
+<script>CP1Relay.install({uid:()=>firebase.auth().currentUser?.uid,token:async()=>firebase.auth().currentUser?.getIdToken()});
+
+ownerPowerOff=async function(i){const p=(DB.get('postes')||[])[i],a=p&&activeForPoste(p,i);if(!a?.actif)return;if(!confirm('OFF TV : terminer la séance de '+p.num+' ? La recette sera conservée.'))return;try{const tx=await fbRoot.transaction(r=>{const st=rootReadActive(r,p,i);if(!st?.actif||st.sessionId!==a.sessionId)return;rootWriteActive(r,p,i,blankRemoteActive(st));r.closed_sessions=r.closed_sessions||{};r.closed_sessions[a.sessionId]={status:'terminee',ts:Date.now(),poste:p.num};return r;});if(tx.committed){DB._cache=tx.snapshot.val();ownerPersistActivity(p.num+' — OFF TV','Temps terminé, recette conservée','',{poste:p.num,sessionId:a.sessionId,typeActivite:'terminee'});renderControl();}}catch(e){showToast(e.message);}};
+const originalSavePosteY=savePoste;savePoste=async function(){const num=document.getElementById('p-num')?.value;try{if(num)CP1Relay.poste({num});return await originalSavePosteY();}catch(e){showToast(e.message);}};
+
+ document.title='GameZone CP1 — Patron';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 COMPLET 05 · Relais Firebase local';</script><script>
+// Les contrôles physiques précèdent la validation de la vente dans transaction().
+ownerTuyaCommand=async function(p,on){try{return on?await CP1Relay.ready(p):await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
+ownerReliableOff=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
+</script><script>const originalOpenPosteY=openModalPoste;openModalPoste=function(i=-1){originalOpenPosteY(i);document.getElementById('p-devid').readOnly=true;};
+savePoste=async function(){const n=document.getElementById('p-num').value.trim();try{CP1Relay.poste({num:n});}catch(e){return showToast(e.message);}document.getElementById('p-devid').value='relay:'+CP1Relay.poste({num:n});return originalSavePosteY();};
+testerPrise=async function(){const out=document.getElementById('test-result');out.style.display='block';try{await CP1Relay.ready({num:document.getElementById('p-num').value});out.textContent='Relais et prise disponibles.';out.className='test-result tr-ok';}catch(e){out.textContent=e.message;out.className='test-result tr-err';}};
+setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=DB._cache.operation_incidents||{};let box=document.getElementById('youssef-incidents');if(Object.keys(incidents).length){if(!box){box=document.createElement('div');box.id='youssef-incidents';box.style.cssText='padding:10px;background:#652438;color:#fff;font-size:12px';document.getElementById('gz-build-version')?.after(box);}box.textContent='⚠ Opération à vérifier : contrôler les prises et le rapport avant de refaire une vente.';}},3000);
+</script><script>
+const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
+const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
+</script><script src="./actions-v03.js?v=complete03"></script><script src="pending-pause.js"></script>
 </body>
 </html>

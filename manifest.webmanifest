@@ -1,10 +1,10 @@
 {
-  "name": "GameZone Bah V62 — Patron",
-  "short_name": "GZ Patron",
+  "name": "GameZone CP1 — PATRON",
+  "short_name": "CP1 Patron",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#140e20",
   "theme_color": "#21152e",
-  "description": "GameZone Patron V35 — chargement initial allégé, voix après confirmation, cartes alignées"
+  "description": "GameZone CP1 · 7 postes · relais Firebase"
 }
