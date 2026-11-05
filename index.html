@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-reduction-1.9"></script></head>
+<script src="./youssef-relay.js?v=cp1-feedback-2.0"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -3019,28 +3019,14 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     return current?await current.getIdToken():null;
   }
   async function enableRealNotifications(button){
-    if(!window.isSecureContext||!('Notification'in window)||!('serviceWorker'in navigator)||!('PushManager'in window))
-      throw new Error('Utilise le site HTTPS, et sur iPhone installe GameZone sur l’écran d’accueil.');
-    // iPhone Safari exige le clic utilisateur DIRECT pour la demande d'autorisation.
+    if(!window.isSecureContext||!('Notification'in window)||!('serviceWorker'in navigator))throw new Error('Ouvre GameZone en HTTPS dans Chrome. Sur iPhone, utilise son icône sur l’écran d’accueil.');
     const permission=await Notification.requestPermission();
-    if(permission!=='granted')throw new Error(permission==='denied'?'Notifications bloquées pour ce site. Ouvre GameZone directement dans Chrome, puis paramètres du site > Notifications > Autoriser. Sur iPhone, ouvre GameZone depuis son icône sur l’écran d’accueil.':'Autorisation non accordée. Ouvre GameZone dans ton navigateur habituel puis clique à nouveau la cloche et autorise les notifications.');
-    const token=await firebaseLoginToken();
-    if(!token)throw new Error('Connecte-toi à la salle GameZone avant d’activer les notifications.');
-    const keyReq=await fetch(WORKER_URL+'/?action=pushKey',{cache:'no-store'});
-    const keyData=await keyReq.json();
-    if(!keyData.success||!keyData.key)throw new Error('Le serveur de notifications n’est pas encore configuré.');
-    let readyTimer,reg;
-    try{reg=await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>{readyTimer=setTimeout(()=>reject(new Error('Service de notifications non prêt. Recharge le site dans ton navigateur habituel puis réessaie.')),12000);})]);}finally{clearTimeout(readyTimer);}
-    let sub=await reg.pushManager.getSubscription();
-    if(sub&&sub.options.applicationServerKey){const old=new Uint8Array(sub.options.applicationServerKey),current=keyBytes(keyData.key);if(old.length!==current.length||old.some((b,i)=>b!==current[i])){await sub.unsubscribe();sub=null;}}
-    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyBytes(keyData.key)});
-    const resp=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({tenantKey:'GZ-07732',action:'subscribePush',subscription:sub.toJSON(),url:location.href.split(/[?#]/)[0],role:ROLE})});
-    const answer=await resp.json().catch(()=>({}));
-    if(!resp.ok||!answer.success||!answer.registered)throw new Error(answer.error||'Abonnement impossible : vérifier le Worker.');
-    await reg.showNotification('🎮 GameZone CP1 — alertes activées',{body:'Ce téléphone recevra les alertes à 5 minutes et à la fin du temps, même en arrière-plan si le système le permet.',tag:'gz-push-ready'});
-    button.title='Notifications distantes activées';
-    button.textContent='🔔✓';
+    if(permission!=='granted')throw new Error('Notifications non autorisées. Vérifie les autorisations de ce site dans les réglages du navigateur.');
+    const reg=await navigator.serviceWorker.register('./sw.js');
+    await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error('Service de notifications non prêt. Recharge la page.')),10000))]);
+    await reg.showNotification('GameZone CP1 — notifications autorisées',{body:'Alertes à 5 minutes et à la fin pendant que GameZone reste ouvert. Les alertes site fermé nécessitent un serveur push.',tag:'cp1-local-ready'});
+    button.title='Notifications locales autorisées — garder GameZone ouvert';button.textContent='🔔✓';
+    window.GZFeedback?.notificationStatus();
   }
   function bind(){
     const button=document.getElementById('gz-notify-btn');
@@ -3219,12 +3205,13 @@ ownerReliableOff=async function(p){try{return await CP1Relay.safeOff(p);}catch(e
 </script><script>const originalOpenPosteY=openModalPoste;openModalPoste=function(i=-1){originalOpenPosteY(i);document.getElementById('p-devid').readOnly=true;};
 savePoste=async function(){const n=document.getElementById('p-num').value.trim();try{CP1Relay.poste({num:n});}catch(e){return showToast(e.message);}document.getElementById('p-devid').value='relay:'+CP1Relay.poste({num:n});return originalSavePosteY();};
 testerPrise=async function(){const out=document.getElementById('test-result');out.style.display='block';try{await CP1Relay.ready({num:document.getElementById('p-num').value});out.textContent='Relais et prise disponibles.';out.className='test-result tr-ok';}catch(e){out.textContent=e.message;out.className='test-result tr-err';}};
-setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=DB._cache.operation_incidents||{};let box=document.getElementById('youssef-incidents');if(Object.keys(incidents).length){if(!box){box=document.createElement('div');box.id='youssef-incidents';box.style.cssText='padding:10px;background:#652438;color:#fff;font-size:12px';document.getElementById('gz-build-version')?.after(box);}const ids=Object.keys(incidents).sort().join('|');if(box.dataset.ids!==ids){box.dataset.ids=ids;box.replaceChildren();const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='⚠ '+Object.keys(incidents).length+' opération(s) à contrôler — détails';details.append(summary);const info=document.createElement('p');info.textContent='Une ancienne commande n’a pas reçu de confirmation. Vérifiez le poste et la recette avant de répéter une vente. La fin automatique du temps libère le poste.';details.append(info);box.append(details);}}},3000);
+
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
 </script><script src="./actions-v03.js?v=cp1-boutons-1.6"></script><script src="pending-pause.js"></script>
 <script src="./cp1-v12-ui.js?v=cp1-sync-1.8"></script>
+<script src="./cp1-feedback.js?v=2.0"></script>
 </body>
 </html>
 
