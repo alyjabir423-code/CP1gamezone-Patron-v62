@@ -1829,7 +1829,7 @@ async function startSecurePatron(user){
     // Le rôle doit impérativement provenir de Realtime Database; aucun contournement des autorisations.
     let role;
     try {
-      if(user.uid!=="JO0hgBAEvlZOXCmV1jOmKmeB0sp1")throw Error('Compte Patron CP1 requis');
+      if(user.uid!=="Jt6csGJGWiZGRB4yExIFHmVrXzf1")throw Error('Compte Patron CP1 requis');
       await CP1Relay.initialize();role='patron';
     } catch(readError) {
       throw new Error('Lecture du rôle Firebase impossible ('+(readError.code||readError.message||'erreur réseau')+'). Chemin : '+rolePath+'. Ne modifie pas les règles sans vérifier.');
