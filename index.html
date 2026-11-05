@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-commandes-1.1"></script></head>
+<script src="./youssef-relay.js?v=cp1-commandes-1.2"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -1420,7 +1420,7 @@ function ownerRenderReport(){
 }
 async function ownerEnsureDailyRollover(){
   const key=businessDateKey(new Date());if(!ownerRuntimeDayKey){ownerRuntimeDayKey=key;return;}if(key===ownerRuntimeDayKey||ownerRolloverBusy||!fbRoot)return;const prevKey=ownerRuntimeDayKey;ownerRuntimeDayKey=key;ownerRolloverBusy=true;
-  try{const res=await fbRoot.transaction(root=>{root=root||{};root.rollovers=root.rollovers||{};if(root.rollovers[key])return root;root.daily=root.daily||{};const prev=root.sessions||{};if(!root.daily[prevKey]||money(prev.recettes)>=money(root.daily[prevKey]&&root.daily[prevKey].recettes))root.daily[prevKey]=deepClone(prev);const zero={recettes:0,count:0,date:today(),parPoste:{},sessionsParPoste:{},payStats:{}};root.sessions=zero;root.daily[key]=deepClone(zero);const arr=Array.isArray(root.active_postes)?root.active_postes.slice():[];arr.forEach((a,i)=>{if(a&&a.actif)arr[i]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_postes=arr;if(root.active_by_poste&&typeof root.active_by_poste==='object'){const map=Object.assign({},root.active_by_poste);Object.keys(map).forEach(k=>{const a=map[k];if(a&&a.actif)map[k]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_by_poste=map;}root.rollovers[key]={ts:Date.now(),previousKey:prevKey};return root;},undefined,false);if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;showToast('🌅 00h00 — nouvelle journée de gestion');}catch(e){console.log('Rollover patron',e);}finally{ownerRolloverBusy=false;}
+  try{const res=await fbRoot.transaction(root=>{root=root||{};root.rollovers=root.rollovers||{};if(root.rollovers[key])return root;root.daily=root.daily||{};const prev=root.sessions||{};if(!root.daily[prevKey]||money(prev.recettes)>=money(root.daily[prevKey]&&root.daily[prevKey].recettes))root.daily[prevKey]=deepClone(prev);const zero={recettes:0,count:0,date:today(),parPoste:{},sessionsParPoste:{},payStats:{}};root.sessions=zero;root.daily[key]=deepClone(zero);const arr=Array.isArray(root.active_postes)?root.active_postes.slice():[];arr.forEach((a,i)=>{if(a&&a.actif)arr[i]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_postes=arr;if(root.active_by_poste&&typeof root.active_by_poste==='object'){const map=Object.assign({},root.active_by_poste);Object.keys(map).forEach(k=>{const a=map[k];if(a&&a.actif)map[k]=Object.assign({},a,{montantJourSession:0,updatedAt:Date.now()});});root.active_by_poste=map;}root.rollovers[key]={ts:Date.now(),previousKey:prevKey};return root;},undefined,false);if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;showToast('🌅 8 h — nouvelle journée de gestion');}catch(e){console.log('Rollover patron',e);}finally{ownerRolloverBusy=false;}
 }
 
 
@@ -3213,12 +3213,12 @@ async function ownerConfirmReduce(){
 })();
 </script>
 
-<script>CP1Relay.install({uid:()=>firebase.auth().currentUser?.uid,token:async()=>firebase.auth().currentUser?.getIdToken()});
+<script>CP1Relay.install({uid:()=>firebase.auth().currentUser?.uid,token:async force=>firebase.auth().currentUser?.getIdToken(!!force)});
 
 ownerPowerOff=async function(i){const p=(DB.get('postes')||[])[i],a=p&&activeForPoste(p,i);if(!a?.actif)return;if(!confirm('OFF TV : terminer la séance de '+p.num+' ? La recette sera conservée.'))return;try{const tx=await fbRoot.transaction(r=>{const st=rootReadActive(r,p,i);if(!st?.actif||st.sessionId!==a.sessionId)return;rootWriteActive(r,p,i,blankRemoteActive(st));r.closed_sessions=r.closed_sessions||{};r.closed_sessions[a.sessionId]={status:'terminee',ts:Date.now(),poste:p.num};return r;});if(tx.committed){DB._cache=tx.snapshot.val();ownerPersistActivity(p.num+' — OFF TV','Temps terminé, recette conservée','',{poste:p.num,sessionId:a.sessionId,typeActivite:'terminee'});renderControl();}}catch(e){showToast(e.message);}};
 const originalSavePosteY=savePoste;savePoste=async function(){const num=document.getElementById('p-num')?.value;try{if(num)CP1Relay.poste({num});return await originalSavePosteY();}catch(e){showToast(e.message);}};
 
- document.title='GameZone CP1 — Patron';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 COMPLET 05 · Relais Firebase local';</script><script>
+ document.title='GameZone CP1 — Patron';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.2 · Temps sauvegardés jusqu’à 8 h';</script><script>
 // Les contrôles physiques précèdent la validation de la vente dans transaction().
 ownerTuyaCommand=async function(p,on){try{return on?await CP1Relay.ready(p):await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
 ownerReliableOff=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
@@ -3229,7 +3229,8 @@ setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=D
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
-</script><script src="./actions-v03.js?v=cp1-commandes-1.1"></script><script src="pending-pause.js"></script>
+</script><script src="./actions-v03.js?v=cp1-commandes-1.2"></script><script src="pending-pause.js"></script>
+<script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
 </body>
 </html>
 
