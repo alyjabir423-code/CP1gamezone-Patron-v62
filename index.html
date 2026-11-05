@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-commandes-1.2"></script></head>
+<script src="./youssef-relay.js?v=expiration-1.4"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -1702,18 +1702,17 @@ async function ownerFinishExpired(i,p,a){
   if(ownerFinishLocks.has(key))return;
   ownerFinishLocks.add(key);
   try{
-    if(!(await gzConfirmFinish16(p,a)))return;
     // Clôture atomique de la séance AVANT tout appel à la prise Tuya.
     const result=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,p,i)||{};
-      if(!r.actif||(sid&&r.sessionId!==sid)||!r.poweredOffAt||r.powerCutSessionId!==sid)return undefined;
+      if(!r.actif||(sid&&r.sessionId!==sid))return undefined;
       const now=Date.now();
       if(r.paused){if(Number(r.pauseRemainingSec||0)>0)return undefined;}
       else if(!Number(r.finTs)||Number(r.finTs)>now)return undefined;
       root.closed_sessions=root.closed_sessions||{};
       const alreadyClosed=!!(sid&&root.closed_sessions[sid]);
       const cleared=blankRemoteActive(r);
-      cleared.cleanup=true;cleared.cleanupUntil=now+20000;cleared.sessionId=sid;
+      cleared.cleanup=false;cleared.cleanupUntil=0;cleared.sessionId='';cleared.expiredSessionId=sid;cleared.powerUnverified=true;
       rootWriteActive(root,p,i,cleared);
       const ss=freshSessionSnapshotFromRoot(root);
       if(!alreadyClosed&&!r.bonusOnly)ss.count=Math.max(0,Number(ss.count)||0)+1;
@@ -1724,16 +1723,11 @@ async function ownerFinishExpired(i,p,a){
     },undefined,false);
     if(!result||!result.committed)return;
     if(result.snapshot&&typeof result.snapshot.val==='function')DB._cache=result.snapshot.val()||DB._cache;
-    // OFF is already confirmed for this session; do not send a second OFF.
+    // Clôture logique confirmée. Ne pas envoyer un OFF tardif au client suivant.
     renderControl();renderHome();
     ownerSpeak('Temps terminé pour '+ownerSpeechPosteName(p.num)+'.');
-    ownerTextVoiceNotify('GameZone — Fin de session',ownerSpeechPosteName(p.num)+' : temps terminé, télévision éteinte.','');
+    ownerTextVoiceNotify('GameZone — Fin de session',ownerSpeechPosteName(p.num)+' : temps terminé, poste libre. État électrique à vérifier.','');
     ownerPersistActivity(p.num+' — Temps écoulé',(a.client||'Client')+' · fin automatique',money(a.montantSession)+' F',{poste:p.num,client:a.client||'',sessionId:sid,typeActivite:'terminee_auto',tempsRestantSec:0,montant:money(a.montantSession)});
-    try{await fbRoot.transaction(root=>{
-      root=root||{};const live=rootReadActive(root,p,i)||{};
-      if(live.actif||!live.cleanup||live.sessionId!==sid)return undefined;
-      rootWriteActive(root,p,i,{...live,cleanup:false,cleanupUntil:0,sessionId:'',updatedAt:Date.now()});return root;
-    },undefined,false);}catch(e){console.warn('Libération nettoyage Patron:',e);}
   }catch(e){console.warn('Fin Patron:',e);}finally{ownerFinishLocks.delete(key);}
 }
 
@@ -3225,7 +3219,7 @@ ownerReliableOff=async function(p){try{return await CP1Relay.safeOff(p);}catch(e
 </script><script>const originalOpenPosteY=openModalPoste;openModalPoste=function(i=-1){originalOpenPosteY(i);document.getElementById('p-devid').readOnly=true;};
 savePoste=async function(){const n=document.getElementById('p-num').value.trim();try{CP1Relay.poste({num:n});}catch(e){return showToast(e.message);}document.getElementById('p-devid').value='relay:'+CP1Relay.poste({num:n});return originalSavePosteY();};
 testerPrise=async function(){const out=document.getElementById('test-result');out.style.display='block';try{await CP1Relay.ready({num:document.getElementById('p-num').value});out.textContent='Relais et prise disponibles.';out.className='test-result tr-ok';}catch(e){out.textContent=e.message;out.className='test-result tr-err';}};
-setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=DB._cache.operation_incidents||{};let box=document.getElementById('youssef-incidents');if(Object.keys(incidents).length){if(!box){box=document.createElement('div');box.id='youssef-incidents';box.style.cssText='padding:10px;background:#652438;color:#fff;font-size:12px';document.getElementById('gz-build-version')?.after(box);}box.textContent='⚠ Opération à vérifier : contrôler les prises et le rapport avant de refaire une vente.';}},3000);
+setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=DB._cache.operation_incidents||{};let box=document.getElementById('youssef-incidents');if(Object.keys(incidents).length){if(!box){box=document.createElement('div');box.id='youssef-incidents';box.style.cssText='padding:10px;background:#652438;color:#fff;font-size:12px';document.getElementById('gz-build-version')?.after(box);}const ids=Object.keys(incidents).sort().join('|');if(box.dataset.ids!==ids){box.dataset.ids=ids;box.replaceChildren();const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='⚠ '+Object.keys(incidents).length+' opération(s) à contrôler — détails';details.append(summary);const info=document.createElement('p');info.textContent='Une ancienne commande n’a pas reçu de confirmation. Vérifiez le poste et la recette avant de répéter une vente. La fin automatique du temps libère le poste.';details.append(info);box.append(details);}}},3000);
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
@@ -3233,4 +3227,5 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
 </body>
 </html>
+
 
