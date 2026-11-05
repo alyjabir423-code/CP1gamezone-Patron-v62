@@ -25,7 +25,11 @@ if(!patron){
  addJournal=function(color,main,detail,amount,motif='',extra={}){const stamp=Date.now(),key=CP1Relay.dayKey(),event={...extra,color,main,detail,amount,motif,ts:stamp,dateKey:key,t:new Date(stamp).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),actorRole:'gerant',uid:CP1Relay.currentUid()};CP1Relay.child(CP1Relay.room+'/activity_daily/'+key+'/'+crypto.randomUUID()).set(event).catch(()=>{});};
 }
 // Network loss is not evidence that the physical plug went OFF.
-if(patron&&typeof ownerAutoPause==='function')ownerAutoPause=async()=>false;
+if(patron){
+ if(typeof ownerAutoPause==='function')ownerAutoPause=async()=>false;
+ // Only the relay owns the shared 08:00 reset under the operation lock.
+ ownerEnsureDailyRollover=async()=>{ownerRuntimeDayKey=CP1Relay.dayKey();};
+}
 const style=document.createElement('style');style.textContent='#cp1-saved-times select{background:#171123;color:white;border:1px solid #735b9b;border-radius:8px}';document.head.append(style);
 let lastDay=CP1Relay.dayKey();setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const nextDay=CP1Relay.dayKey();if(lastDay!==nextDay){lastDay=nextDay;if(!patron){ensureDailyRollover();updateStats();renderRapport();}drawBanks();}DB._cache=CP1Relay.syncPhysicalRoot(DB._cache);drawBanks();},1000);
 })(window);
