@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=expiration-1.4"></script></head>
+<script src="./youssef-relay.js?v=cp1-boutons-1.6"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -3209,7 +3209,7 @@ async function ownerConfirmReduce(){
 
 <script>CP1Relay.install({uid:()=>firebase.auth().currentUser?.uid,token:async force=>firebase.auth().currentUser?.getIdToken(!!force)});
 
-ownerPowerOff=async function(i){const p=(DB.get('postes')||[])[i],a=p&&activeForPoste(p,i);if(!a?.actif)return;if(!confirm('OFF TV : terminer la séance de '+p.num+' ? La recette sera conservée.'))return;try{const tx=await fbRoot.transaction(r=>{const st=rootReadActive(r,p,i);if(!st?.actif||st.sessionId!==a.sessionId)return;rootWriteActive(r,p,i,blankRemoteActive(st));r.closed_sessions=r.closed_sessions||{};r.closed_sessions[a.sessionId]={status:'terminee',ts:Date.now(),poste:p.num};return r;});if(tx.committed){DB._cache=tx.snapshot.val();ownerPersistActivity(p.num+' — OFF TV','Temps terminé, recette conservée','',{poste:p.num,sessionId:a.sessionId,typeActivite:'terminee'});renderControl();}}catch(e){showToast(e.message);}};
+ownerPowerOff=async function(i){const p=(DB.get('postes')||[])[i],a=p&&activeForPoste(p,i);if(!a?.actif)return;const entered=prompt('Motif obligatoire pour OFF TV (recette conservée) :');if(entered===null)return;const reason=entered.trim();if(!reason||reason.length>500){showToast('Motif obligatoire : 1 à 500 caractères.');return;}if(!confirm('OFF TV : terminer la séance de '+p.num+' ? La recette sera conservée.'))return;try{const tx=await fbRoot.transaction(r=>{const st=rootReadActive(r,p,i);if(!st?.actif||st.sessionId!==a.sessionId)return;rootWriteActive(r,p,i,blankRemoteActive(st));r.closed_sessions=r.closed_sessions||{};r.closed_sessions[a.sessionId]={status:'terminee',ts:Date.now(),poste:p.num};return r;});if(tx.committed){DB._cache=tx.snapshot.val();ownerPersistActivity(p.num+' — OFF TV','Temps terminé, recette conservée · Motif : '+reason,'',{poste:p.num,sessionId:a.sessionId,typeActivite:'terminee',motif:reason});renderControl();}}catch(e){showToast(e.message);}};
 const originalSavePosteY=savePoste;savePoste=async function(){const num=document.getElementById('p-num')?.value;try{if(num)CP1Relay.poste({num});return await originalSavePosteY();}catch(e){showToast(e.message);}};
 
  document.title='GameZone CP1 — Patron';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.2 · Temps sauvegardés jusqu’à 8 h';</script><script>
@@ -3223,9 +3223,10 @@ setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=D
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
-</script><script src="./actions-v03.js?v=cp1-commandes-1.2"></script><script src="pending-pause.js"></script>
-<script src="./cp1-v12-ui.js?v=cp1-temps-1.2"></script>
+</script><script src="./actions-v03.js?v=cp1-boutons-1.6"></script><script src="pending-pause.js"></script>
+<script src="./cp1-v12-ui.js?v=cp1-boutons-1.6"></script>
 </body>
 </html>
+
 
 
