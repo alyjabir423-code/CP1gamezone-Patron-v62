@@ -1,6 +1,6 @@
 /* GameZone CP1: commandes confirmées par pilotage_v1, sans Worker. */
 (function(w){'use strict';
-const URL_DB='https://gamezone-bah-nouveau-default-rtdb.europe-west1.firebasedatabase.app',OWNER='JO0hgBAEvlZOXCmV1jOmKmeB0sp1',ROOM='gz_GZ-07732';
+const URL_DB='https://gamezone-bah-nouveau-default-rtdb.europe-west1.firebasedatabase.app',OWNER='Jt6csGJGWiZGRB4yExIFHmVrXzf1',ROOM='gz_GZ-07732';
 const fetchNative=w.fetch.bind(w),pending=new Map();let cfg={},offset=0,confirmedRoot=null;
 const clone=x=>x==null?x:JSON.parse(JSON.stringify(x)),snap=x=>({val:()=>clone(x)}),sleep=t=>new Promise(r=>setTimeout(r,t));
 function uid(){return cfg.uid();}function now(){return Date.now()+offset;}function id(){return crypto.randomUUID();}
