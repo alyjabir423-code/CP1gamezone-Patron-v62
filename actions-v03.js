@@ -16,6 +16,10 @@ else{
  const oldReport=renderRapport;renderRapport=function(){updateStats();oldReport();const rev=CP1Relay.todayRevenue(DB._cache);document.getElementById('r-rec-day').textContent=rev.toLocaleString('fr-FR')+' FCFA';for(const id of ['r-rec-yesterday','r-rec-month','r-rec-week','r-rec-total']){const el=document.getElementById(id);if(el)el.closest('.rrow').hidden=true;}const box=document.getElementById('r-postes-list'),daily=DB._cache.daily?.[CP1Relay.dayKey()]||{};box.replaceChildren();for(const p of postes){const row=document.createElement('div');row.className='rrow';row.textContent=GameZoneManagement.displayName(p)+' — Aujourd’hui : '+Number(daily.parPoste?.[p.num]||0).toLocaleString('fr-FR')+' F';box.append(row);}};
  wrap('confirmerSession','Activation');wrap('confirmerPlus','Ajout du temps');
 }
+
+for(const name of ['ownerRenderDashboard','ownerRenderReport','updateStats','renderRapport']){const original=w[name];if(typeof original==='function')w[name]=function(...args){const result=original.apply(this,args);CP1Relay.renderPhysical();return result;};}
+
 const style=document.createElement('style');style.textContent='[hidden]{display:none!important}.ms{overflow-y:auto;max-height:88dvh}button:disabled{opacity:.55;cursor:wait}';document.head.append(style);
 let day=CP1Relay.dayKey();setInterval(()=>{const current=CP1Relay.dayKey();if(current===day)return;day=current;if(patron){renderHome();ownerRenderReport();ownerRenderHistory();}else{updateStats();renderRapport();renderJournal();renderHistories();}},1000);
 })(window);
+

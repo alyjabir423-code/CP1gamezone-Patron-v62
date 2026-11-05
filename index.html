@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-patron-20261105"></script></head>
+<script src="./youssef-relay.js?v=cp1-commandes-1.1"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -1168,7 +1168,7 @@ function renderOwnerDurations(containerId,post,kind){
 function ownerChooseDuration(containerId,kind,min,el){gzCustomReset(kind);document.querySelectorAll('#'+containerId+' .dctl-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');if(kind==='start')ownerSelMin=min;else ownerPlusMin=min;gzChoosePreset(kind,ownerTarifs((DB.get('postes')||[])[ownerPosteIdx]),min);}
 
 function ownerPosteOrderValue(p,idx){const m=String((p&&p.num)||'').match(/\d+/);return m?Number(m[0]):1000+Number(idx||0);}
-function ownerOrderedPostesEntries(list){return (list||[]).map((p,i)=>({p,i})).sort((a,b)=>ownerPosteOrderValue(a.p,a.i)-ownerPosteOrderValue(b.p,b.i));}
+function ownerOrderedPostesEntries(list){return CP1Relay.entries(list);}
 
 
 // V42/V19 : vert > 10 min ; jaune > 5 à <= 10 min ; rouge <= 5 min jusqu'à 00:00.
@@ -1204,7 +1204,7 @@ function renderControl(){
       ? `<button class="ctl-btn ctl-resume" onclick="ownerResume(${i})">▶ REPRENDRE</button><button class="ctl-btn ctl-off" onclick="gzRetryPausedPower(${i})">${a.pausePowerOffConfirmed?'OFF CONFIRMÉ':'RÉESSAYER OFF'}</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`
       : `<button class="ctl-btn ctl-pause" onclick="ownerPause(${i})">⏸ PAUSE</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`;
     return `<div class="ctl-card ${cls}">
-      <div class="ctl-head"><div><div class="ctl-num">${esc(GameZoneManagement.displayName(p))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
+      <div class="ctl-head"><div><div class="ctl-num">${esc(CP1Relay.displayName(p))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
       <div class="ctl-timer-row"><div class="ctl-timer ${a.paused?'pause':(a.actif?'on':'free')}">${timer}</div>${a.actif?`<div class="ctl-money">${amount.toLocaleString('fr-FR')} F</div>`:''}</div>
       <div class="ctl-progress"><div class="ctl-progress-bar" style="width:${pct}%;background:${progressColor}"></div></div>
       <div class="ctl-client">${a.actif?esc(a.client||'Client'):'Disponible'}</div>
@@ -3229,6 +3229,7 @@ setInterval(()=>{if(typeof DB==='undefined'||!DB._cache)return;const incidents=D
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
-</script><script src="./actions-v03.js?v=complete03"></script><script src="pending-pause.js"></script>
+</script><script src="./actions-v03.js?v=cp1-commandes-1.1"></script><script src="pending-pause.js"></script>
 </body>
 </html>
+
