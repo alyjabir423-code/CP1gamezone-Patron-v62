@@ -1362,19 +1362,17 @@ async function patronCorrectRevenue(){
  if(!poste||!['add','subtract'].includes(how)||!Number.isSafeInteger(amount)||amount<100||amount>100000||amount%100||reason.length<8)return patronCorrectionStatus('Choisis le poste, un montant multiple de 100 F et un motif de 8 caractères minimum');
  const btn=document.getElementById('patron-corr-confirm');patronCorrectionBusy=true;btn.disabled=true;
  try{
-  if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
-  if((await firebase.database().ref('pilotage_v1/access/'+uid+'/rooms/'+patronAuditRoom()).once('value')).val()!=='patron')throw Error('Accès Patron requis');
-  const raw=firebase.database().ref(patronAuditRoom()),room=(await raw.once('value')).val()||{};
+  if((await CP1Relay.request('pilotage_v1/access/'+uid+'/rooms/'+patronAuditRoom())).data!=='patron')throw Error('Accès Patron requis');
+  const room=(await CP1Relay.request(patronAuditRoom())).data||{};
   const current=businessDateKey(new Date()),day=GameZoneManagement.snapshot(room,key,current,today());
   const op={id:'C'+Date.now()+'_'+Math.random().toString(36).slice(2,10),key,poste,reason,delta:how==='add'?amount:-amount,beforeTotal:Number(day.ss.recettes)||0,beforePoste:Number((day.ss.parPoste||{})[poste])||0};
   GameZoneManagement.applyCorrection(room,op,current,today());
-  if(Object.values(patronAuditEvents||{}).some(e=>e&&e.dateKey===key&&e.poste===poste&&Number(e.delta)===op.delta&&Date.now()-Number(e.creeLe||0)<120000))throw Error('Correction similaire récente : vérifie le journal privé');
+  if(Object.entries(patronAuditEvents||{}).some(([id,e])=>e&&room.patron_adjustment_once?.[id]===true&&e.dateKey===key&&e.poste===poste&&Number(e.delta)===op.delta&&Date.now()-Number(e.creeLe||0)<120000))throw Error('Correction similaire récente : vérifie le journal privé');
   if(!confirm('CORRECTION PATRON — '+key+'\n'+GameZoneManagement.displayName((room.postes||[]).find(p=>p.num===poste)||{num:poste})+'\n'+patronMoneySigned(op.delta)+'\nTotal : '+op.beforeTotal+' F → '+(op.beforeTotal+op.delta)+' F\nMotif : '+reason+'\nConfirmer ?'))return;
   const audit={id:op.id,uid,poste,dateKey:key,creeLe:Date.now(),delta:op.delta,montant:amount,motif:reason,sens:how,avantPoste:op.beforePoste,apresPoste:op.beforePoste+op.delta,avantTotal:op.beforeTotal,apresTotal:op.beforeTotal+op.delta};
-  const auditRef=firebase.database().ref(patronAuditPrefix+patronAuditRoom()+'/'+op.id);await auditRef.set(audit);
-  let issue='';
-  const tx=await raw.transaction(data=>{try{return GameZoneManagement.applyCorrection(data,op,businessDateKey(new Date()),today());}catch(e){issue=e.message;return undefined;}},undefined,false);
-  if(!tx.committed)throw Error(issue||'Correction non appliquée');
+  await CP1Relay.request(patronAuditPrefix+patronAuditRoom()+'/'+op.id,'PUT',audit);
+  const tx=await CP1Relay.transaction(data=>GameZoneManagement.applyCorrection(data,op,businessDateKey(new Date()),today()));
+  if(!tx.committed)throw Error('Correction non appliquée');
   DB._cache=tx.snapshot.val()||DB._cache;
   patronCorrectionStatus('✅ Correction du '+key+' appliquée : '+patronMoneySigned(op.delta));
   document.getElementById('patron-corr-amount').value='';document.getElementById('patron-corr-reason').value='';
@@ -3244,6 +3242,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-feedback.js?v=2.0"></script>
 </body>
 </html>
+
 
 
 
