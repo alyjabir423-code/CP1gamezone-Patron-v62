@@ -29,6 +29,10 @@ function applyCorrection(room,op,currentKey,currentDate){
  return next;
 }
 function displayName(poste){return String(poste&&poste.displayName||poste&&poste.num||'Poste');}
+function validatePostTariffs(rows){
+ if(!Array.isArray(rows)||!rows.length||rows.length>30)throw Error('Ajoute de 1 à 30 tarifs pour ce poste');
+ const seen=new Set();return rows.map(t=>{const min=Number(t.min),prix=Number(t.prix);if(!Number.isSafeInteger(min)||min<1||min>1440||!Number.isSafeInteger(prix)||prix<1||prix>100000)throw Error('Durée : 1 à 1440 minutes ; prix : 1 à 100 000 FCFA entiers');if(seen.has(min))throw Error('Chaque durée doit être unique pour ce poste');seen.add(min);return {min,prix,lbl:min+' min'};}).sort((a,b)=>a.min-b.min);
+}
 function updatePostes(room,index,values){
  const list=Array.isArray(room.postes)?clone(room.postes):[],old=index>=0?list[index]:null;
  if(index>=0&&!old)throw Error('Poste introuvable');
@@ -38,10 +42,12 @@ function updatePostes(room,index,values){
  if(!old&&list.some(p=>p.num===num))throw Error('Identifiant déjà utilisé');
  const state=old&&((room.active_by_poste||{})[encodeURIComponent(old.num)]||(room.active_postes||[])[index])||{};
  if((state.actif||state.starting||state.cleanup)&&old&&(old.type!==values.type||String(old.typeCustom||'')!==String(values.typeCustom||'')||String(old.devid||'')!==String(values.devid||'')))throw Error('Termine la séance avant de changer le type ou la prise');
+ if(values.tarifsSpecifiques!=null)values=Object.assign({},values,{tarifsSpecifiques:validatePostTariffs(values.tarifsSpecifiques)});
  const poste=Object.assign({},old||{},values,{num,displayName:name});delete poste.key;
  if(old)list[index]=poste;else list.push(poste);
  return list;
 }
-root.GameZoneManagement={snapshot,applyCorrection,displayName,updatePostes};
+root.GameZoneManagement={snapshot,applyCorrection,displayName,updatePostes,validatePostTariffs};
 })(typeof globalThis!=='undefined'?globalThis:this);
+
 

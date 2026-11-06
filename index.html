@@ -239,7 +239,7 @@ button,.ni,.ctl-btn{touch-action:manipulation}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 
-<script src="./management.js?v=recettes-libres-1"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
+<script src="./management.js?v=postes-tarifs-1"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
 <script>
 /* GAMEZONE VOIX HOMME : réglage local à chaque appareil, aucune écriture Firebase. */
 (function(){
@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-local-1.8"></script></head>
+<script src="./youssef-relay.js?v=postes-1-cp1-local-1.8"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -662,6 +662,11 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <div style="font-size:10px;color:var(--muted)">Exemple : PS2. Si des tarifs PS2 existent, ils seront utilisés ; sinon, les tarifs génériques « Autres » restent disponibles.</div>
     </div>
 
+    <div class="ig" style="border:1px solid var(--gold);padding:12px;border-radius:10px">
+      <label><input type="checkbox" id="p-own-tariffs" onchange="gzTogglePostTariffs()"> Tarifs personnalisés pour ce poste</label>
+      <div style="font-size:11px;color:var(--muted)">Sinon, les tarifs du type de console sont utilisés. Les séances déjà vendues conservent leur montant et leur temps.</div>
+      <div id="p-own-tariffs-editor" hidden><div id="p-own-tariffs-rows"></div><button type="button" class="btn-edit" onclick="gzAddPostTariff()">+ Ajouter un tarif</button></div>
+    </div>
     <div style="margin:16px 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">🔌 Prise relais OPPO</div>
     <div class="info-box">Seul le <b>Device ID</b> est enregistré pour le poste. Les clés Tuya restent protégées dans le téléphone relais.</div>
     <div class="ig"><label>Device ID</label><input type="text" id="p-devid" placeholder="Depuis Tuya Developer" autocomplete="off"></div>
@@ -871,6 +876,7 @@ function gzTarifCategory(poste){
     ? gzConsoleTypeName(poste.typeCustom) : type;
 }
 function gzTarifsForPoste(poste){
+  if(Array.isArray(poste?.tarifsSpecifiques)&&poste.tarifsSpecifiques.length)return poste.tarifsSpecifiques.map(t=>({...t}));
   const all=DB.get('tarifs')||[];
   const category=gzTarifCategory(poste),type=gzConsoleTypeName(poste&&poste.type||'PS5');
   const matched=all.filter(t=>gzConsoleTypeKey(t.console||'PS5')===gzConsoleTypeKey(category));
@@ -2034,6 +2040,20 @@ function gzRefreshPosteTypeSelect(selected){
   el.value=found;
   gzToggleCustomConsole();
 }
+function gzTogglePostTariffs(){document.getElementById('p-own-tariffs-editor').hidden=!document.getElementById('p-own-tariffs').checked;}
+function gzAddPostTariff(t={}){
+ const row=document.createElement('div');row.className='poste-tariff-row';row.style.cssText='display:flex;gap:6px;align-items:center;margin:8px 0';
+ const minutes=document.createElement('input'),price=document.createElement('input'),remove=document.createElement('button');
+ for(const input of [minutes,price]){input.type='number';input.min='1';input.step='1';input.inputMode='numeric';input.style.cssText='width:40%;min-width:0;padding:10px';}
+ minutes.className='poste-tariff-min';minutes.placeholder='Minutes';minutes.setAttribute('aria-label','Durée en minutes');minutes.value=t.min||'';
+ price.className='poste-tariff-price';price.placeholder='Prix FCFA';price.setAttribute('aria-label','Prix en FCFA');price.value=t.prix||'';
+ remove.type='button';remove.textContent='×';remove.setAttribute('aria-label','Supprimer ce tarif');remove.onclick=()=>row.remove();row.append(minutes,price,remove);document.getElementById('p-own-tariffs-rows').append(row);
+}
+function gzLoadPostTariffs(p){
+ document.getElementById('p-own-tariffs').checked=Array.isArray(p?.tarifsSpecifiques)&&p.tarifsSpecifiques.length>0;
+ document.getElementById('p-own-tariffs-rows').replaceChildren();const rows=p?gzTarifsForPoste(p):[];for(const t of rows)gzAddPostTariff(t);if(!rows.length)gzAddPostTariff();gzTogglePostTariffs();
+}
+function gzReadPostTariffs(){if(!document.getElementById('p-own-tariffs').checked)return null;return GameZoneManagement.validatePostTariffs(Array.from(document.querySelectorAll('#p-own-tariffs-rows .poste-tariff-row')).map(row=>({min:row.querySelector('.poste-tariff-min').value,prix:row.querySelector('.poste-tariff-price').value})));}
 function openModalPoste(idx=-1){
   document.getElementById('p-edit-idx').value=idx;
   document.getElementById('test-result').style.display='none';
@@ -2058,6 +2078,7 @@ function openModalPoste(idx=-1){
     document.getElementById('p-custom-type').value='';
   }
   gzToggleCustomConsole();
+  gzLoadPostTariffs(idx>=0?(DB.get('postes')||[])[idx]:null);
   openModal('mo-poste');
   setTimeout(()=>document.getElementById('p-num').focus(),200);
 }
@@ -2065,18 +2086,16 @@ function editPoste(i){openModalPoste(i);}
 
 async function savePoste(){
  const idx=Number(document.getElementById('p-edit-idx').value),type=document.getElementById('p-type').value.trim();
- const values={num:document.getElementById('p-num').value.trim(),displayName:document.getElementById('p-display-name').value.trim(),type,typeCustom:type==='Autres'?document.getElementById('p-custom-type').value.trim():'',devid:document.getElementById('p-devid').value.trim(),ip:'',ver:'3.3'};
+ const button=document.querySelector('#mo-poste .btn-ok');if(button?.disabled)return;if(button)button.disabled=true;
  try{
-  if(!loggedIn||!fbRoot||!firebase.auth().currentUser)throw Error('Connexion Patron requise');
-  if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
-  const raw=firebase.database().ref(patronAuditRoom()),before=(await raw.once('value')).val()||{};
-  const expected=JSON.stringify((before.postes||[])[idx]||null);let issue='';
-  const tx=await raw.transaction(room=>{try{if(!room||JSON.stringify((room.postes||[])[idx]||null)!==expected)throw Error('Le poste a changé ailleurs : actualise');const list=GameZoneManagement.updatePostes(room,idx,values);return Object.assign({},room,{postes:list});}catch(e){issue=e.message;return undefined;}},undefined,false);
-  if(!tx.committed)throw Error(issue||'Modification refusée');
-  DB._cache=tx.snapshot.val()||DB._cache;
-  await ownerPersistActivity('Paramètres de poste modifiés',values.displayName,'',{poste:values.num,typeActivite:'parametres_poste'});
-  closeModal('mo-poste');renderPostes();renderHome();showToast('✅ Poste enregistré');
- }catch(e){showToast('⚠️ '+e.message);}
+  if(!loggedIn||!fbRoot||CP1Relay.currentUid()!==CP1Relay.owner)throw Error('Connexion Patron requise');
+  const before=(await CP1Relay.request(patronAuditRoom())).data||{},old=(before.postes||[])[idx],expected=JSON.stringify(old||null);
+  const values={num:old?.num||document.getElementById('p-num').value.trim(),displayName:document.getElementById('p-display-name').value.trim(),type,typeCustom:type==='Autres'?document.getElementById('p-custom-type').value.trim():'',devid:old?.devid||document.getElementById('p-devid').value.trim(),tarifsSpecifiques:gzReadPostTariffs()};
+  const tx=await CP1Relay.transaction(room=>{if(JSON.stringify((room.postes||[])[idx]||null)!==expected)throw Error('Le poste a changé ailleurs : actualise');room.postes=GameZoneManagement.updatePostes(room,idx,values);return room;});
+  if(!tx.committed)throw Error('Modification refusée');DB._cache=tx.snapshot.val()||DB._cache;
+  closeModal('mo-poste');renderPostes();renderControl();renderHome();showToast('✅ Nom et tarifs du poste enregistrés');
+  ownerPersistActivity('Paramètres de poste modifiés',values.displayName,'',{poste:values.num,typeActivite:'parametres_poste'});
+ }catch(e){showToast('⚠️ '+e.message);}finally{if(button)button.disabled=false;}
 }
 
 function delPoste(i){
@@ -2306,21 +2325,16 @@ function openModalTarif(idx=-1){
 }
 function editTarif(i){openModalTarif(i);}
 async function gzSaveTarifChange(index,values){
- if(!loggedIn||!firebase.auth().currentUser||!fbRoot)throw Error('Connexion Patron requise');
- if((await firebase.database().ref('.info/connected').once('value')).val()!==true)throw Error('Connexion Firebase absente');
- const ref=firebase.database().ref(patronAuditRoom()+'/tarifs');
- const before=(await ref.once('value')).val()||[],expected=JSON.stringify(before[index]||null);let issue='';
- const tx=await ref.transaction(items=>{try{
-  const list=Array.isArray(items)?items.slice():[];
+ if(!loggedIn||CP1Relay.currentUid()!==CP1Relay.owner||!fbRoot)throw Error('Connexion Patron requise');
+ const before=(await CP1Relay.request(patronAuditRoom()+'/tarifs')).data||[],expected=JSON.stringify(before[index]||null);
+ const tx=await CP1Relay.transaction(room=>{const list=Array.isArray(room.tarifs)?room.tarifs.slice():[];
   if(JSON.stringify(list[index]||null)!==expected)throw Error('Ce tarif a changé ailleurs : actualise');
   if(values){if(!values.console||!values.lbl||values.lbl.length>64||!Number.isSafeInteger(values.min)||values.min<=0||!Number.isSafeInteger(values.prix)||values.prix<=0)throw Error('Nom, durée et prix entiers positifs obligatoires');if(index>=0)list[index]=values;else list.push(values);}
-  else{if(index<0||!list[index])throw Error('Tarif introuvable');list.splice(index,1);}
-  return list;
- }catch(e){issue=e.message;return undefined;}},undefined,false);
- if(!tx.committed)throw Error(issue||'Modification refusée');
- DB._cache.tarifs=tx.snapshot.val()||[];
- await ownerPersistActivity(values?'Tarif enregistré':'Tarif supprimé',values?values.console+' · '+values.lbl+' · '+values.min+' min · '+values.prix+' F':'Suppression du tarif sélectionné','',{typeActivite:'parametres_tarifs'});
+  else{if(index<0||!list[index])throw Error('Tarif introuvable');list.splice(index,1);}room.tarifs=list;return room;});
+ if(!tx.committed)throw Error('Modification refusée');DB._cache=tx.snapshot.val()||DB._cache;
+ ownerPersistActivity(values?'Tarif enregistré':'Tarif supprimé',values?values.console+' · '+values.lbl+' · '+values.min+' min · '+values.prix+' F':'Suppression du tarif sélectionné','',{typeActivite:'parametres_tarifs'});
 }
+
 async function saveTarif(){
  const values={console:document.getElementById('t-console').value,min:Number(document.getElementById('t-min').value),lbl:document.getElementById('t-lbl').value.trim(),prix:Number(document.getElementById('t-prix').value)};
  try{await gzSaveTarifChange(Number(document.getElementById('t-edit-idx').value),values);activeConsoleTab=values.console;closeModal('mo-tarif');renderTarifs();showToast('✅ Tarif enregistré');}catch(e){showToast('⚠️ '+e.message);}
@@ -3241,7 +3255,7 @@ const originalSavePosteY=savePoste;savePoste=async function(){const num=document
 ownerTuyaCommand=async function(p,on){try{return on?await CP1Relay.ready(p):await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
 ownerReliableOff=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
 </script><script>const originalOpenPosteY=openModalPoste;openModalPoste=function(i=-1){originalOpenPosteY(i);document.getElementById('p-devid').readOnly=true;};
-savePoste=async function(){const n=document.getElementById('p-num').value.trim();try{CP1Relay.poste({num:n});}catch(e){return showToast(e.message);}document.getElementById('p-devid').value='relay:'+CP1Relay.poste({num:n});return originalSavePosteY();};
+savePoste=async function(){const idx=Number(document.getElementById('p-edit-idx').value);if(idx>=0)return originalSavePosteY();const n=document.getElementById('p-num').value.trim();try{CP1Relay.poste({num:n});}catch(e){return showToast(e.message);}document.getElementById('p-devid').value='relay:'+CP1Relay.poste({num:n});return originalSavePosteY();};
 testerPrise=async function(){const out=document.getElementById('test-result');out.style.display='block';try{await CP1Relay.ready({num:document.getElementById('p-num').value});out.textContent='Relais et prise disponibles.';out.className='test-result tr-ok';}catch(e){out.textContent=e.message;out.className='test-result tr-err';}};
 
 </script><script>
@@ -3253,6 +3267,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 

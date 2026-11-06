@@ -11,7 +11,7 @@ function poste(p){const label=String(p?.num||p||''),n=CP1_POST_MAP[label];if(!Nu
 
 // Preserve Firebase indices and historical rows; show only the six mapped controls.
 function entries(posts){const seen=new Set();return (posts||[]).map((p,i)=>({p,i})).filter(({p})=>{const n=CP1_POST_MAP[p?.num];if(!n||seen.has(n))return false;seen.add(n);return true;}).sort((a,b)=>CP1_POST_MAP[a.p.num]-CP1_POST_MAP[b.p.num]);}
-function displayName(p){const n=CP1_POST_MAP[p?.num];return n?'Poste '+n:String(p?.displayName||p?.num||'Poste');}
+function displayName(p){const custom=String(p?.displayName||'').trim();if(custom)return custom;const n=CP1_POST_MAP[p?.num];return n?'Poste '+n:String(p?.num||'Poste');}
 let physicalRows={},physicalAt=0,physicalPoll=null;
 function physicalSummary(){const on=[],unknown=[];for(let n=1;n<=6;n++){const row=physicalRows[n];if(!row?.online||now()-row.seenAt>30000){unknown.push(n);continue;}if(row.power===true)on.push(n);else if(row.power!==false)unknown.push(n);}return {on,unknown,count:unknown.length?'—':on.length,text:unknown.length?'État à vérifier : poste(s) '+unknown.join(', '):(on.length?'Prises allumées : '+on.map(n=>'Poste '+n).join(', '):'Les six prises sont éteintes')};}
 function renderPhysical(){const s=physicalSummary();for(const key of ['od-prises','or-plugs','s-prises','r-prises']){const el=document.getElementById(key);if(el)el.textContent=s.count;}for(const key of ['od-prises-list','s-prises-list']){const el=document.getElementById(key);if(el)el.textContent=s.text;}}
@@ -156,6 +156,7 @@ function dayKey(d=new Date()){return new Date(d.getTime()-8*60*60*1000).toISOStr
 function todayRevenue(room,d=new Date()){return Math.max(0,Number(room.daily?.[dayKey(d)]?.recettes)||0);}
 w.CP1Relay={dayStart,nextEight,managerSnapshot,restRoom,saveTime,restoreTime,validBanks,syncPhysicalRoot,leafPatch,entries,displayName,physicalSummary,renderPhysical,refreshPhysical,install,request,acceptSnapshot,isPatronEvent,dayKey,todayRevenue,currentUid:uid,applyPause,applyAuto,importTariffs,ready,command,plan,transaction,roomRef,child,initialize,safeOff,poste,remaining,owner:OWNER,room:ROOM};
 })(window);
+
 
 
 
