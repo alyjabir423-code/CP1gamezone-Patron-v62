@@ -16,8 +16,8 @@ function snapshot(room,key,currentKey,currentDate){
 }
 function applyCorrection(room,op,currentKey,currentDate){
  if(!room||typeof room!=='object')throw Error('Salle introuvable');
- if(!op.id||!op.poste||String(op.reason||'').trim().length<8)throw Error('Poste et motif obligatoire');
- if(!Number.isSafeInteger(op.delta)||!op.delta||Math.abs(op.delta)>100000||op.delta%100)throw Error('Montant invalide : multiple de 100 F');
+ if(!op.id||!op.poste)throw Error('Poste obligatoire');
+ if(!Number.isSafeInteger(op.delta)||!op.delta||Math.abs(op.delta)>100000)throw Error('Montant invalide : entier de 1 à 100 000 FCFA');
  if(room.patron_adjustment_once&&room.patron_adjustment_once[op.id])throw Error('Correction déjà appliquée');
  const day=snapshot(room,op.key,currentKey,currentDate),before=amount(day.ss.parPoste&&day.ss.parPoste[op.poste]);
  if(amount(day.ss.recettes)!==op.beforeTotal||before!==op.beforePoste)throw Error('Le rapport a changé : recharge avant de corriger');
@@ -44,3 +44,4 @@ function updatePostes(room,index,values){
 }
 root.GameZoneManagement={snapshot,applyCorrection,displayName,updatePostes};
 })(typeof globalThis!=='undefined'?globalThis:this);
+

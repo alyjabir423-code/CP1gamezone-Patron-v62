@@ -239,7 +239,7 @@ button,.ni,.ctl-btn{touch-action:manipulation}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 
-<script src="./management.js?v=manuel16"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
+<script src="./management.js?v=recettes-libres-1"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
 <script>
 /* GAMEZONE VOIX HOMME : réglage local à chaque appareil, aucune écriture Firebase. */
 (function(){
@@ -492,13 +492,12 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
       <!-- PATRON UNIQUEMENT : corrections manuelles ; jamais affichees dans l’application Gerant. -->
       <div class="owner-report-card" id="patron-revenue-correction" style="padding:13px 14px;border:1px solid rgba(250,204,21,.42);margin-top:12px">
         <div style="font-size:14px;font-weight:700;color:#facc15">🔒 Correction de recette — Patron uniquement</div>
-        <div style="font-size:11px;color:var(--sub);line-height:1.6;margin:5px 0 12px">Choisis le jour actuel ou une journée précédente enregistrée. Une correction ne crée ni faux client, ni nouvelle séance et ne touche pas aux prises. Motif obligatoire. Le journal privé est réservé au Patron.</div>
+        <div style="font-size:11px;color:var(--sub);line-height:1.6;margin:5px 0 12px">Choisis le jour actuel ou une journée précédente enregistrée. Une correction ne crée ni faux client, ni nouvelle séance et ne touche pas aux prises. Aucun motif à saisir. Le journal privé est réservé au Patron.</div>
         <div id="patron-corr-live-total" style="color:#4ade80;font-size:12px;margin-bottom:10px">Recette du jour : chargement Firebase…</div>
         <div class="ig"><label for="patron-corr-date">Journée à corriger (journée de gestion dès 08h)</label><input type="date" id="patron-corr-date" onchange="patronPopulateRevenuePostes()"></div>
         <div class="ig"><label for="patron-corr-poste">Poste concerné</label><select id="patron-corr-poste" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"></select></div>
         <div class="ig"><label for="patron-corr-sens">Opération</label><select id="patron-corr-sens" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"><option value="add">+ Ajouter une vente réelle oubliée</option><option value="subtract">− Retirer un montant saisi par erreur</option></select></div>
-        <div class="ig"><label for="patron-corr-amount">Montant en F CFA (multiple de 100)</label><input id="patron-corr-amount" type="number" inputmode="numeric" min="100" max="100000" step="100" placeholder="Ex. 200" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"/></div>
-        <div class="ig"><label for="patron-corr-reason">Motif et justification obligatoire (8 caractères minimum)</label><textarea id="patron-corr-reason" maxlength="280" rows="2" placeholder="Ex. Ventes réellement encaissées vers 11 h, oubliées après déconnexion." style="width:100%;min-height:62px;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"></textarea></div>
+        <div class="ig"><label for="patron-corr-amount">Montant en FCFA</label><input id="patron-corr-amount" type="number" inputmode="numeric" min="1" max="100000" step="1" placeholder="Ex. 130" style="width:100%;padding:10px;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:9px"/></div>
         <button type="button" id="patron-corr-confirm" onclick="patronCorrectRevenue()" style="width:100%;border:1px solid #facc15;background:#392b0e;color:#facc15;border-radius:9px;padding:12px;font-size:13px;font-weight:700">VÉRIFIER ET CONFIRMER LA CORRECTION</button>
         <div id="patron-corr-result" style="font-size:12px;line-height:1.55;color:var(--sub);margin-top:8px" aria-live="polite"></div>
       </div>
@@ -1358,8 +1357,8 @@ async function patronCorrectRevenue(){
  if(!loggedIn||!uid||!fbRoot||currentTenantKey!==ROOM_KEY)return patronCorrectionStatus('Connecte-toi en Patron à CP1');
  const key=patronSelectedCorrectionDay(),poste=document.getElementById('patron-corr-poste').value;
  const how=document.getElementById('patron-corr-sens').value,amount=Number(document.getElementById('patron-corr-amount').value);
- const reason=String(document.getElementById('patron-corr-reason').value||'').trim();
- if(!poste||!['add','subtract'].includes(how)||!Number.isSafeInteger(amount)||amount<100||amount>100000||amount%100||reason.length<8)return patronCorrectionStatus('Choisis le poste, un montant multiple de 100 F et un motif de 8 caractères minimum');
+ const reason=how==='add'?'Ajout manuel par le Patron':'Retrait manuel par le Patron';
+ if(!poste||!['add','subtract'].includes(how)||!Number.isSafeInteger(amount)||amount<1||amount>100000)return patronCorrectionStatus('Choisis le poste et un montant entier de 1 à 100 000 FCFA');
  const btn=document.getElementById('patron-corr-confirm');patronCorrectionBusy=true;btn.disabled=true;
  try{
   if((await CP1Relay.request('pilotage_v1/access/'+uid+'/rooms/'+patronAuditRoom())).data!=='patron')throw Error('Accès Patron requis');
@@ -1368,14 +1367,14 @@ async function patronCorrectRevenue(){
   const op={id:'C'+Date.now()+'_'+Math.random().toString(36).slice(2,10),key,poste,reason,delta:how==='add'?amount:-amount,beforeTotal:Number(day.ss.recettes)||0,beforePoste:Number((day.ss.parPoste||{})[poste])||0};
   GameZoneManagement.applyCorrection(room,op,current,today());
   if(Object.entries(patronAuditEvents||{}).some(([id,e])=>e&&room.patron_adjustment_once?.[id]===true&&e.dateKey===key&&e.poste===poste&&Number(e.delta)===op.delta&&Date.now()-Number(e.creeLe||0)<120000))throw Error('Correction similaire récente : vérifie le journal privé');
-  if(!confirm('CORRECTION PATRON — '+key+'\n'+GameZoneManagement.displayName((room.postes||[]).find(p=>p.num===poste)||{num:poste})+'\n'+patronMoneySigned(op.delta)+'\nTotal : '+op.beforeTotal+' F → '+(op.beforeTotal+op.delta)+' F\nMotif : '+reason+'\nConfirmer ?'))return;
+  if(!confirm('CORRECTION PATRON — '+key+'\n'+GameZoneManagement.displayName((room.postes||[]).find(p=>p.num===poste)||{num:poste})+'\n'+patronMoneySigned(op.delta)+'\nTotal : '+op.beforeTotal+' F → '+(op.beforeTotal+op.delta)+' F\nConfirmer ?'))return;
   const audit={id:op.id,uid,poste,dateKey:key,creeLe:Date.now(),delta:op.delta,montant:amount,motif:reason,sens:how,avantPoste:op.beforePoste,apresPoste:op.beforePoste+op.delta,avantTotal:op.beforeTotal,apresTotal:op.beforeTotal+op.delta};
   await CP1Relay.request(patronAuditPrefix+patronAuditRoom()+'/'+op.id,'PUT',audit);
   const tx=await CP1Relay.transaction(data=>GameZoneManagement.applyCorrection(data,op,businessDateKey(new Date()),today()));
   if(!tx.committed)throw Error('Correction non appliquée');
   DB._cache=tx.snapshot.val()||DB._cache;
   patronCorrectionStatus('✅ Correction du '+key+' appliquée : '+patronMoneySigned(op.delta));
-  document.getElementById('patron-corr-amount').value='';document.getElementById('patron-corr-reason').value='';
+  document.getElementById('patron-corr-amount').value='';
   patronRenderPrivateAudit();ownerRenderReport();renderHome();
  }catch(e){patronCorrectionStatus('⚠️ '+(e.message||e));}
  finally{patronCorrectionBusy=false;btn.disabled=false;}
@@ -3254,6 +3253,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 
