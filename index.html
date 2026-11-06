@@ -3018,13 +3018,43 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     const current=window.firebase?.auth?.().currentUser;
     return current?await current.getIdToken():null;
   }
+  // CP1 iPhone: explain installation before checking the unavailable Notification API.
+  function notificationPlatform(){
+    const ios=/iPad|iPhone|iPod/.test(navigator.userAgent||'')||
+      (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    const standalone=navigator.standalone===true||
+      (typeof window.matchMedia==='function'&&window.matchMedia('(display-mode: standalone)').matches);
+    return {ios,standalone};
+  }
   async function enableRealNotifications(button){
-    if(!window.isSecureContext||!('Notification'in window)||!('serviceWorker'in navigator))throw new Error('Ouvre GameZone en HTTPS dans Chrome. Sur iPhone, utilise son icône sur l’écran d’accueil.');
-    const permission=await Notification.requestPermission();
-    if(permission!=='granted')throw new Error('Notifications non autorisées. Vérifie les autorisations de ce site dans les réglages du navigateur.');
-    const reg=await navigator.serviceWorker.register('./sw.js');
-    await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>setTimeout(()=>reject(Error('Service de notifications non prêt. Recharge la page.')),10000))]);
-    await reg.showNotification('GameZone CP1 — notifications autorisées',{body:'Alertes à 5 minutes et à la fin pendant que GameZone reste ouvert. Les alertes site fermé nécessitent un serveur push.',tag:'cp1-local-ready'});
+    const device=notificationPlatform();
+    if(!window.isSecureContext)throw new Error('Ouvre le lien sécurisé de GameZone : son adresse doit commencer par https://.');
+    if(device.ios&&!device.standalone)throw new Error(
+      'Sur iPhone ou iPad :\n1. Ouvre GameZone dans Safari.\n2. Appuie sur Partager, puis « Sur l’écran d’accueil » et Ajouter.\n3. Ouvre GameZone depuis cette nouvelle icône et appuie sur la cloche.\n\niOS 16.4 ou plus récent est nécessaire. Les séances en cours restent conservées.');
+    if(!('Notification'in window)||typeof Notification.requestPermission!=='function'||!('serviceWorker'in navigator))
+      throw new Error(device.ios
+        ? 'Les notifications ne sont pas disponibles sur cet iPhone. Vérifie iOS 16.4 ou plus récent et ouvre GameZone depuis son icône sur l’écran d’accueil.'
+        : 'Les notifications ne sont pas disponibles dans ce navigateur. Ouvre GameZone dans un navigateur récent compatible.');
+    if(Notification.permission==='denied')throw new Error(device.ios
+      ? 'Notifications refusées pour GameZone. Sur l’iPhone, ouvre Réglages → Notifications → GameZone et active « Autoriser les notifications », puis reviens ici.'
+      : 'Notifications refusées. Autorise-les dans les paramètres de ce site, puis réessaie.');
+    // Keep the native permission request directly inside the user's tap.
+    const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
+    if(permission!=='granted')throw new Error('Autorisation non accordée. Appuie à nouveau sur la cloche lorsque tu souhaites autoriser les notifications.');
+    let timer,reg;
+    try{
+      await navigator.serviceWorker.register('./sw.js');
+      reg=await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>{
+        timer=setTimeout(()=>reject(Error('Le service de notifications ne répond pas. Vérifie la connexion puis réessaie la cloche.')),10000);
+      })]);
+    }catch(error){
+      throw new Error(error.message||'Service de notifications indisponible. Vérifie la connexion puis réessaie.');
+    }finally{clearTimeout(timer);}
+    if(typeof reg.showNotification!=='function')throw new Error('Ce navigateur ne permet pas d’afficher les notifications de GameZone.');
+    await reg.showNotification('GameZone CP1 — notifications autorisées',{
+      body:'Alertes à 5 minutes et à la fin pendant que GameZone reste ouvert. Écran verrouillé ou application fermée : alertes non garanties.',
+      tag:'cp1-local-ready'
+    });
     button.title='Notifications locales autorisées — garder GameZone ouvert';button.textContent='🔔✓';
     window.GZFeedback?.notificationStatus();
   }
@@ -3214,6 +3244,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-feedback.js?v=2.0"></script>
 </body>
 </html>
+
 
 
 
