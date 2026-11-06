@@ -21,7 +21,23 @@ async function refreshPhysical(){if(activeTransactions)return;try{await states()
 function applyPause(state,marker){if(marker?.reason==='prise_injoignable')return state;if(!state?.actif||state.paused||!marker||marker.sessionId!==state.sessionId)return state;if(state.nativeCommandId&&marker.nativeId!==state.nativeCommandId)return state;if(Number(marker.at)<Number(state.startedAt||0))return state;const remaining=Number(marker.remaining);if(!Number.isInteger(remaining)||remaining<0||remaining>86400)return state;return {...state,paused:true,pauseRemainingSec:remaining,finTs:0,pausePowerOffConfirmed:marker.powerConfirmed===true,pauseReason:marker.reason,autoPausedAt:marker.at};}
 function applyAuto(root){if(!root||typeof root!=='object')return root;const next=clone(root);for(const [key,state]of Object.entries(next.active_by_poste||{})){next.active_by_poste[key]=applyPause(state,next.auto_pauses?.[key]);const st=next.active_by_poste[key],receipt=next.pause_results?.[key];if(st.pendingPauseId){st.pausePowerOffConfirmed=receipt?.id===st.pendingPauseId&&receipt?.sessionId===st.sessionId&&receipt?.powerConfirmed===true;st.pausePending=!st.pausePowerOffConfirmed;}}return next;}
 function remaining(s){return !s?.actif?0:s.paused?Math.max(0,Math.floor(s.pauseRemainingSec||0)):Math.max(0,Math.ceil(((s.finTs||0)-Date.now())/1000));}
-async function ready(p){const n=poste(p);const [h,row]=await Promise.all([request('pilotage_v1/heartbeat'),request('pilotage_v1/states/'+n)]);if(h.date)offset=new Date(h.date).getTime()-Date.now();const st=row.data||{};if(!h.data?.capabilities?.includes('command-receipts-v2'))throw Error('Mise à jour du relais CP1 requise.');if(!h.data?.at||now()-h.data.at>45000)throw Error('Relais OPPO non disponible');if(!st.online||now()-st.seenAt>30000)throw Error('Prise du poste '+n+' non disponible');return st;}
+function transientReadError(e){return !/Firebase (401|403)|Connexion Firebase requise/.test(String(e?.message||e));}
+async function ready(p){
+ const n=poste(p),h=await request('pilotage_v1/heartbeat');
+ if(h.date)offset=new Date(h.date).getTime()-Date.now();
+ if(!h.data?.capabilities?.includes('command-receipts-v2'))throw Error('Mise à jour du relais CP1 requise.');
+ if(!h.data?.at||now()-h.data.at>45000)throw Error('Relais OPPO non disponible');
+ // Wait for a fresh confirmed reading. This preflight sends no plug command.
+ const until=Date.now()+8000;
+ do{
+  try{const st=(await request('pilotage_v1/states/'+n)).data||{};
+   const age=now()-Number(st.seenAt||0);
+   if(st.online===true&&age>=-5000&&age<=30000)return st;
+  }catch(e){if(!transientReadError(e))throw e;}
+  if(Date.now()>=until)break;await sleep(400);
+ }while(Date.now()<until);
+ throw Error('Prise du poste '+n+' non joignable après vérification. Vérifie son Wi-Fi et son adresse IP dans le relais.');
+}
 async function command(p,action,seconds=0,operationId){
  const n=poste(p);if(pending.has(n))throw Error('Une commande est déjà en cours pour ce poste.');
  pending.set(n,{reserving:true});
@@ -35,10 +51,15 @@ async function command(p,action,seconds=0,operationId){
   w.GZActionAudio?.play(action);
   await request('pilotage_v1/commands/'+n,'PUT',c);
   for(let i=0;i<100;i++){
-   const s=(await request('pilotage_v1/states/'+n)).data;
+   let s;
+   try{s=(await request('pilotage_v1/states/'+n)).data;}
+   catch(e){if(!transientReadError(e))throw e;if(now()>c.expiresAt+1500)break;await sleep(300);continue;}
    if(s?.result?.id===c.id){
     if(!s.result.ok)throw Error(s.result.message||'Commande refusée par le relais');
-    if(!s.online||now()-s.seenAt>30000)throw Error('Réponse du relais trop ancienne');
+    if(!s.online||now()-s.seenAt>30000){
+     if(now()>c.expiresAt+1500)break;
+     await sleep(300);continue;
+    }
     if(action==='subtract'){
      const ceiling=Math.max(0,previousCredit-seconds)+2;
      if(previousCredit<=seconds&&s.power!==false)throw Error('Extinction après réduction à zéro non confirmée.');
@@ -135,6 +156,7 @@ function dayKey(d=new Date()){return new Date(d.getTime()-8*60*60*1000).toISOStr
 function todayRevenue(room,d=new Date()){return Math.max(0,Number(room.daily?.[dayKey(d)]?.recettes)||0);}
 w.CP1Relay={dayStart,nextEight,managerSnapshot,restRoom,saveTime,restoreTime,validBanks,syncPhysicalRoot,leafPatch,entries,displayName,physicalSummary,renderPhysical,refreshPhysical,install,request,acceptSnapshot,isPatronEvent,dayKey,todayRevenue,currentUid:uid,applyPause,applyAuto,importTariffs,ready,command,plan,transaction,roomRef,child,initialize,safeOff,poste,remaining,owner:OWNER,room:ROOM};
 })(window);
+
 
 
 
