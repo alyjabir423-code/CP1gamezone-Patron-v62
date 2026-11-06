@@ -239,7 +239,7 @@ button,.ni,.ctl-btn{touch-action:manipulation}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 
-<script src="./management.js?v=postes-tarifs-1"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
+<script src="./management.js?v=association-1"></script><script>window.GZ_CUSTOM_ROLE="PATRON";</script><script src="./custom-time.js?v=manuel16"></script>
 <script>
 /* GAMEZONE VOIX HOMME : réglage local à chaque appareil, aucune écriture Firebase. */
 (function(){
@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=postes-1-cp1-local-1.8"></script></head>
+<script src="./youssef-relay.js?v=association-1-postes-1-cp1-local-1.8"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -646,7 +646,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
     <div class="mh"></div>
     <div class="mt" id="mo-poste-title">Nouveau poste</div>
     <div class="ig"><label>Nom affiché de votre choix</label><input type="text" id="p-display-name" maxlength="48" placeholder="Ex. Salon VIP"></div>
-    <div class="ig"><label>Identifiant du poste (conservé après création)</label><input type="text" id="p-num" placeholder="Ex: P01"></div>
+    <div class="ig"><label for="p-relay-poste">Poste du relais à associer</label><select id="p-relay-poste"><option value="">Choisir le poste…</option><option value="1">Poste 1</option><option value="2">Poste 2</option><option value="3">Poste 3</option><option value="4">Poste 4</option><option value="5">Poste 5</option><option value="6">Poste 6</option></select><div style="font-size:11px;color:var(--muted)">Choisis la télévision commandée par cette console. Changement possible uniquement lorsque les prises sont libres et éteintes.</div><input type="hidden" id="p-num"></div>
     <div class="ig"><label>Type de console</label>
       <select id="p-type" onchange="gzToggleCustomConsole()">
         <option value="PS5">PS5</option>
@@ -934,7 +934,7 @@ function gzSharedPlugOccupant(root, poste, idx){
   const all=Array.isArray(root.postes)?root.postes:[];
   for(let j=0;j<all.length;j++){
     const other=all[j];
-    if(!other||j===idx||String(other.num||'')===String(poste.num||'')||String(other.devid||'').trim()!==id)continue;
+    if(!other||j===idx||String(other.num||'')===String(poste.num||'')||!CP1Relay.samePlug(poste,other))continue;
     const st=rootReadActive(root,other,j)||{};
     if(Number(st.pausePendingUntil)>Date.now()||st.actif||(st.starting&&Date.now()<Number(st.startingUntil||0))||(st.cleanup&&Date.now()<Number(st.cleanupUntil||0)))return other;
   }
@@ -942,7 +942,7 @@ function gzSharedPlugOccupant(root, poste, idx){
 }
 function gzSharedPlugPartners(poste){
   const id=String(poste&&poste.devid||'').trim();
-  return id?(DB.get('postes')||[]).filter(x=>x&&String(x.num||'')!==String(poste.num||'')&&String(x.devid||'').trim()===id):[];
+  return id?(DB.get('postes')||[]).filter(x=>x&&String(x.num||'')!==String(poste.num||'')&&CP1Relay.samePlug(poste,x)):[];
 }
 async function gzSafeToSwitchOffShared(poste){
   if(!gzSharedPlugPartners(poste).length)return true;
@@ -2079,6 +2079,7 @@ function openModalPoste(idx=-1){
   }
   gzToggleCustomConsole();
   gzLoadPostTariffs(idx>=0?(DB.get('postes')||[])[idx]:null);
+  {let n='';try{n=CP1Relay.poste((DB.get('postes')||[])[idx]);}catch(_){}document.getElementById('p-relay-poste').value=n;}
   openModal('mo-poste');
   setTimeout(()=>document.getElementById('p-num').focus(),200);
 }
@@ -2090,10 +2091,12 @@ async function savePoste(){
  try{
   if(!loggedIn||!fbRoot||CP1Relay.currentUid()!==CP1Relay.owner)throw Error('Connexion Patron requise');
   const before=(await CP1Relay.request(patronAuditRoom())).data||{},old=(before.postes||[])[idx],expected=JSON.stringify(old||null);
-  const values={num:old?.num||document.getElementById('p-num').value.trim(),displayName:document.getElementById('p-display-name').value.trim(),type,typeCustom:type==='Autres'?document.getElementById('p-custom-type').value.trim():'',devid:old?.devid||document.getElementById('p-devid').value.trim(),tarifsSpecifiques:gzReadPostTariffs()};
-  const tx=await CP1Relay.transaction(room=>{if(JSON.stringify((room.postes||[])[idx]||null)!==expected)throw Error('Le poste a changé ailleurs : actualise');room.postes=GameZoneManagement.updatePostes(room,idx,values);return room;});
+  const relayPoste=Number(document.getElementById('p-relay-poste').value);let previous=null;try{previous=Number(CP1Relay.poste(old));}catch(_){}const bindingChanged=!old||previous!==relayPoste;
+  if(bindingChanged)await CP1Relay.checkAssociation(before,idx,relayPoste);
+  const values={relayPoste,num:old?.num||('CP1-'+crypto.randomUUID()),displayName:document.getElementById('p-display-name').value.trim(),type,typeCustom:type==='Autres'?document.getElementById('p-custom-type').value.trim():'',devid:bindingChanged?'relay:'+relayPoste:(old?.devid||'relay:'+relayPoste),tarifsSpecifiques:gzReadPostTariffs()};
+  const tx=await CP1Relay.transaction(room=>{if(JSON.stringify((room.postes||[])[idx]||null)!==expected)throw Error('Le poste a changé ailleurs : actualise');if(bindingChanged){const a=room.active_by_poste?.[encodeURIComponent(old?.num||values.num)]||room.active_postes?.[idx]||{};if(a.actif||a.starting||a.cleanup)throw Error('Une séance a démarré : association annulée');CP1Relay.bindingGuard(room,{...old,...values});}room.postes=GameZoneManagement.updatePostes(room,idx,values);if(bindingChanged){room.active_by_poste=room.active_by_poste||{};room.active_by_poste.__relay_bindings_v1={...(room.active_by_poste.__relay_bindings_v1||{}),[encodeURIComponent(values.num)]:relayPoste};}return room;});
   if(!tx.committed)throw Error('Modification refusée');DB._cache=tx.snapshot.val()||DB._cache;
-  closeModal('mo-poste');renderPostes();renderControl();renderHome();showToast('✅ Nom et tarifs du poste enregistrés');
+  closeModal('mo-poste');renderPostes();renderControl();renderHome();showToast('✅ Poste, association et tarifs enregistrés');
   ownerPersistActivity('Paramètres de poste modifiés',values.displayName,'',{poste:values.num,typeActivite:'parametres_poste'});
  }catch(e){showToast('⚠️ '+e.message);}finally{if(button)button.disabled=false;}
 }
@@ -3250,13 +3253,13 @@ async function ownerConfirmReduce(){
 ownerPowerOff=async function(i){const p=(DB.get('postes')||[])[i],a=p&&activeForPoste(p,i);if(!a?.actif)return;const entered=prompt('Motif obligatoire pour OFF TV (recette conservée) :');if(entered===null)return;const reason=entered.trim();if(!reason||reason.length>500){showToast('Motif obligatoire : 1 à 500 caractères.');return;}if(!confirm('OFF TV : terminer la séance de '+p.num+' ? La recette sera conservée.'))return;try{const tx=await fbRoot.transaction(r=>{const st=rootReadActive(r,p,i);if(!st?.actif||st.sessionId!==a.sessionId)return;rootWriteActive(r,p,i,blankRemoteActive(st));r.closed_sessions=r.closed_sessions||{};r.closed_sessions[a.sessionId]={status:'terminee',ts:Date.now(),poste:p.num};return r;});if(tx.committed){DB._cache=tx.snapshot.val();ownerPersistActivity(p.num+' — OFF TV','Temps terminé, recette conservée · Motif : '+reason,'',{poste:p.num,sessionId:a.sessionId,typeActivite:'terminee',motif:reason});renderControl();}}catch(e){showToast(e.message);}};
 const originalSavePosteY=savePoste;savePoste=async function(){const num=document.getElementById('p-num')?.value;try{if(num)CP1Relay.poste({num});return await originalSavePosteY();}catch(e){showToast(e.message);}};
 
- document.title='GameZone CP1 — Patron';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.2 · Temps sauvegardés jusqu’à 8 h';</script><script>
+ document.title='GameZone CP1 — Patron';const y=document.getElementById('gz-build-version');if(y)y.textContent='GZ-07732 CP1 1.9 · Association prises · Temps sauvegardés jusqu’à 8 h';</script><script>
 // Les contrôles physiques précèdent la validation de la vente dans transaction().
 ownerTuyaCommand=async function(p,on){try{return on?await CP1Relay.ready(p):await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
 ownerReliableOff=async function(p){try{return await CP1Relay.safeOff(p);}catch(e){gzTuyaError=e.message;return false;}};
 </script><script>const originalOpenPosteY=openModalPoste;openModalPoste=function(i=-1){originalOpenPosteY(i);document.getElementById('p-devid').readOnly=true;};
-savePoste=async function(){const idx=Number(document.getElementById('p-edit-idx').value);if(idx>=0)return originalSavePosteY();const n=document.getElementById('p-num').value.trim();try{CP1Relay.poste({num:n});}catch(e){return showToast(e.message);}document.getElementById('p-devid').value='relay:'+CP1Relay.poste({num:n});return originalSavePosteY();};
-testerPrise=async function(){const out=document.getElementById('test-result');out.style.display='block';try{await CP1Relay.ready({num:document.getElementById('p-num').value});out.textContent='Relais et prise disponibles.';out.className='test-result tr-ok';}catch(e){out.textContent=e.message;out.className='test-result tr-err';}};
+savePoste=async function(){return originalSavePosteY();};
+testerPrise=async function(){const out=document.getElementById('test-result');out.style.display='block';try{await CP1Relay.ready({num:document.getElementById('p-num').value,relayPoste:Number(document.getElementById('p-relay-poste').value)});out.textContent='Relais et prise disponibles.';out.className='test-result tr-ok';}catch(e){out.textContent=e.message;out.className='test-result tr-err';}};
 
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
@@ -3267,6 +3270,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 

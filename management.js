@@ -41,13 +41,15 @@ function updatePostes(room,index,values){
  if(list.some((p,i)=>i!==index&&displayName(p).trim().toLowerCase()===name.toLowerCase()))throw Error('Ce nom est déjà utilisé');
  if(!old&&list.some(p=>p.num===num))throw Error('Identifiant déjà utilisé');
  const state=old&&((room.active_by_poste||{})[encodeURIComponent(old.num)]||(room.active_postes||[])[index])||{};
- if((state.actif||state.starting||state.cleanup)&&old&&(old.type!==values.type||String(old.typeCustom||'')!==String(values.typeCustom||'')||String(old.devid||'')!==String(values.devid||'')))throw Error('Termine la séance avant de changer le type ou la prise');
+ if((state.actif||state.starting||state.cleanup)&&old&&((old.relayPoste!=null&&values.relayPoste!=null&&Number(old.relayPoste)!==Number(values.relayPoste))||old.type!==values.type||String(old.typeCustom||'')!==String(values.typeCustom||'')||String(old.devid||'')!==String(values.devid||'')))throw Error('Termine la séance avant de changer le type ou la prise');
  if(values.tarifsSpecifiques!=null)values=Object.assign({},values,{tarifsSpecifiques:validatePostTariffs(values.tarifsSpecifiques)});
+ if(values.relayPoste!=null&&(!Number.isInteger(values.relayPoste)||values.relayPoste<1||values.relayPoste>6))throw Error('Choisis Poste 1 à Poste 6');
  const poste=Object.assign({},old||{},values,{num,displayName:name});delete poste.key;
  if(old)list[index]=poste;else list.push(poste);
  return list;
 }
 root.GameZoneManagement={snapshot,applyCorrection,displayName,updatePostes,validatePostTariffs};
 })(typeof globalThis!=='undefined'?globalThis:this);
+
 
 
