@@ -1523,8 +1523,9 @@ async function ownerConfirmStart(){
       return root;
     },undefined,false);
     if(!tx||!tx.committed)throw new Error('Nouvelle séance détectée : activation annulée');
-    reserved=false;if(tx.snapshot)DB._cache=tx.snapshot.val()||DB._cache;
-    closeModal('mo-owner-start');ownerPersistActivity(p.num+' — Session démarrée par le patron',
+    reserved=false;closeModal('mo-owner-start');
+    if(tx.snapshot)DB._cache=tx.snapshot.val()||DB._cache;
+    ownerPersistActivity(p.num+' — Session démarrée par le patron',
       nom+' · '+min+' min',prix.toLocaleString('fr-FR')+' F',
       {poste:p.num,client:nom,sessionId:sid,typeActivite:'demarrage',montant:prix});
     if(autoBonusStartP>0)ownerPersistActivity(p.num+' — 🎁 Bonus automatique',nom+' · '+p.type+' · +'+autoBonusStartP+' min gratuites','0 F',{poste:p.num,client:nom,sessionId:sid,typeActivite:'bonus_auto',dureeAjouteeSec:autoBonusStartP*60,montant:0});
@@ -2521,8 +2522,18 @@ function showPage(name,el){
 }
 
 // MODAL
-function openModal(id){document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){
+  const modal=document.getElementById(id);if(!modal)return;
+  modal.hidden=false;modal.style.removeProperty('display');modal.setAttribute('aria-hidden','false');modal.classList.add('open');
+}
+function closeModal(id){
+  const modal=document.getElementById(id);if(!modal)return;
+  if(modal.contains(document.activeElement))document.activeElement?.blur();
+  modal.classList.remove('open');modal.hidden=true;modal.style.display='none';modal.setAttribute('aria-hidden','true');
+  // Commit the visibility change even when the mobile keyboard/compositor is idle.
+  void modal.offsetHeight;
+  requestAnimationFrame(()=>{if(!modal.classList.contains('open'))modal.style.display='none';});
+}
 document.querySelectorAll('.mo').forEach(el=>{el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});});
 
 // TOAST
@@ -3243,6 +3254,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 
