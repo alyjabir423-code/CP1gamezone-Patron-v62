@@ -1024,20 +1024,8 @@ let ownerVoiceUtterance=null,ownerVoiceRetryTimer=null,ownerVoicePrimed=false;
 function ownerFrenchVoice(){return window.GZMaleSpeech?window.GZMaleSpeech.selectedVoice():null;}
 function ownerPrimeVoice(){try{return !!('speechSynthesis' in window && window.speechSynthesis.getVoices());}catch(e){return false;}}
 try{if('speechSynthesis'in window)window.speechSynthesis.addEventListener?.('voiceschanged',()=>{try{window.speechSynthesis.getVoices();}catch(e){}});}catch(e){}
-function ownerSpeak(text,attempt=0){
-  try{
-    const msg=String(text||'').trim();if(!msg)return false;
-    if(!('speechSynthesis'in window)||typeof SpeechSynthesisUtterance==='undefined'){console.log('Synthèse vocale Patron indisponible');return false;}
-    ownerPrimeVoice();const s=window.speechSynthesis;
-    if(ownerVoiceRetryTimer){clearTimeout(ownerVoiceRetryTimer);ownerVoiceRetryTimer=null;}
-    const u=new SpeechSynthesisUtterance(msg),v=ownerFrenchVoice();if(!v){console.warn('GameZone: aucune voix masculine sélectionnée — bouton 🎙️ pour choisir.');return false;}u.voice=v;u.lang=v.lang||'fr-FR';u.rate=.90;u.pitch=.83;u.volume=1;ownerVoiceUtterance=u;let started=false;
-    u.onstart=()=>{started=true;};u.onend=()=>{if(ownerVoiceUtterance===u)ownerVoiceUtterance=null;};
-    u.onerror=(ev)=>{console.log('Vocal Patron erreur:',ev&&ev.error);if(attempt<1&&ev&&ev.error!=='canceled'&&ev.error!=='interrupted')ownerVoiceRetryTimer=setTimeout(()=>ownerSpeak(msg,attempt+1),350);};
-    try{s.cancel();}catch(e){}try{s.resume();}catch(e){}
-    setTimeout(()=>{try{s.resume();s.speak(u);setTimeout(()=>{try{if(s.paused)s.resume();if(!started&&!s.speaking&&attempt<2)ownerVoiceRetryTimer=setTimeout(()=>ownerSpeak(msg,attempt+1),120);}catch(e){}},650);}catch(e){if(attempt<2)ownerVoiceRetryTimer=setTimeout(()=>ownerSpeak(msg,attempt+1),350);}},70);
-    return true;
-  }catch(e){console.log('Vocal Patron:',e);return false;}
-}
+function ownerSpeak(text,attempt=0){return false;}
+
 function ownerVoiceStartKey(sid){return 'gz_patron_voice_start_'+String(currentTenantKey||'')+'_'+String(sid||'');}
 function ownerVoiceFiveKey(sid,cycle){return 'gz_patron_voice_5_'+String(currentTenantKey||'')+'_'+String(sid||'')+'_'+String(Number(cycle)||0);}
 function ownerMarkExistingVoiceSessions(){const postes=DB.get('postes')||[];postes.forEach((p,i)=>{const a=activeForPoste(p,i)||{};if(a.actif&&a.sessionId)try{localStorage.setItem(ownerVoiceStartKey(a.sessionId),'1');}catch(e){}});}
@@ -3266,10 +3254,11 @@ const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=roo
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
 </script><script src="./actions-v03.js?v=cp1-boutons-1.6"></script><script src="pending-pause.js"></script>
 <script src="./cp1-v12-ui.js?v=cp1-sync-1.8"></script>
-<script src="./cp1-feedback.js?v=2.0"></script>
+<script src="./cp1-feedback.js?v=click-only-20261107"></script>
 <script src="./cp1-expiry.js?v=1.0"></script>
 </body>
 </html>
+
 
 
 
