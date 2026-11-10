@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script src="./firebase-quota-sync.js?v=quota-20261110-1"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0a0f1e">
@@ -360,7 +361,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=cp1-publication-v12-20261110"></script></head>
+<script src="./youssef-relay.js?v=quota-20261110-1"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -3250,7 +3251,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-v12-ui.js?v=cp1-publication-v12-20261110"></script>
 <script src="./cp1-feedback.js?v=cp1-publication-v12-20261110"></script>
 <script src="./cp1-expiry.js?v=cp1-publication-v12-20261110"></script>
-<script>document.title='GameZone CP1 — Patron';const version=document.getElementById('gz-build-version');if(version)version.textContent='CP1 V12 · relais 2.4 · version validée';</script><script>(function(){for(const [name,label]of [['ownerPause','Pause'],['ownerResume','Reprise'],['pausePoste','Pause'],['reprendrePoste','Reprise'],['cp1SaveTime','Sauvegarde'],['cp1RestoreTime','Restauration']]){const original=window[name];if(typeof original!=='function')continue;window[name]=async function(...args){if(name==='pausePoste'&&args[1]===true)return original.apply(this,args);const timing=CP1Relay.beginTiming(label);try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script><script>(function(){for(const name of ['gymConfirmStartP','gymConfirmCancelP']){const original=window[name];window[name]=async function(...args){const timing=CP1Relay.beginTiming(name.includes('Cancel')?'Annulation Gym':'Démarrage Gym');try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script></body>
+<script>document.title='GameZone CP1 — Patron';const version=document.getElementById('gz-build-version');if(version)version.textContent='CP1 V12 · relais 2.4 · version validée';</script><script>(function(){for(const [name,label]of [['ownerPause','Pause'],['ownerResume','Reprise'],['pausePoste','Pause'],['reprendrePoste','Reprise'],['cp1SaveTime','Sauvegarde'],['cp1RestoreTime','Restauration']]){const original=window[name];if(typeof original!=='function')continue;window[name]=async function(...args){if(name==='pausePoste'&&args[1]===true)return original.apply(this,args);const timing=CP1Relay.beginTiming(label);try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script><script>(function(){for(const name of ['gymConfirmStartP','gymConfirmCancelP']){const original=window[name];window[name]=async function(...args){const timing=CP1Relay.beginTiming(name.includes('Cancel')?'Annulation Gym':'Démarrage Gym');try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script><script>const quotaVersion=document.getElementById('gz-build-version');if(quotaVersion)quotaVersion.textContent+=' · QUOTA Q1';</script></body>
 </html>
 
 
