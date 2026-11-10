@@ -36,24 +36,51 @@ function applyAuto(root){if(!root||typeof root!=='object')return root;const next
 function remaining(s){return !s?.actif?0:s.paused?Math.max(0,Math.floor(s.pauseRemainingSec||0)):Math.max(0,Math.ceil(((s.finTs||0)-Date.now())/1000));}
 function transientReadError(e){return !/Firebase (401|403)|Connexion Firebase requise/.test(String(e?.message||e));}
 async function ready(p){
- const n=poste(p),h=await request('pilotage_v1/heartbeat');
+ const n=poste(p);
+ // Independent checks share the same network round trip.
+ const first=request('pilotage_v1/states/'+n).then(r=>({state:r.data})).catch(error=>({error}));
+ const h=await request('pilotage_v1/heartbeat');
  if(h.date)offset=new Date(h.date).getTime()-Date.now();
  if(!h.data?.capabilities?.includes('command-receipts-v2'))throw Error('Mise à jour du relais CP1 requise.');
  if(!h.data?.at||now()-h.data.at>45000)throw Error('Relais OPPO non disponible');
  // Wait for a fresh confirmed reading. This preflight sends no plug command.
- const until=Date.now()+8000;
+ const until=Date.now()+8000;let initial=await first;
  do{
-  try{const st=(await request('pilotage_v1/states/'+n)).data||{};
+  try{if(initial?.error)throw initial.error;const st=(initial?initial.state:(await request('pilotage_v1/states/'+n)).data)||{};initial=null;
    const age=now()-Number(st.seenAt||0);
    if(st.online===true&&age>=-5000&&age<=30000)return st;
-  }catch(e){if(!transientReadError(e))throw e;}
+  }catch(e){initial=null;if(!transientReadError(e))throw e;}
   if(Date.now()>=until)break;await sleep(400);
  }while(Date.now()<until);
  throw Error('Prise du poste '+n+' non joignable après vérification. Vérifie son Wi-Fi et son adresse IP dans le relais.');
 }
+// A short-lived authenticated SDK listener receives the physical receipt as
+// soon as Firebase publishes it. No background speech and no second command.
+// REST remains a fallback for browsers without the SDK.
+function receiptSubscription(n,c){
+ const user=w.firebase?.auth?.().currentUser;
+ if(!user||user.uid!==uid()||!w.firebase?.database)return null;
+ let ref;try{ref=w.firebase.database().ref('pilotage_v1/states/'+n);}catch(_){return null;}
+ let done=false,timer,handler,cancel,stop;
+ const promise=new Promise((resolve,reject)=>{
+  stop=(error,row)=>{if(done)return;done=true;clearTimeout(timer);ref.off('value',handler);error?reject(error):resolve(row);};
+  handler=snapshot=>{const row=snapshot.val();if(row?.result?.id!==c.id)return;
+   if(!row.result.ok){stop(Error(row.result.message||'Commande refusée par le relais'));return;}
+   const age=now()-Number(row.seenAt||0);
+   if(row.online===true&&age>=-5000&&age<=30000)stop(null,row);
+  };
+  cancel=()=>stop(Error('Écoute Firebase interrompue : contrôler la prise avant de répéter.'));
+  timer=setTimeout(()=>stop(Error('Délai dépassé : vérifier la prise avant une nouvelle tentative.')),Math.max(1,c.expiresAt+1500-now()));
+  try{ref.on('value',handler,cancel);}catch(error){stop(error);}
+ });
+ // Attach rejection handling before PUT; a denied listener must not leak an
+ // unhandled rejection while the command write is still awaiting its response.
+ promise.catch(()=>{});
+ return {promise,close:()=>stop(Error('Attente de commande terminée'))};
+}
 async function command(p,action,seconds=0,operationId){
  const n=poste(p);if(pending.has(n))throw Error('Une commande est déjà en cours pour ce poste.');
- pending.set(n,{reserving:true});
+ pending.set(n,{reserving:true});let subscription=null;
  try{
   const [before,waiting]=await Promise.all([ready(p),request('pilotage_v1/commands/'+n)]);
   const c={id:operationId?(String(operationId).endsWith('_a1')?operationId:operationId+'_a1'):id(),by:uid(),action,seconds,createdAt:Math.round(now()),expiresAt:Math.round(now()+20000)};
@@ -61,12 +88,12 @@ async function command(p,action,seconds=0,operationId){
   pending.set(n,c);
   if(before.result?.id===c.id){if(!before.result.ok)throw Error(before.result.message||'Commande refusée');return before;}
   const old=waiting.data;if(old?.expiresAt>now()&&before?.result?.id!==old.id)throw Error('Une autre commande attend confirmation.');
-  w.GZActionAudio?.play(action);
+  subscription=receiptSubscription(n,c);
   await request('pilotage_v1/commands/'+n,'PUT',c);
   for(let i=0;i<100;i++){
    let s;
-   try{s=(await request('pilotage_v1/states/'+n)).data;}
-   catch(e){if(!transientReadError(e))throw e;if(now()>c.expiresAt+1500)break;await sleep(300);continue;}
+   try{s=subscription?await subscription.promise:(await request('pilotage_v1/states/'+n)).data;}
+   catch(e){if(subscription||!transientReadError(e))throw e;if(now()>c.expiresAt+1500)break;await sleep(600);continue;}
    if(s?.result?.id===c.id){
     if(!s.result.ok)throw Error(s.result.message||'Commande refusée par le relais');
     if(!s.online||now()-s.seenAt>30000){
@@ -78,12 +105,12 @@ async function command(p,action,seconds=0,operationId){
      if(previousCredit<=seconds&&s.power!==false)throw Error('Extinction après réduction à zéro non confirmée.');
      if(Number(s.remaining)>ceiling||(s.mode==='actif'&&Number(s.nativeSeconds)>ceiling))throw Error('Réduction non confirmée par la prise : vérifier son minuteur.');
     }
-    w.GZActionAudio?.play('confirmed');return s;
+    return s;
    }
-   if(now()>c.expiresAt+1500)break;await sleep(200);
+   if(now()>c.expiresAt+1500)break;await sleep(600);
   }
   throw Error('Délai dépassé : vérifier la prise avant une nouvelle tentative.');
- }catch(e){w.GZActionAudio?.play('error');throw e;}finally{pending.delete(n);}
+ }finally{subscription?.close();pending.delete(n);}
 }
 function plan(old,next){const ops=[];for(let i=0;i<(next.postes||[]).length;i++){const p=next.postes[i];if(!p)continue;const k=encodeURIComponent(p.num),a=old.active_by_poste?.[k]||old.active_postes?.[i]||{},b=next.active_by_poste?.[k]||next.active_postes?.[i]||{};if(JSON.stringify(a)===JSON.stringify(b))continue;let action='',seconds=0;if(b.actif&&!a.actif){action='start';seconds=remaining(b);}else if(a.actif&&!b.actif)action='off';else if(a.actif&&b.actif){if(!a.paused&&b.paused)action='pause';else if(a.paused&&!b.paused)action='resume';else{const delta=b.paused?Number(b.pauseRemainingSec||0)-Number(a.pauseRemainingSec||0):Math.round((Number(b.finTs||0)-Number(a.finTs||0))/1000);if(delta>0){action='add';seconds=delta;}else if(delta<0){action='subtract';seconds=-delta;}}}if(action)ops.push({p,k,b,action,seconds});}return ops;}
 async function acquire(){const key=id(),path=ROOM+'/operation_lock';for(let i=0;i<8;i++){const got=await request(path,'GET',null,{'X-Firebase-ETag':'true'});if(!got.data||got.data.until<now()){try{await request(path,'PUT',{id:key,by:uid(),until:now()+90000},{'if-match':got.etag});return key;}catch(e){if(i===7)throw e;}}await sleep(300);}throw Error('Une opération est en cours sur un autre appareil. Réessaie.');}
@@ -169,6 +196,7 @@ function dayKey(d=new Date()){return new Date(d.getTime()-8*60*60*1000).toISOStr
 function todayRevenue(room,d=new Date()){return Math.max(0,Number(room.daily?.[dayKey(d)]?.recettes)||0);}
 w.CP1Relay={samePlug,checkAssociation,bindingGuard,dayStart,nextEight,managerSnapshot,restRoom,saveTime,restoreTime,validBanks,syncPhysicalRoot,leafPatch,entries,displayName,physicalSummary,renderPhysical,refreshPhysical,install,request,acceptSnapshot,isPatronEvent,dayKey,todayRevenue,currentUid:uid,applyPause,applyAuto,importTariffs,ready,command,plan,transaction,roomRef,child,initialize,safeOff,poste,remaining,owner:OWNER,room:ROOM};
 })(window);
+
 
 
 
