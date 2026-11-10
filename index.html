@@ -360,7 +360,7 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=association-1-postes-1-cp1-local-1.8"></script></head>
+<script src="./youssef-relay.js?v=cp1-publication-v12-20261110"></script></head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -1161,7 +1161,7 @@ function renderOwnerDurations(containerId,post,kind){
 function ownerChooseDuration(containerId,kind,min,el){gzCustomReset(kind);document.querySelectorAll('#'+containerId+' .dctl-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');if(kind==='start')ownerSelMin=min;else ownerPlusMin=min;gzChoosePreset(kind,ownerTarifs((DB.get('postes')||[])[ownerPosteIdx]),min);}
 
 function ownerPosteOrderValue(p,idx){const m=String((p&&p.num)||'').match(/\d+/);return m?Number(m[0]):1000+Number(idx||0);}
-function ownerOrderedPostesEntries(list){return CP1Relay.entries(list);}
+function ownerOrderedPostesEntries(list){return CP1Relay.displayEntries(list);}
 
 
 // V42/V19 : vert > 10 min ; jaune > 5 à <= 10 min ; rouge <= 5 min jusqu'à 00:00.
@@ -1203,7 +1203,7 @@ function renderControl(){
       <div class="ctl-client">${a.actif?esc(a.client||'Client'):'Disponible'}</div>
       ${ownerBonusNotice(a)}
       <div style="font-size:10px;color:var(--muted);margin:3px 0 8px">${relayId?'🔌 Prise liée':'⚠️ Prise à configurer'}</div>
-      <div class="ctl-actions">${!relayId?'':expired?'<span style="font-size:11px;color:#fca5a5">⏳ Temps terminé — libération automatique</span>':!a.actif?`<button class="ctl-btn ctl-start" style="background:#7c3aed;border-color:#8b5cf6;color:#fff" onclick="ownerOpenStart(${i})">DÉMARRER</button>`:activeButtons}</div>
+      <div class="ctl-actions">${!relayId?`<button class="ctl-btn ctl-plus" onclick="openModalPoste(${i})">ASSOCIER LA PRISE</button>`:expired?'<span style="font-size:11px;color:#fca5a5">⏳ Temps terminé — libération automatique</span>':!a.actif?`<button class="ctl-btn ctl-start" style="background:#7c3aed;border-color:#8b5cf6;color:#fff" onclick="ownerOpenStart(${i})">DÉMARRER</button>`:activeButtons}</div>
     </div>`;
   }).join('')+ownerRenderBonusCard(postes);
   const c=document.getElementById('ctl-active-count');if(c)c.textContent=actifs+' actif'+(actifs>1?'s':'');
@@ -1246,24 +1246,29 @@ function ownerBonusPostChanged(){
   if(a.actif){client.value=a.client||'';client.readOnly=true;info.textContent='Ce poste est déjà actif : le bonus ajoutera '+ownerBonusMin+' minutes sans ajouter 1 F à la recette.';}
   else{client.readOnly=false;if(!client.value)client.value='';info.textContent='Ce poste est libre : le bonus démarrera une session gratuite de '+ownerBonusMin+' minutes (0 F).';}
 }
+const ownerBonusInFlight=new Set();
 async function ownerConfirmBonus(){
   const postes=DB.get('postes')||[],idx=Number(document.getElementById('owner-bonus-poste').value)||0,p=postes[idx];if(!p)return;
   const local=activeForPoste(p,idx)||{},min=Math.floor(Number(ownerBonusMin)||30),now=Date.now();if(min<1||min>720)return showToast('⚠️ Durée bonus entre 1 et 720 minutes');let nom=(document.getElementById('owner-bonus-client').value||'').trim();if(local.actif)nom=local.client||nom;if(!nom)return showToast('⚠️ Entrez le nom du client');
+  if(ownerBonusInFlight.has(idx))return;ownerBonusInFlight.add(idx);
+  const button=document.querySelector('#mo-owner-bonus .btn-ok'),timing=CP1Relay.beginTiming('Bonus gratuit');
+  if(button){button.disabled=true;button.textContent='VALIDATION EN COURS…';}
   try{
-    if(!local.actif&&p.devid){const on=await ownerTuyaCommand(p,true);if(!on)return showToast('⚠️ TV non confirmée : bonus NON activé');}
+    if(!String(p.devid||'').trim())throw Error('Prise non configurée');
     let startedNew=!local.actif,sid=startedNew?('bonus-'+String(p.num)+'-'+now+'-'+Math.random().toString(36).slice(2,8)):local.sessionId,finalTs=0;
     const res=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,Object.assign({},p,local),idx)||{};
-      if(startedNew){if(Number(r.pausePendingUntil)>Date.now()||r.actif || (r.starting&&Date.now()<Number(r.startingUntil||0)))return;const st={actif:true,client:nom,finTs:now+min*60000,tempsTotal:min*60,dureeMin:min,paused:false,pauseRemainingSec:0,montantSession:0,montantJourSession:0,paiementsSession:{},sessionId:sid,startedAt:now,bonus:true,bonusOnly:true,bonusSource:'patron',bonusDurationMin:min,bonusMinutesAdded:min,bonusGrantedAt:now,updatedAt:now};rootWriteActive(root,p,idx,st);finalTs=st.finTs;}
+      if(startedNew){if(gzSharedPlugOccupant(root,p,idx)||Number(r.pausePendingUntil)>Date.now()||r.actif || (r.starting&&Date.now()<Number(r.startingUntil||0))||(r.cleanup&&Date.now()<Number(r.cleanupUntil||0)))return;const st={actif:true,client:nom,finTs:now+min*60000,tempsTotal:min*60,dureeMin:min,paused:false,pauseRemainingSec:0,montantSession:0,montantJourSession:0,paiementsSession:{},sessionId:sid,startedAt:now,bonus:true,bonusOnly:true,bonusSource:'patron',bonusDurationMin:min,bonusMinutesAdded:min,bonusGrantedAt:now,updatedAt:now};rootWriteActive(root,p,idx,st);finalTs=st.finTs;}
       else{if(!r.actif||(local.sessionId&&r.sessionId&&r.sessionId!==local.sessionId))return;const u=Object.assign({},r);if(u.paused)u.pauseRemainingSec=(Number(u.pauseRemainingSec)||0)+min*60;else u.finTs=(Number(u.finTs)||Date.now())+min*60000;u.tempsTotal=(Number(u.tempsTotal)||0)+min*60;u.dureeMin=(Number(u.dureeMin)||0)+min;u.bonus=true;u.bonusOnly=!!u.bonusOnly;u.bonusSource='patron';u.bonusDurationMin=min;u.bonusMinutesAdded=(Number(u.bonusMinutesAdded)||0)+min;u.bonusGrantedAt=now;u.updatedAt=now;finalTs=u.paused?0:u.finTs;rootWriteActive(root,Object.assign({},p,local),idx,u);sid=u.sessionId||sid;}
       return root;
-    },undefined,false);
-    if(!res.committed)return showToast('⚠️ Le poste a changé sur un autre appareil');if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;closeModal('mo-owner-bonus');
+    },{control:'bonus',preflightPoste:p},false);
+    if(!res.committed)return showToast('⚠️ Le poste a changé sur un autre appareil');if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;closeModal('mo-owner-bonus');finalTs=Number((rootReadActive(res.snapshot.val(),Object.assign({},p,local),idx)||{}).finTs)||0;
     const finTexte=finalTs?ownerFmtClock(finalTs):(local.paused?'EN PAUSE':'—');ownerPersistActivity(p.num+' — 🎁 Bonus offert',nom+' · '+min+' min offertes · Début '+ownerFmtClock(now)+' · Fin prévue '+finTexte+' · Tarif inchangé','0 F',{poste:p.num,client:nom,sessionId:sid,typeActivite:'bonus_offert',bonus:true,bonusOnly:startedNew,dureeSec:min*60,debutTs:now,finPrevueTs:finalTs,montant:0});
     if(startedNew){ownerAnnounceStartOnce(sid,p.num,min,true);showToast('🎁 '+p.num+' bonus '+min+' min · TV confirmée');}
     else{ownerSpeak('Bonus client fidèle. '+ownerSpeechPosteName(p.num)+' reçoit '+min+' minutes supplémentaires.');showToast('🎁 +'+min+' min offertes sur '+p.num+' · recette inchangée');}
     renderControl();renderHome();ownerRenderJournal();
-  }catch(e){console.log('Bonus Patron:',e);showToast('⚠️ Bonus impossible — vérifiez Internet');}
+  }catch(e){console.log('Bonus Patron:',e);showToast('⚠️ Bonus non confirmé : '+(e.message||'vérifiez la prise avant de réessayer'));}
+  finally{ownerBonusInFlight.delete(idx);if(button){button.disabled=false;button.textContent='OFFRIR LE BONUS ✓';}CP1Relay.endTiming(timing);}
 }
 
 function ownerCurrentSessionSnapshot(){
@@ -1451,17 +1456,17 @@ async function ownerConfirmCancel(){
       root=root||{};root.refunded_sessions=root.refunded_sessions||{};root.closed_sessions=root.closed_sessions||{};
       if(sid&&root.refunded_sessions[sid])return root;
       const remote=rootReadActive(root,Object.assign({},p,local),ownerCancelIdx)||{};
-      if(!remote.actif||(sid&&remote.sessionId&&remote.sessionId!==sid))return;
+      if(!remote.actif||(sid&&remote.sessionId&&remote.sessionId!==sid)||(Number(remote.updatedAt||0)!==Number(local.updatedAt||0)))return;
       
       const refund=Math.max(0,todayAmount);
       const ss=freshSessionSnapshotFromRoot(root);ss.recettes=Math.max(0,money(ss.recettes)-refund);ss.parPoste=ownerSubtractPosteBreakdown(ss.parPoste||{},p.num,refund);ss.payStats=ownerSubtractPaymentBreakdown(ss.payStats||{},detail,refund);
-      if(startedKey===dayKey){ss.sessionsParPoste=Object.assign({},ss.sessionsParPoste||{});ss.sessionsParPoste[p.num]=Math.max(0,Math.floor(Number(ss.sessionsParPoste[p.num])||0)-1);if(ss.sessionsParPoste[p.num]===0)delete ss.sessionsParPoste[p.num];}
+      if(startedKey===dayKey&&!local.bonusOnly){ss.sessionsParPoste=Object.assign({},ss.sessionsParPoste||{});ss.sessionsParPoste[p.num]=Math.max(0,Math.floor(Number(ss.sessionsParPoste[p.num])||0)-1);if(ss.sessionsParPoste[p.num]===0)delete ss.sessionsParPoste[p.num];}
       root.sessions=ss;root.daily=root.daily||{};root.daily[dayKey]=deepClone(ss);
       rootWriteActive(root,Object.assign({},p,local),ownerCancelIdx,blankRemoteActive(remote));
       const ann={id:sid,dateKey:dayKey,ts:now,heure:ownerFmtClock(now),poste:p.num,type:p.type||'',client:local.client||'',montant:totalAmount,montantRetireJour:refund,tempsJoueSec:used,tempsRestantSec:rest,raison:reason,gerant:'Patron'};
       let arr=Array.isArray(root.annulations)?root.annulations.slice():[];if(!arr.some(x=>x&&x.id===sid))arr.unshift(ann);root.annulations=arr.slice(0,200);
       root.closed_sessions[sid]={status:'annulee',ts:now,dateKey:dayKey,poste:p.num};root.refunded_sessions[sid]={ts:now,dateKey:dayKey,poste:p.num,montant:refund};return root;
-    },undefined,false);
+    },{control:'bonusCancel',cancelSessionId:sid},false);
     if(!res.committed){showToast('⚠️ Le poste a changé sur un autre appareil');return;}
     if(res.snapshot&&typeof res.snapshot.val==='function')DB._cache=res.snapshot.val()||DB._cache;
     ownerSpeak(ownerSpeechPosteName(p.num)+', temps annulé.');closeModal('mo-owner-cancel');
@@ -1476,7 +1481,7 @@ const ownerStartInFlight=new Set();
 async function ownerConfirmStart(){
   const postes=DB.get('postes')||[],idx=ownerPosteIdx,p=postes[idx];if(!p)return;
   if(ownerStartInFlight.has(idx))return;ownerStartInFlight.add(idx);
-  let sid='',reserved=false,powered=false,autoBonusStartP=0;
+  let sid='',autoBonusStartP=0;
   try{
     const nom=document.getElementById('owner-client').value.trim();
     if(!nom)return showToast('⚠️ Entrez le nom du client');
@@ -1487,21 +1492,10 @@ async function ownerConfirmStart(){
     if(!fbRoot)return showToast('⚠️ Firebase indisponible');
     if(!String(p.devid||'').trim())return showToast('⚠️ '+p.num+' : prise Tuya non configurée. Aucun temps ni recette démarrés.');
     sid=p.num+'-'+Date.now()+'-pat-'+Math.random().toString(36).slice(2,6);
-    const reservation=await fbRoot.transaction(root=>{
-      root=root||{};const r=rootReadActive(root,p,idx)||{};
-      if(gzSharedPlugOccupant(root,p,idx))return undefined;
-      if(Number(r.pausePendingUntil)>Date.now()||r.actif||(r.starting&&Date.now()<Number(r.startingUntil||0))||(r.cleanup&&Date.now()<Number(r.cleanupUntil||0)))return undefined;
-      rootWriteActive(root,p,idx,{actif:false,starting:true,startingUntil:Date.now()+45000,
-        client:nom,sessionId:sid,finTs:0,paused:false,montantSession:0,updatedAt:Date.now()});
-      return root;
-    },undefined,false);
-    if(!reservation||!reservation.committed)return showToast('⚠️ Poste occupé, activation en cours ou prise partagée déjà utilisée par une autre console.');
-    reserved=true;showToast('⏳ Vérification prise '+p.num);
-    powered=await CP1Relay.ready(p);
-    if(!powered)throw new Error('Prise Tuya non confirmée ON : temps non activé'+gzTuyaErrorText());
+    showToast('⏳ Confirmation de la prise '+p.num+' ...');
     const tx=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,p,idx)||{};
-      if(!r.starting||r.sessionId!==sid||r.actif||gzSharedPlugOccupant(root,p,idx))return undefined;
+      if(gzSharedPlugOccupant(root,p,idx)||Number(r.pausePendingUntil)>Date.now()||r.actif||(r.starting&&Date.now()<Number(r.startingUntil||0))||(r.cleanup&&Date.now()<Number(r.cleanupUntil||0)))return undefined;
       const now=Date.now();const state={actif:true,starting:false,startingUntil:0,client:nom,
         finTs:now+min*60000,tempsTotal:min*60,dureeMin:min,paused:false,pauseRemainingSec:0,
         montantSession:prix,montantJourSession:prix,paiementsSession:{[pay]:prix},
@@ -1514,9 +1508,9 @@ async function ownerConfirmStart(){
       ss.payStats[pay]=money(ss.payStats[pay])+prix;
       root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date(now))]=deepClone(ss);
       return root;
-    },undefined,false);
+    },{control:'sale',preflightPoste:p},false);
     if(!tx||!tx.committed)throw new Error('Nouvelle séance détectée : activation annulée');
-    reserved=false;closeModal('mo-owner-start');
+    closeModal('mo-owner-start');
     if(tx.snapshot)DB._cache=tx.snapshot.val()||DB._cache;
     ownerPersistActivity(p.num+' — Session démarrée par le patron',
       nom+' · '+min+' min',prix.toLocaleString('fr-FR')+' F',
@@ -1526,11 +1520,7 @@ async function ownerConfirmStart(){
     showToast('✅ '+p.num+' — prise Tuya ON confirmée, minuteur activé. Vérifie que la TV sort de veille.');
   }catch(e){
     console.warn('Activation Patron:',e);showToast('⚠️ '+(e&&e.message||'Activation impossible'));
-    if(reserved){try{await fbRoot.transaction(root=>{root=root||{};const r=rootReadActive(root,p,idx)||{};
-      if(!r.starting||r.sessionId!==sid)return undefined;
-      rootWriteActive(root,p,idx,blankRemoteActive(r));return root;},undefined,false);}catch(ex){console.warn(ex);}}
-    if(powered&&p.devid){try{const snap=await fbRoot.once('value');const r=rootReadActive(snap.val()||{},p,idx)||{};
-      if(!r.actif&&!r.starting)await ownerReliableOff(p);}catch(ex){console.warn(ex);}}
+    // Une confirmation ambiguë doit être contrôlée, jamais compensée par un OFF aveugle.
   }finally{setTimeout(()=>ownerStartInFlight.delete(idx),650);}
 }
 
@@ -1546,7 +1536,7 @@ async function ownerConfirmPlus(){
   if(btn&&btn.disabled)return;
   if(btn)btn.disabled=true;
   try{
-    const before=(await fbRoot.once('value')).val()||{};
+    const before=DB._cache||{};
     const active=rootReadActive(before,p,idx)||{};
     if(!active.actif||(!active.paused&&Number(active.finTs||0)<=Date.now())){
       showToast('⚠️ Ce poste est maintenant libre ou terminé');return;
@@ -1574,7 +1564,7 @@ async function ownerConfirmPlus(){
       root.sessions=ss;root.daily=root.daily||{};
       root.daily[businessDateKey(new Date())]=deepClone(ss);
       return root;
-    },undefined,false);
+    },{control:'sale',preflightPoste:p},false);
     if(!tx||!tx.committed){showToast('⚠️ Le poste a changé. Actualisez puis réessayez.');return;}
     const saved=tx.snapshot.val()||{};
     DB._cache=saved;
@@ -1597,14 +1587,13 @@ async function ownerResume(i){
   const a=activeForPoste(p,i)||{},sid=a.sessionId||'';
   if(!a.actif||!a.paused)return;
   try{
-    if(p.devid&&!(await ownerTuyaCommand(p,true)))return showToast('⚠️ TV non confirmée ON — temps toujours en pause');
     const tx=await fbRoot.transaction(root=>{
       root=root||{};const r=rootReadActive(root,Object.assign({},p,a),i)||{};
       if(!r.actif||!r.paused||(sid&&r.sessionId!==sid))return undefined;
       const rest=Math.max(0,Number(r.pauseRemainingSec)||0);if(!rest)return undefined;
       rootWriteActive(root,Object.assign({},p,a),i,Object.assign({},r,{paused:false,
         pauseRemainingSec:0,finTs:Date.now()+rest*1000,updatedAt:Date.now()}));return root;
-    },undefined,false);
+    },{control:true,preflightPoste:p},false);
     if(!tx||!tx.committed)return showToast('⚠️ Poste modifié ailleurs');
     ownerSpeak(ownerSpeechPosteName(p.num)+', temps repris.');
     ownerPersistActivity(p.num+' — Reprise par le patron',a.client||'Client','',
@@ -1614,7 +1603,6 @@ async function ownerResume(i){
 }
 
 async function ownerPowerOff(i){
-  return ownerOpenCancel(i); // Arrêt manuel Patron = annulation de vente avec motif.
 
   const postes=DB.get('postes')||[];
   const p=postes[i];
@@ -1656,7 +1644,7 @@ async function ownerPowerOff(i){
         };
       }
       return root;
-    },undefined,false);
+    },{control:'finishTime',closedSessionId:sid},false);
 
     if(!res.committed){
       showToast('⚠️ Le poste a déjà été modifié sur un autre appareil');
@@ -1674,8 +1662,7 @@ async function ownerPowerOff(i){
 
     // La commande physique OFF reste exclusive au Patron. Si Internet/Tuya
     // ne répond pas, elle est mise en file d'attente et réessayée automatiquement.
-    let tvOk=true;
-    if(p.devid)tvOk=await ownerReliableOff(p);
+    const tvOk=true; // The transaction has already verified the native OFF receipt.
     ownerSpeak(ownerSpeechPosteName(p.num)+(tvOk?', télévision éteinte. Temps terminé.':', temps terminé. Extinction de la télévision en attente.'));
 
     renderControl();renderHome();ownerRenderReport();ownerRenderHistory();
@@ -2694,7 +2681,10 @@ window.GymProofFree=(function(){
     if(u.protocol!=='https:'||u.hostname!=='drive.google.com'||!(u.pathname.startsWith('/file/d/')||u.pathname==='/open')){throw new Error('Lien vidéo Google Drive invalide (https://drive.google.com/file/d/...)');}
     if(u.toString().length>1200)throw new Error('Lien Drive trop long');return u.toString();
   }
-  function compressedPhoto(file){return new Promise((resolve,reject)=>{
+  const photoCache=new WeakMap();
+  function compressedPhoto(file){if(!file||typeof file!=='object')return Promise.reject(Error('Photo invalide'));if(!photoCache.has(file)){const pending=compressPhoto(file);photoCache.set(file,pending);pending.catch(()=>photoCache.delete(file));}return photoCache.get(file);}
+  function preparePhoto(file){compressedPhoto(file).catch(()=>{});}
+  function compressPhoto(file){return new Promise((resolve,reject)=>{
     if(!file||!String(file.type||'').startsWith('image/'))return reject(new Error('Choisis une photo valide'));
     if(file.size>14*1024*1024)return reject(new Error('Photo trop lourde (14 Mo maximum à la capture)'));
     const url=URL.createObjectURL(file),im=new Image();
@@ -2721,7 +2711,10 @@ window.GymProofFree=(function(){
     const dataUrl=await compressedPhoto(file);
     if(!token)throw new Error('Connexion Firebase requise');
     const payload={kind:'image/jpeg',dataUrl,createdAt:Date.now(),name:String(file.name||'photo.jpg').slice(0,100)};
-    const resp=await fetch(photoPath(room,sid,base)+'?auth='+encodeURIComponent(token),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const send=key=>fetch(photoPath(room,sid,base)+'?print=silent&auth='+encodeURIComponent(key),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctrl.signal});
+    const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),15000);let resp;
+    try{resp=await send(token);if(resp.status===401)resp=await send(await window.GZ_GYM_GET_TOKEN(true));}
+    finally{clearTimeout(timer);}
     if(!resp.ok)throw new Error('Photo non enregistrée (HTTP '+resp.status+'). '+(resp.status===401||resp.status===403?'Publie les règles Firebase GYM6, puis reconnecte-toi.':'Vérifie Internet puis réessaie.'));
     return {url:'',path:'gym_proofs/'+room+'/'+sid,kind:'photo-db',type:'image/jpeg',name:payload.name,size:dataUrl.length};
   }
@@ -2751,7 +2744,7 @@ window.GymProofFree=(function(){
   document.addEventListener('click',function(ev){const el=ev.target&&ev.target.closest?ev.target.closest('[data-gz-proof]'):null;if(!el)return;
     ev.preventDefault();openProof(el.dataset.gzRoom,el.dataset.gzSid,el.dataset.gzKind,el.dataset.gzUrl).catch(e=>alert('Preuve : '+e.message));
   });
-  return {compressedPhoto,photoPut,videoProof,driveLink,eventHtml,cardHtml,openProof};
+  return {compressedPhoto,preparePhoto,photoPut,videoProof,driveLink,eventHtml,cardHtml,openProof};
 })();
 </script>
 
@@ -2880,7 +2873,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
   }
   window.addEventListener('online',()=>setTimeout(monitorRoomStatusP,1200));window.addEventListener('offline',()=>setStatusP('📶 Problème de connexion Internet — état des prises non vérifiable.','warn'));setInterval(monitorRoomStatusP,10000);setTimeout(monitorRoomStatusP,2500);
 
-  window.GZ_GYM_GET_TOKEN=async()=>{const u=firebase.auth().currentUser;if(!u)throw new Error('Connexion Firebase requise');return u.getIdToken(true);};
+  window.GZ_GYM_GET_TOKEN=async(force=false)=>{const u=firebase.auth().currentUser;if(!u)throw new Error('Connexion Firebase requise');return u.getIdToken(force);};
   window.GZ_GYM_DB_URL=()=>firebaseConfig.databaseURL;
   async function uploadGymProofP(file,sid){
     if(gymProofModeP==='video')return GymProofFree.videoProof(document.getElementById('gym-drive-url-p').value);
@@ -2892,6 +2885,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
       const file=await GZCameraProof.capture(kind);
       if(!file)return;
       gymProofP=file;
+      if(kind==='photo')GymProofFree.preparePhoto(file);
       gymProofModeP=kind;
       const zone=document.getElementById('gym-drive-zone-p');
       zone.style.display=kind==='video'?'block':'none';
@@ -2920,7 +2914,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
 
   window.gymOpenP=function(){try{if(gp().actif)return;fillGymP();openModal('mo-gym-p');}catch(e){console.error(e);showToast('Gymnastique : '+e.message);}};
   function gymStartStatusP(msg){const status=document.getElementById('gym-result-p');if(status)status.textContent=msg;return showToast(msg);}
-  const gymConfirmStartImplP=async function(){const nom=(document.getElementById('gym-client-p').value||'').trim();if(!nom)return gymStartStatusP('⚠️ Entrez le nom du client');if(!gymProofP)return gymStartStatusP('📸 Prends une photo ou filme une vidéo avec la caméra avant ACTIVER');if(gymProofModeP==='video'&&!document.getElementById('gym-drive-url-p').value.trim())return gymStartStatusP('🎥 Colle le lien Drive de la vidéo que tu viens de filmer');const tar=gpTar(gymMinP);if(!tar)return;const now=Date.now(),sid='GYM-'+now+'-pat';gymStartStatusP('⏳ Envoi de la preuve...');try{const proof=await uploadGymProofP(gymProofP,sid);const st={actif:true,client:nom,mouvement:gymMoveP,finTs:now+gymMinP*60000,tempsTotal:gymMinP*60,dureeMin:gymMinP,paused:false,pauseRemainingSec:0,montantSession:tar.prix,ventesParJour:{[businessDateKey(new Date(now))]:tar.prix},paiement:gymPayP,sessionId:sid,startedAt:now,updatedAt:now,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveType:proof.type,preuveNom:proof.name};const tx=await fbRoot.transaction(root=>{root=root||{};if(root.gym&&root.gym.actif)return undefined;root.gym=st;const ss=freshSessionSnapshotFromRoot(root);ss.recettes=money(ss.recettes)+tar.prix;ss.parPoste['Gymnastique']=money(ss.parPoste['Gymnastique'])+tar.prix;ss.sessionsParPoste['Gymnastique']=Math.max(0,Number(ss.sessionsParPoste['Gymnastique'])||0)+1;ss.payStats[gymPayP]=money(ss.payStats[gymPayP])+tar.prix;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(!tx||!tx.committed)return gymStartStatusP('⚠️ Gym déjà occupé');if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerPersistActivity('🏃 Gymnastique — Session démarrée',nom+' · '+gymMoveP+' · '+gymMinP+' min · preuve photo/vidéo enregistrée',tar.prix+' F',{poste:'Gymnastique',client:nom,sessionId:sid,typeActivite:'gym_demarrage',mouvement:gymMoveP,dureeSec:gymMinP*60,montant:tar.prix,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveSalle:currentTenantKey,preuveType:proof.type,heureDebut:now,heureFinPrevue:now+gymMinP*60000});ownerSpeak('Gymnastique activée pour '+gymMinP+' minutes.');closeModal('mo-gym-p');gymStartStatusP('✅ Gym '+gymMinP+' min activé');renderControl();ownerRenderReport();}catch(e){console.log(e);gymStartStatusP('⚠️ '+(e.message||'Activation gym impossible'));}};
+  const gymConfirmStartImplP=async function(){const nom=(document.getElementById('gym-client-p').value||'').trim();if(!nom)return gymStartStatusP('⚠️ Entrez le nom du client');if(!gymProofP)return gymStartStatusP('📸 Prends une photo ou filme une vidéo avec la caméra avant ACTIVER');if(gymProofModeP==='video'&&!document.getElementById('gym-drive-url-p').value.trim())return gymStartStatusP('🎥 Colle le lien Drive de la vidéo que tu viens de filmer');const tar=gpTar(gymMinP);if(!tar)return;const sid='GYM-'+Date.now()+'-pat';gymStartStatusP('⏳ Envoi de la preuve...');try{const proof=await uploadGymProofP(gymProofP,sid);const now=Date.now(),st={actif:true,client:nom,mouvement:gymMoveP,finTs:now+gymMinP*60000,tempsTotal:gymMinP*60,dureeMin:gymMinP,paused:false,pauseRemainingSec:0,montantSession:tar.prix,ventesParJour:{[businessDateKey(new Date(now))]:tar.prix},paiement:gymPayP,sessionId:sid,startedAt:now,updatedAt:now,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveType:proof.type,preuveNom:proof.name};const tx=await fbRoot.transaction(root=>{root=root||{};if(root.gym&&root.gym.actif)return undefined;root.gym=st;const ss=freshSessionSnapshotFromRoot(root);ss.recettes=money(ss.recettes)+tar.prix;ss.parPoste['Gymnastique']=money(ss.parPoste['Gymnastique'])+tar.prix;ss.sessionsParPoste['Gymnastique']=Math.max(0,Number(ss.sessionsParPoste['Gymnastique'])||0)+1;ss.payStats[gymPayP]=money(ss.payStats[gymPayP])+tar.prix;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},{gym:{kind:'start'}},false);if(!tx||!tx.committed)return gymStartStatusP('⚠️ Gym déjà occupé');if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerPersistActivity('🏃 Gymnastique — Session démarrée',nom+' · '+gymMoveP+' · '+gymMinP+' min · preuve photo/vidéo enregistrée',tar.prix+' F',{poste:'Gymnastique',client:nom,sessionId:sid,typeActivite:'gym_demarrage',mouvement:gymMoveP,dureeSec:gymMinP*60,montant:tar.prix,preuveUrl:proof.url,preuvePath:proof.path,preuveKind:proof.kind,preuveSalle:currentTenantKey,preuveType:proof.type,heureDebut:now,heureFinPrevue:now+gymMinP*60000});ownerSpeak('Gymnastique activée pour '+gymMinP+' minutes.');closeModal('mo-gym-p');gymStartStatusP('✅ Gym '+gymMinP+' min activé');renderControl();ownerRenderReport();}catch(e){console.log(e);gymStartStatusP('⚠️ '+(e.message||'Activation gym impossible'));}};
   let gymStartBusyP=false;
   window.gymConfirmStartP=async function(){
     if(gymStartBusyP)return;
@@ -2931,13 +2925,13 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     try{return await gymConfirmStartImplP();}
     finally{gymStartBusyP=false;if(btn){btn.disabled=false;btn.textContent='ACTIVER ✓';}}
   };
-  window.gymPauseP=async function(){const g=gp();if(!g.actif||g.paused)return;const rest=gpRest(g);try{const tx=await fbRoot.transaction(root=>{root=root||{};if(!root.gym||!root.gym.actif)return undefined;root.gym=Object.assign({},root.gym,{paused:true,pauseRemainingSec:rest,finTs:0,updatedAt:Date.now()});return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps mis en pause.');ownerPersistActivity('🏃 Gymnastique — Pause',(g.client||'Client')+' · '+gpFmt(rest)+' restantes','',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_pause'});renderControl();}}catch(e){showToast('⚠️ Pause gym impossible');}};
-  window.gymResumeP=async function(){const g=gp();if(!g.actif||!g.paused)return;const rest=Math.max(1,Number(g.pauseRemainingSec)||0);try{const tx=await fbRoot.transaction(root=>{root=root||{};if(!root.gym||!root.gym.actif||!root.gym.paused)return undefined;root.gym=Object.assign({},root.gym,{paused:false,pauseRemainingSec:0,finTs:Date.now()+rest*1000,updatedAt:Date.now()});return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps repris.');ownerPersistActivity('🏃 Gymnastique — Reprise',g.client||'Client','',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_reprise'});renderControl();}}catch(e){showToast('⚠️ Reprise gym impossible');}};
+  window.gymPauseP=async function(){const g=gp();if(!g.actif||g.paused)return;const rest=gpRest(g);try{const tx=await fbRoot.transaction(root=>{root=root||{};if(!root.gym||!root.gym.actif)return undefined;root.gym=Object.assign({},root.gym,{paused:true,pauseRemainingSec:rest,finTs:0,updatedAt:Date.now()});return root;},{gym:{kind:'pause',sessionId:g.sessionId,updatedAt:g.updatedAt}},false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps mis en pause.');ownerPersistActivity('🏃 Gymnastique — Pause',(g.client||'Client')+' · '+gpFmt(rest)+' restantes','',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_pause'});renderControl();}}catch(e){showToast('⚠️ Pause gym impossible');}};
+  window.gymResumeP=async function(){const g=gp();if(!g.actif||!g.paused)return;const rest=Math.max(1,Number(g.pauseRemainingSec)||0);try{const tx=await fbRoot.transaction(root=>{root=root||{};if(!root.gym||!root.gym.actif||!root.gym.paused)return undefined;root.gym=Object.assign({},root.gym,{paused:false,pauseRemainingSec:0,finTs:Date.now()+rest*1000,updatedAt:Date.now()});return root;},{gym:{kind:'resume',sessionId:g.sessionId,updatedAt:g.updatedAt}},false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps repris.');ownerPersistActivity('🏃 Gymnastique — Reprise',g.client||'Client','',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_reprise'});renderControl();}}catch(e){showToast('⚠️ Reprise gym impossible');}};
   window.gymPlusP=async function(min){const g=gp();if(!g.actif)return;const tar=gpTar(min);if(!tar)return;try{const tx=await fbRoot.transaction(root=>{root=root||{};const x=root.gym||{};if(!x.actif)return undefined;const u=Object.assign({},x);if(u.paused)u.pauseRemainingSec=(Number(u.pauseRemainingSec)||0)+min*60;else u.finTs=(Number(u.finTs)||Date.now())+min*60000;u.tempsTotal=(Number(u.tempsTotal)||0)+min*60;u.montantSession=money(u.montantSession)+tar.prix;const dayKey=businessDateKey(new Date());
     u.ventesParJour=Object.assign({},u.ventesParJour||{});
     if(!Object.keys(u.ventesParJour).length&&u.startedAt&&businessDateKey(new Date(Number(u.startedAt)))===dayKey)u.ventesParJour[dayKey]=money(x.montantSession);
     u.ventesParJour[dayKey]=money(u.ventesParJour[dayKey])+tar.prix;
-    u.updatedAt=Date.now();root.gym=u;const ss=freshSessionSnapshotFromRoot(root);ss.recettes=money(ss.recettes)+tar.prix;ss.parPoste['Gymnastique']=money(ss.parPoste['Gymnastique'])+tar.prix;ss.payStats[g.paiement||'especes']=money(ss.payStats[g.paiement||'especes'])+tar.prix;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, '+min+' minutes supplémentaires ajoutées.');ownerPersistActivity('🏃 Gymnastique — Temps ajouté',(g.client||'Client')+' · +'+min+' min',tar.prix+' F',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_prolongation',montant:tar.prix});showToast('✅ +'+min+' min Gym');renderControl();ownerRenderReport();}}catch(e){showToast('⚠️ Ajout temps Gym impossible');}};
+    u.updatedAt=Date.now();root.gym=u;const ss=freshSessionSnapshotFromRoot(root);ss.recettes=money(ss.recettes)+tar.prix;ss.parPoste['Gymnastique']=money(ss.parPoste['Gymnastique'])+tar.prix;ss.payStats[g.paiement||'especes']=money(ss.payStats[g.paiement||'especes'])+tar.prix;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},{gym:{kind:'add',sessionId:g.sessionId,updatedAt:g.updatedAt}},false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, '+min+' minutes supplémentaires ajoutées.');ownerPersistActivity('🏃 Gymnastique — Temps ajouté',(g.client||'Client')+' · +'+min+' min',tar.prix+' F',{poste:'Gymnastique',sessionId:g.sessionId||'',typeActivite:'gym_prolongation',montant:tar.prix});showToast('✅ +'+min+' min Gym');renderControl();ownerRenderReport();}}catch(e){showToast('⚠️ Ajout temps Gym impossible');}};
   // Annulation Gym : idempotente, limitée à la séance active et à ses ventes DU JOUR.
   // Les recettes TV / les jours précédents ne sont jamais modifiés.
   let gymCancellationPendingP=false;
@@ -2959,6 +2953,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
     const sid=g.sessionId||'',timeLeft=gpRest(g),now=Date.now(),dayKey=businessDateKey(new Date(now));
     if(!sid)return showToast('⚠️ Identifiant de séance absent : annulation protégée');
     gymCancellationPendingP=true;
+    const button=document.querySelector('#mo-gym-cancel-p .btn-ok');if(button){button.disabled=true;button.textContent='ANNULATION EN COURS…';}
     try{
       const tx=await fbRoot.transaction(root=>{
         root=root||{};
@@ -2986,8 +2981,7 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
         if(!arr.some(a=>a&&a.id===sid))arr.unshift(ann);root.annulations=arr.slice(0,200);
         root.refunded_sessions=root.refunded_sessions||{};
         root.refunded_sessions[sid]={ts:now,dateKey:dayKey,poste:'Gymnastique',montant:refund};
-        return root;
-      },undefined,false);
+        return root;},{gym:{kind:'cancel',sessionId:g.sessionId,updatedAt:g.updatedAt}},false);
       if(!tx||!tx.committed)return showToast('⚠️ Cette séance a déjà été modifiée ou annulée');
       if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;
       const refunded=money((DB.get('gym')||{}).refundToday);
@@ -3000,11 +2994,11 @@ const postes=DB.get('postes')||[],p=postes[i],a=activeForPoste(p,i)||{};if(!p||!
       renderControl();ownerRenderDashboard();ownerRenderReport();
       showToast('↩ Gym annulée · -'+refunded.toLocaleString('fr-FR')+' F sur la recette Gym du jour');
     }catch(e){console.error('Annulation Gym',e);showToast('⚠️ Annulation non enregistrée : '+(e.message||'erreur Firebase'));}
-    finally{gymCancellationPendingP=false;}
+    finally{gymCancellationPendingP=false;if(button){button.disabled=false;button.textContent='CONFIRMER ANNULATION';}}
   };
   function renderGymP(){const box=document.getElementById('control-postes');if(!box)return;const old=document.getElementById('gym-card-p'),g=gp(),rest=gpRest(g),expired=g.actif&&rest===0;const sig=JSON.stringify(g)+'|'+expired;if(old&&old.dataset.gymState===sig){const clock=old.querySelector('.gz-gym-clock');if(clock)clock.textContent=g.actif?gpFmt(rest):'00:00';const fill=old.querySelector('.gz-yellow-fill');if(fill){fill.style.width=(g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)):0)+'%';fill.className='gz-yellow-fill '+(g.actif?gzProgressTone(rest,!!g.paused):'');}return;}if(old)old.remove();const card=document.createElement('div');card.dataset.gymState=sig;card.id='gym-card-p';card.className='ctl-card gym-card '+(g.actif?(g.paused?'paused':'active'):'');const proof=GymProofFree.cardHtml(g,currentTenantKey);card.innerHTML=`<div class="gym-head"><div><b>🏃  GYMNASTIQUE</b><small>Vélo · Abdos · Jambes · Bras</small></div><span>${g.paused?'PAUSE':(g.actif?'EN COURS':'LIBRE')}</span></div><div class="gz-gym-remaining-label">⏱ TEMPS RESTANT — ${g.paused?'EN PAUSE':'DÉCOMPTE ACTIF'}</div><div class="gym-timer-row"><strong class="gz-gym-clock">${g.actif?gpFmt(rest):'00:00'}</strong><em>${g.actif?money(g.montantSession)+' F':''}</em></div><div class="gz-yellow-progress"><div class="gz-yellow-fill ${g.actif?gzProgressTone(rest,!!g.paused):''}" style="width:${g.actif&&Number(g.tempsTotal)>0?Math.min(100,Math.max(0,rest/Number(g.tempsTotal)*100)).toFixed(2):0}%"></div></div><div class="gym-client">${g.actif?escp(g.client||'Client')+' · '+escp(g.mouvement||'Gymnastique'):'Disponible · 30 min = 100 F · 1 h = 200 F'}</div>${proof}<div class="gym-actions">${expired?'<span>⏳ Temps terminé — libération automatique</span>':!g.actif?`<button onclick="gymOpenP()">DÉMARRER</button>`:(g.paused?`<button class="gz-gym-action" onclick="gymResumeP()">▶ REPRENDRE</button>`:`<button class="gz-gym-action" onclick="gymPauseP()">⏸ PAUSE</button>`)}${g.actif&&!expired?`<button class="gz-gym-action" onclick="gymPlusP(30)">+ 30 min / 100 F</button><button class="gz-gym-action" onclick="gymPlusP(60)">+ 1 h / 200 F</button><button class="gz-gym-action gz-gym-cancel" onclick="gymOpenCancelP()">↩ ANNULER LA SÉANCE</button>`:''}</div><div class="gym-no-cancel">🔒 Annulation réservée au Patron · Motif obligatoire · Sans effacer les anciennes recettes.</div>`;box.appendChild(card);}
   const oldRC=window.renderControl;window.renderControl=function(){const gymSaved=document.getElementById('gym-card-p');const r=oldRC&&oldRC.apply(this,arguments);if(gymSaved&&!document.getElementById('gym-card-p')){const grid=document.getElementById('control-postes');if(grid)grid.appendChild(gymSaved);}try{document.querySelectorAll('#control-postes .ctl-card').forEach(c=>{const badge=c.querySelector('.b-off'),type=c.querySelector('.ctl-type');if(badge&&type&&!/LIBRE/i.test(type.textContent))type.textContent=type.textContent+' · LIBRE';});renderGymP();}catch(e){console.log(e);}return r;};
-  async function finishGymP(){if(gymTimerBusyP)return;const g=gp();if(!g.actif||gpRest(g)>0)return;gymTimerBusyP=true;try{const sid=g.sessionId||'';const tx=await fbRoot.transaction(root=>{root=root||{};const x=root.gym||{};if(!x.actif||(sid&&x.sessionId&&x.sessionId!==sid))return undefined;root.gym=Object.assign({},x,{actif:false,finTs:0,paused:false,pauseRemainingSec:0,updatedAt:Date.now(),endedAt:Date.now()});const ss=freshSessionSnapshotFromRoot(root);ss.count=Math.max(0,Number(ss.count)||0)+1;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},undefined,false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps terminé.');ownerPersistActivity('🏃 Gymnastique — Temps écoulé',(g.client||'Client')+' · '+(g.mouvement||'Gymnastique')+' · session terminée',money(g.montantSession)+' F',{poste:'Gymnastique',client:g.client||'',sessionId:sid,typeActivite:'gym_terminee',mouvement:g.mouvement||'',preuveUrl:g.preuveUrl||'',preuvePath:g.preuvePath||'',preuveKind:g.preuveKind||'',preuveSalle:currentTenantKey});renderControl();ownerRenderReport();}}catch(e){console.log(e);}finally{gymTimerBusyP=false;}}
+  async function finishGymP(){if(gymTimerBusyP)return;const g=gp();if(!g.actif||gpRest(g)>0)return;gymTimerBusyP=true;try{const sid=g.sessionId||'';const tx=await fbRoot.transaction(root=>{root=root||{};const x=root.gym||{};if(!x.actif||(sid&&x.sessionId&&x.sessionId!==sid))return undefined;root.gym=Object.assign({},x,{actif:false,finTs:0,paused:false,pauseRemainingSec:0,updatedAt:Date.now(),endedAt:Date.now()});const ss=freshSessionSnapshotFromRoot(root);ss.count=Math.max(0,Number(ss.count)||0)+1;root.sessions=ss;root.daily=root.daily||{};root.daily[businessDateKey(new Date())]=deepClone(ss);return root;},{gym:{kind:'finish',sessionId:g.sessionId,updatedAt:g.updatedAt}},false);if(tx&&tx.committed){if(tx.snapshot&&typeof tx.snapshot.val==='function')DB._cache=tx.snapshot.val()||DB._cache;ownerSpeak('Gymnastique, temps terminé.');ownerPersistActivity('🏃 Gymnastique — Temps écoulé',(g.client||'Client')+' · '+(g.mouvement||'Gymnastique')+' · session terminée',money(g.montantSession)+' F',{poste:'Gymnastique',client:g.client||'',sessionId:sid,typeActivite:'gym_terminee',mouvement:g.mouvement||'',preuveUrl:g.preuveUrl||'',preuvePath:g.preuvePath||'',preuveKind:g.preuveKind||'',preuveSalle:currentTenantKey});renderControl();ownerRenderReport();}}catch(e){console.log(e);}finally{gymTimerBusyP=false;}}
   setInterval(()=>{try{if(loggedIn){finishGymP();const c=document.getElementById('gym-card-p');if(c)renderGymP();}}catch(_e){}},1000);
 
   ensureStatusBannerP();
@@ -3252,12 +3246,13 @@ testerPrise=async function(){const out=document.getElementById('test-result');ou
 </script><script>
 const rootReadAutoY=rootReadActive;rootReadActive=function(root,p,i){const s=rootReadAutoY(root,p,i);return CP1Relay.applyPause(s,root?.auto_pauses?.[remotePostKey(p?.num)]);};
 const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.applyPause(activeAutoY(p,i),DB._cache.auto_pauses?.[remotePostKey(p?.num)]);};
-</script><script src="./actions-v03.js?v=cp1-boutons-1.6"></script><script src="pending-pause.js"></script>
-<script src="./cp1-v12-ui.js?v=cp1-sync-1.8"></script>
-<script src="./cp1-feedback.js?v=click-only-20261107"></script>
-<script src="./cp1-expiry.js?v=1.0"></script>
-</body>
+</script><script src="./actions-v03.js?v=cp1-publication-v12-20261110"></script><script src="pending-pause.js?v=cp1-publication-v12-20261110"></script>
+<script src="./cp1-v12-ui.js?v=cp1-publication-v12-20261110"></script>
+<script src="./cp1-feedback.js?v=cp1-publication-v12-20261110"></script>
+<script src="./cp1-expiry.js?v=cp1-publication-v12-20261110"></script>
+<script>document.title='GameZone CP1 — Patron';const version=document.getElementById('gz-build-version');if(version)version.textContent='CP1 V12 · relais 2.4 · version validée';</script><script>(function(){for(const [name,label]of [['ownerPause','Pause'],['ownerResume','Reprise'],['pausePoste','Pause'],['reprendrePoste','Reprise'],['cp1SaveTime','Sauvegarde'],['cp1RestoreTime','Restauration']]){const original=window[name];if(typeof original!=='function')continue;window[name]=async function(...args){if(name==='pausePoste'&&args[1]===true)return original.apply(this,args);const timing=CP1Relay.beginTiming(label);try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script><script>(function(){for(const name of ['gymConfirmStartP','gymConfirmCancelP']){const original=window[name];window[name]=async function(...args){const timing=CP1Relay.beginTiming(name.includes('Cancel')?'Annulation Gym':'Démarrage Gym');try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script></body>
 </html>
+
 
 
 

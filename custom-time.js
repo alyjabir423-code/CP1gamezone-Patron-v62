@@ -54,3 +54,4 @@ root.GameZoneCustom={quote,status,observePower};
   return box.outerHTML;
  };
 })(typeof globalThis!=='undefined'?globalThis:this);
+

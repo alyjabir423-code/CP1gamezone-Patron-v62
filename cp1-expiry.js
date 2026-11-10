@@ -23,7 +23,7 @@ function closeExpired(root,stamp=Date.now()){
  root.daily=root.daily||{};root.daily[key]=clone(ss);return root;
 }
 async function check(){
- if(running||typeof DB==='undefined'||!DB._cache||!CP1Relay.currentUid())return;
+ if(running||CP1Relay.diagnosticsBusy?.()||typeof DB==='undefined'||!DB._cache||!CP1Relay.currentUid())return;
  const cache=DB._cache,stamp=Date.now();
  if(!CP1Relay.entries(cache.postes||[]).some(({p,i})=>expired(cache.active_by_poste?.[encodeURIComponent(p.num)]||cache.active_postes?.[i],stamp)))return;
  running=true;
@@ -37,3 +37,4 @@ w.addEventListener('online',check);
 w.addEventListener('pageshow',check);
 setInterval(check,3000);
 })(window);
+

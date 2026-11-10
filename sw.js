@@ -8,3 +8,4 @@ self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin)return;if(/\/cp1-audio-[a-z]+\.mp3$/.test(u.pathname)){e.respondWith(caches.open(AUDIO_CACHE).then(async c=>(await c.match(e.request))||fetch(e.request)));}else e.respondWith(fetch(e.request,{cache:'no-store'}));});
 self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(self.clients.matchAll({type:'window'}).then(async rows=>{const row=rows.find(x=>x.url.startsWith(self.registration.scope));if(row)return row.focus();return self.clients.openWindow(self.registration.scope);}));});
 
+
