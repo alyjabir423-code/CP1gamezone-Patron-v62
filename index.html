@@ -361,7 +361,31 @@ button:focus-visible,.ni:focus-visible{outline:2px solid var(--gz-jaune);outline
 #gz-notify-btn{border-color:#a67d3e!important;background:#3e311d!important;color:#fde047!important}
 
 </style>
-<script src="./youssef-relay.js?v=quota-20261110-2"></script></head>
+<script src="./youssef-relay.js?v=quota-20261110-2"></script><script id="gz-session-display-20261110">
+(function (w) {
+  'use strict';
+  const number = value => {
+    const n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+  function details(state) {
+    const a = state || {};
+    const payments = Object.values(a.paiementsSession || {}).reduce((sum, value) => sum + number(value), 0);
+    const paid = Math.round(number(a.montantSession) || payments);
+    const bonus = a.bonus ? Math.floor(number(a.gzAutoBonusGrantedMin) || number(a.bonusMinutesAdded) || number(a.bonusDurationMin)) : 0;
+    const unknown = paid === 0 && !a.bonusOnly && number(a.gzAutoBonusGrantedMin) > 0;
+    return { paid, bonus, unknown };
+  }
+  function label(state) {
+    const value = details(state);
+    const amount = value.unknown ? 'Montant à confirmer' : value.paid.toLocaleString('fr-FR') + ' F';
+    return amount + (value.bonus > 0 ? ' + ' + value.bonus + ' min de bonus' : '');
+  }
+  w.GZSessionDisplay = Object.freeze({ details, label });
+})(window);
+</script>
+<style id="gz-session-display-style">.ctl-money,.pc-amount{white-space:normal;text-align:right;max-width:52%;overflow-wrap:anywhere}</style>
+</head>
 <body>
 
 <div id="fb-loading" style="position:fixed;inset:0;background:#0d0d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:900;gap:10px">
@@ -1199,7 +1223,7 @@ function renderControl(){
       : `<button class="ctl-btn ctl-pause" onclick="ownerPause(${i})">⏸ PAUSE</button><button class="ctl-btn ctl-plus" onclick="ownerOpenPlus(${i})">＋TPS</button><button class="ctl-btn ctl-pause" onclick="ownerOpenReduce(${i})">− TEMPS</button><button class="ctl-btn ctl-cancel" onclick="ownerOpenCancel(${i})">ANNULER</button><button class="ctl-btn ctl-off" onclick="ownerPowerOff(${i})">⏻ OFF TV</button>`;
     return `<div class="ctl-card ${cls}">
       <div class="ctl-head"><div><div class="ctl-num">${esc(CP1Relay.displayName(p))}</div><div class="ctl-type">${esc(gzPosteTypeLabel(p))}</div></div><span class="badge ${a.actif?'b-on':'b-off'}">${badge}</span></div>
-      <div class="ctl-timer-row"><div class="ctl-timer ${a.paused?'pause':(a.actif?'on':'free')}">${timer}</div>${a.actif?`<div class="ctl-money">${amount.toLocaleString('fr-FR')} F</div>`:''}</div>
+      <div class="ctl-timer-row"><div class="ctl-timer ${a.paused?'pause':(a.actif?'on':'free')}">${timer}</div>${a.actif?`<div class="ctl-money">${GZSessionDisplay.label(a)}</div>`:''}</div>
       <div class="ctl-progress"><div class="ctl-progress-bar" style="width:${pct}%;background:${progressColor}"></div></div>
       <div class="ctl-client">${a.actif?esc(a.client||'Client'):'Disponible'}</div>
       ${ownerBonusNotice(a)}
@@ -3253,6 +3277,7 @@ const activeAutoY=activeForPoste;activeForPoste=function(p,i){return CP1Relay.ap
 <script src="./cp1-expiry.js?v=cp1-publication-v12-20261110"></script>
 <script>document.title='GameZone CP1 — Patron';const version=document.getElementById('gz-build-version');if(version)version.textContent='CP1 V12 · relais 2.4 · version validée';</script><script>(function(){for(const [name,label]of [['ownerPause','Pause'],['ownerResume','Reprise'],['pausePoste','Pause'],['reprendrePoste','Reprise'],['cp1SaveTime','Sauvegarde'],['cp1RestoreTime','Restauration']]){const original=window[name];if(typeof original!=='function')continue;window[name]=async function(...args){if(name==='pausePoste'&&args[1]===true)return original.apply(this,args);const timing=CP1Relay.beginTiming(label);try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script><script>(function(){for(const name of ['gymConfirmStartP','gymConfirmCancelP']){const original=window[name];window[name]=async function(...args){const timing=CP1Relay.beginTiming(name.includes('Cancel')?'Annulation Gym':'Démarrage Gym');try{return await original.apply(this,args);}finally{CP1Relay.endTiming(timing);}};}})();</script><script>const quotaVersion=document.getElementById('gz-build-version');if(quotaVersion)quotaVersion.textContent+=' · QUOTA Q1 · CORRECTIF TEMPS R1';</script></body>
 </html>
+
 
 
 
